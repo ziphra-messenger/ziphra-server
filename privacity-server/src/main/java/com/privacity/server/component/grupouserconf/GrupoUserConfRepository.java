@@ -1,0 +1,23 @@
+package com.privacity.server.component.grupouserconf;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+
+import com.privacity.server.model.Grupo;
+import com.privacity.server.model.GrupoUserConf;
+import com.privacity.server.model.GrupoUserConfId;
+import com.privacity.server.security.Usuario;
+
+
+
+
+// This will be AUTO IMPLEMENTED by Spring into a Bean called userRepository
+// CRUD refers Create, Read, Update, Delete
+
+public interface GrupoUserConfRepository extends CrudRepository<GrupoUserConf, GrupoUserConfId> {
+
+
+}

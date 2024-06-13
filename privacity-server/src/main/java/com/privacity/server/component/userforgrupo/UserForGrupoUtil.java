@@ -1,0 +1,83 @@
+package com.privacity.server.component.userforgrupo;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+
+import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.server.component.common.service.facade.FacadeComponent;
+import com.privacity.server.exceptions.ValidationException;
+import com.privacity.server.model.Grupo;
+import com.privacity.server.model.UserForGrupo;
+import com.privacity.server.model.UserForGrupoId;
+import com.privacity.server.security.Usuario;
+
+import lombok.NoArgsConstructor;
+
+@Service
+@NoArgsConstructor
+public class UserForGrupoUtil {
+
+	
+	@Autowired @Lazy
+	private FacadeComponent comps;
+	
+	public UserForGrupo getValidation(Usuario u, long idGrupo ) throws ValidationException {
+		
+		UserForGrupo ufgO = comps.repo().userForGrupo().findByIdPrimitive(idGrupo, u.getIdUser());
+		
+		if ( ufgO == null ) {
+			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO);	
+		}
+		
+		return ufgO;
+	}
+	
+	public UserForGrupo getValidationGetAll(Usuario u, long idGrupo ) throws ValidationException {
+		
+		UserForGrupo ufgO = comps.repo().userForGrupo().findByIdPrimitive(idGrupo, u.getIdUser());
+		
+		if ( ufgO == null ) {
+			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO);	
+		}
+		
+		return ufgO;
+	}
+	public Usuario puedeEnviarMensaje(String u, Grupo g, List<UserForGrupo> usersForGrupo ) throws ValidationException {
+		
+		
+		for (UserForGrupo ufg : usersForGrupo) {
+			if (ufg.getUserForGrupoId().getUser().getUsername().equals(u)) {
+				
+				if (ufg.getRole().equals(GrupoRolesEnum.READONLY)) return null;
+				
+				return ufg.getUserForGrupoId().getUser();
+			}
+		}
+
+		throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO);
+		
+
+	}
+	
+//	public String getNicknameForGrupo(Grupo g, Usuario u) {
+//		
+//		Optional<UserForGrupo> ufcO = comps.repo().userForGrupo().findById(new UserForGrupoId(u, g));
+//		
+//		if (!ufcO.isPresent()) return u.getNickname();
+//		
+//		if ( ufcO.get().getNicknameGrupo() == null ) {
+//			return u.getNickname();
+//		}
+//		return ufcO.get().getNicknameGrupo();
+//			
+//	}
+
+
+	
+	
+}
