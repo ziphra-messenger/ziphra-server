@@ -3,6 +3,9 @@ package com.privacity.server.component.message;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.security.DeclareRoles;
+import javax.annotation.security.RolesAllowed;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
@@ -12,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.config.ConstantProtocolo;
 import com.privacity.common.dto.GrupoDTO;
-import com.privacity.common.dto.IdDTO;
 import com.privacity.common.dto.IdMessageDTO;
 import com.privacity.common.dto.MediaDTO;
 import com.privacity.common.dto.MessageDTO;
@@ -39,6 +41,7 @@ import lombok.extern.java.Log;
 @Service
 @AllArgsConstructor
 @Log	
+
 public class MessageValidationService {
 	
 	@Autowired @Lazy
@@ -180,6 +183,9 @@ public class MessageValidationService {
 	public MessageDTO[] loadMessages(MessageDTO request) throws Exception {
 		return comps.process().message().loadMessages(request);
 	}
+	
+	
+	
 	
 	public MessageDTO send(MessageDTO request) throws Exception {
 		

@@ -48,6 +48,16 @@ public interface UserForGrupoRepository extends CrudRepository<UserForGrupo, Use
 			+ " 	Select ufg.userForGrupoId.user.idUser From "
 			+ " 	UserForGrupo ufg "
 			+ " 	WHERE ufg.userForGrupoId.grupo.idGrupo = ?1 "
+			+ " 	"
+			+ ")")
+	List<String> findByForGrupoAll(Long idGrupo);
+	
+	
+	@Query(" SELECT u.username FROM Usuario u "
+			+ " where u.idUser in ( "
+			+ " 	Select ufg.userForGrupoId.user.idUser From "
+			+ " 	UserForGrupo ufg "
+			+ " 	WHERE ufg.userForGrupoId.grupo.idGrupo = ?1 "
 			+ " 	and ufg.userForGrupoId.user.idUser != ?2 "
 			+ ")")
 	List<String> findByForGrupoMinusCreator(Long idGrupo, Long idUsuario);

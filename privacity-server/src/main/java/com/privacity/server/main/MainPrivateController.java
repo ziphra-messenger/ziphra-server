@@ -41,6 +41,7 @@ import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysService;
 import com.privacity.server.component.grupo.GrupoValidationService;
 import com.privacity.server.component.message.MessageValidationService;
+import com.privacity.server.component.model.request.GrupoBlockRemotoRequestLocalDTO;
 import com.privacity.server.component.myaccount.MyAccountValidationService;
 import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.component.requestid.RequestIdValidationService;
@@ -114,6 +115,7 @@ public class MainPrivateController extends ControllerBase{
 		getMapaMetodos().put("/grupo/removeMe", GrupoValidationService.class.getMethod("removeMe", IdDTO.class));
 		getMapaMetodos().put("/grupo/delete", GrupoValidationService.class.getMethod("delete", IdDTO.class));
 		getMapaMetodos().put("/grupo/list/members", GrupoValidationService.class.getMethod("getMembers", GrupoDTO.class));
+		getMapaMetodos().put("/grupo/blockGrupoRemoto", GrupoValidationService.class.getMethod("blockGrupoRemoto", GrupoBlockRemotoRequestLocalDTO.class));
 		
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_SAVE_GENERAL_CONFIGURATION, GrupoValidationService.class.getMethod("saveGrupoGeneralConfiguration", GrupoGralConfDTO.class));
 		getMapaMetodos().put("/grupo/saveGrupoUserConf", GrupoValidationService.class.getMethod("saveGrupoUserConf", GrupoUserConfDTO.class));

@@ -183,7 +183,14 @@ public class WebSocketSenderService {
 			
 		}
 		
-		List<String> lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(Long.parseLong(idGrupo), Long.parseLong( idUsuario));
+		List<String> lista;
+		
+		if (messageDTO.isSystemMessage() ) {
+			lista = comps.repo().userForGrupo().findByForGrupoAll(Long.parseLong(idGrupo));
+		}else {
+			lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(Long.parseLong(idGrupo), Long.parseLong( idUsuario));	
+		}
+		
 		
 		lista.stream().forEach( username -> 
 		senderMessageToGrupoMinusCreatorThread(username,componente, action, messageDTO)

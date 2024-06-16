@@ -20,14 +20,17 @@ import com.privacity.common.dto.IdDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.UserForGrupoDTO;
+import com.privacity.common.dto.UsuarioDTO;
 import com.privacity.common.dto.WrittingDTO;
 import com.privacity.common.dto.request.GrupoAddUserRequestDTO;
 import com.privacity.common.dto.request.GrupoInvitationAcceptRequestDTO;
 import com.privacity.common.dto.request.GrupoNewRequestDTO;
 import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysValidation;
+import com.privacity.server.component.model.request.GrupoBlockRemotoRequestLocalDTO;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.AES;
@@ -63,6 +66,32 @@ public class GrupoValidationService {
 		
 		
 	}
+	
+	
+	@com.privacity.common.RolesAllowed({GrupoRolesEnum.ADMIN,GrupoRolesEnum.MODERATOR} )
+	public void blockGrupoRemoto (GrupoBlockRemotoRequestLocalDTO grupoBlockRemotoRequestLocalDTO) throws Exception {
+
+
+
+			MessageDTO mensajeD = comps.webSocket().sender().buildSystemMessage(
+					grupoBlockRemotoRequestLocalDTO.getGrupo(), 
+					"BLOQUEO DE EMERGENCIA");
+			Message mensaje = comps.common().mapper().doit(mensajeD, comps.util().usuario().getUsuarioSystem(), grupoBlockRemotoRequestLocalDTO.getGrupo());
+			comps.process().message().sendNormal(comps.util().usuario().getUsuarioSystem().getIdUser(), mensaje, grupoBlockRemotoRequestLocalDTO.getGrupo().getIdGrupo());
+			
+			GrupoDTO grupoDTO = comps.process().grupo().getGrupoDTO(grupoBlockRemotoRequestLocalDTO.getUsuarioLoggued(), grupoBlockRemotoRequestLocalDTO.getUserForGrupo());
+			
+		ProtocoloDTO p;
+			p = comps.webSocket().sender().buildProtocoloDTO(
+					ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
+					"/grupo/blockGrupoRemoto");
+		
+				
+				comps.webSocket().sender().senderToGrupoMinusCreator( comps.util().usuario().getUsuarioSystem().getIdUser(), grupoBlockRemotoRequestLocalDTO.getGrupo().getIdGrupo(), p);
+
+	}
+	
+	
 	
 	public void saveGrupoGralConfLock (GrupoDTO request) throws ValidationException {
 		if ( request.getLock().isEnabled()) {
@@ -128,7 +157,7 @@ public class GrupoValidationService {
 					g, 
 					"UN ADMINISTRADOR HA MODIFICADO LA CONFIGURACION DE BLOQUEO DEL GRUPO");
 			Message mensaje = comps.common().mapper().doit(mensajeD, comps.util().usuario().getUsuarioSystem(), g);
-			comps.process().message().sendNormal(u.getIdUser(), mensaje, g.getIdGrupo());
+			comps.process().message().sendNormal(comps.util().usuario().getUsuarioSystem().getIdUser(), mensaje, g.getIdGrupo());
 			
 			GrupoDTO grupoDTO = comps.process().grupo().getGrupoDTO(u, v);
 			
@@ -139,7 +168,7 @@ public class GrupoValidationService {
 		
 				p.setSaveGrupoGralConfLockResponseDTO(c);
 				
-				comps.webSocket().sender().senderToGrupoMinusCreator( u.getIdUser(), g.getIdGrupo(), p);
+				comps.webSocket().sender().senderToGrupoMinusCreator( comps.util().usuario().getUsuarioSystem().getIdUser(), g.getIdGrupo(), p);
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new ValidationException(ExceptionReturnCode.GRUPO_GRUPOID_BADFORMAT);
@@ -149,7 +178,7 @@ public class GrupoValidationService {
 		
 	}
 	
-	
+
 	public int getMembersOnline(GrupoDTO request) throws PrivacityException {
 	
 		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());		
@@ -198,6 +227,7 @@ public class GrupoValidationService {
 		comps.repo().grupo().save(g);
 	}
 	
+
 	public void removeMe(IdDTO request) throws PrivacityException {
 		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
 
@@ -273,6 +303,8 @@ public class GrupoValidationService {
 		 comps.process().grupo().sentInvitation(g, request.getRole() , usuarioLogged,UserInvitationCode, aes);
 		
 	}	
+	
+
 	public GrupoDTO newGrupo(GrupoNewRequestDTO request) throws Exception {
 		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
 		
@@ -295,7 +327,7 @@ public class GrupoValidationService {
 		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
 		return comps.process().grupo().getIdsMisGrupos(usuarioLogged);
 	}
-
+	
 	public GrupoDTO[] getGrupoById(IdDTO[] idDTO) throws Exception {
 		GrupoDTO[] r = new GrupoDTO[idDTO.length];
 		

@@ -1,25 +1,35 @@
 package com.privacity.server.component.common;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.privacity.common.RolesAllowed;
 import com.privacity.common.config.ConstantProtocolo;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.interfaces.GrupoRoleInterface;
+import com.privacity.common.interfaces.UserForGrupoRoleInterface;
+import com.privacity.common.interfaces.UsuarioRoleInterface;
+import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.encrypt.PrivacityIdServices;
 import com.privacity.server.exceptions.ValidationException;
+import com.privacity.server.model.Grupo;
+import com.privacity.server.model.UserForGrupo;
+import com.privacity.server.security.Usuario;
 import com.privacity.server.util.LocalDateAdapter;
 
 public abstract class ControllerBase {
@@ -30,6 +40,11 @@ public abstract class ControllerBase {
 	@Autowired
 	@Lazy
 	private RequestIdUtilService requestIdUtil;
+	
+	@Autowired
+	@Lazy
+	private FacadeComponent comps;
+	
 	
 	protected Map<String, Method> getMapaMetodos() {
 		return mapaMetodos;
@@ -85,11 +100,44 @@ public abstract class ControllerBase {
 				if(getEncryptIds()) {
 					getPrivacityIdServices().transformarDesencriptarOut(dtoObject);
 					getPrivacityIdServices().transformarDesencriptarOutOrder(dtoObject);
+				}
+					
+					if (dtoObject instanceof UsuarioRoleInterface) {
+						((UsuarioRoleInterface) dtoObject).setUsuarioLoggued(comps.util().usuario().getUsuarioLoggedValidate());
+					}
+
+					if (dtoObject instanceof GrupoRoleInterface) {
+						
+						Optional<Grupo> grupoO = comps.repo().grupo().findById(
+								
+								comps.util().grupo().convertIdGrupoStringToLong(((GrupoRoleInterface) dtoObject).getIdGrupo()));
+						
+						if (grupoO.isPresent()) {
+							
+					
+						((GrupoRoleInterface) dtoObject).setGrupo(grupoO.get()
+
+						);	}
+					}
+					
+					if (dtoObject instanceof UserForGrupoRoleInterface) {
+						((UserForGrupoRoleInterface) dtoObject).setUserForGrupo(
+						comps.repo().userForGrupo().findByIdPrimitive(
+								comps.util().grupo().convertIdGrupoStringToLong(((GrupoRoleInterface) dtoObject).getIdGrupo())
+,
+								((UsuarioRoleInterface) dtoObject).getUsuarioLoggued().getIdUser()));
+						
+						
+					}
+					Annotation[] ann = getMapaMetodos().get(request.getAction()).getAnnotations();
+			        for (int i=0; i < ann.length ; i++) {
+			        	if (ann[i] instanceof RolesAllowed) {
+			        		invokeUnderTrace(dtoObject, ann[i]);
+			        		break;
+			        	}
+			        }
 					
 					objetoRetorno =getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()),  dtoObject);
-				}else {
-					objetoRetorno = getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject);
-				}	
 				
 			}
 
@@ -104,9 +152,13 @@ public abstract class ControllerBase {
 		} catch (Exception e) {
 			e.printStackTrace();
 			
-			p.setCodigoRespuesta(e.getCause() + " | ");	
-			if (e.getCause() != null) {
-				p.setCodigoRespuesta(p.getCodigoRespuesta() + e.getCause().getMessage());	
+			if ( e.getCause() != null) {
+				p.setCodigoRespuesta(e.getCause().getMessage());
+			}else if( e.getMessage() != null && !e.getMessage().equals("")) {
+				p.setCodigoRespuesta(e.getMessage());
+				//p.setMensajeRespuesta(e.getCause());
+			}else {
+				p.setCodigoRespuesta("ERROR SIN CLASIFICAR");
 			}
 			
 		} 
@@ -177,4 +229,67 @@ public static void main(String...strings ) {
 	protected boolean showLog(ProtocoloDTO request) {
 		return true;
 	}	
+	
+    protected void invokeUnderTrace(Object o, Annotation ann2) 
+      throws ValidationException {
+        System.out.println("----->AppConfigurationMethodRolValidationInterceptor");
+        
+        RolesAllowed ann = (( RolesAllowed)ann2);
+
+        
+
+        Grupo g=null;
+        Usuario u = null;
+        UserForGrupo ufg = null;
+        
+
+        	if (o instanceof GrupoRoleInterface) {
+        		g = ((GrupoRoleInterface)o).getGrupo();
+        		
+        		if ( g == null ) {
+        			throw new ValidationException(ExceptionReturnCode.GRUPO_NOT_EXISTS);	
+        		}
+        		
+				
+			}
+        	if (o instanceof UsuarioRoleInterface) {
+        		u = ((UsuarioRoleInterface)o).getUsuarioLoggued();
+        		
+				
+			}
+        	
+        	if (o instanceof UserForGrupoRoleInterface) {
+        		ufg = ((UserForGrupoRoleInterface)o).getUserForGrupo();
+        		
+        		if ( ufg == null ) {
+        			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO);	
+        		}
+				
+			}
+        
+        
+        
+
+        
+        boolean isOk= false;
+        
+        for (int i=0; i < ann.value().length ; i++) {
+        	if (ann.value()[i].equals(ufg.getRole())){
+        		isOk=true;
+        		break;
+        	}
+        }
+        if (!isOk) {
+        	throw new ValidationException(ExceptionReturnCode.GRUPO_ROLE_NOT_ALLOW_THIS_ACTION );
+        }
+        
+
+            
+
+
+
+            
+
+    }
+
 }
