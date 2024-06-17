@@ -1,7 +1,6 @@
 package com.privacity.server.component.model.request;
 
 import com.privacity.common.annotations.PrivacityId;
-import com.privacity.common.dto.request.GrupoBlockRemotoRequestDTO;
 import com.privacity.common.interfaces.GrupoRoleInterface;
 import com.privacity.common.interfaces.UserForGrupoRoleInterface;
 import com.privacity.common.interfaces.UsuarioRoleInterface;
@@ -16,9 +15,6 @@ public class GrupoBlockRemotoRequestLocalDTO  implements GrupoRoleInterface, Usu
 
 	@PrivacityId
 	public String idGrupo;
-	@PrivacityId
-	public String idUsuario;
-
 	
 	public Usuario usuarioLoggued;
 	public Grupo grupo;

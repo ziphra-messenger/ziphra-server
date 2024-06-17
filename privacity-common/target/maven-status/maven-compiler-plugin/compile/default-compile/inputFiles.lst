@@ -11,7 +11,6 @@ C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\e
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\dto\servergralconf\SGCInvitationCode.java
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\dto\MediaDTO.java
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\dto\GrupoInvitationDTO.java
-C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\dto\request\GrupoBlockRemotoRequestDTO.java
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\dto\request\PublicKeyByInvitationCodeRequestDTO.java
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\config\SystemGralConfURLs.java
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\dto\response\InitGrupoResponse.java

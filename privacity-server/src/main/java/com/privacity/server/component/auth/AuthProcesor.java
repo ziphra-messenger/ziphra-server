@@ -102,13 +102,14 @@ public class AuthProcesor {
 
 		//String userIdEnc = privacityIdServices.getAES(usuarioDB.getIdUser().toString());
 		
+		
 		LoginDataDTO data = new LoginDataDTO(
 				jwt,
 				usuarioDB.getIdUser().toString(),
 				usuarioDB.getNickname(),
 				usuarioDB.getUserInvitationCode().getInvitationCode(),
 				usuarioDB.getEncryptKeys().getPublicKey(),
-				comps.common().mapper().doit(info.getMyAccountConf()));
+				comps.common().mapper().doit(comps.repo().user().findById(usuarioDB.getIdUser()).get().getMyAccountConf()));
 		
 		privacityLogguer.write(data);
 		if(encryptIds) {

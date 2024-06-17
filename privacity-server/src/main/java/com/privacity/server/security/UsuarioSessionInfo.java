@@ -5,18 +5,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.privacity.common.dto.AESDTO;
+import com.privacity.common.dto.MyAccountConfDTO;
 import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.server.main.AESToUse;
 import com.privacity.server.model.MyAccountConf;
+import com.privacity.server.util.MapperService;
 
 import lombok.Data;
 
 @Data
 public class UsuarioSessionInfo {
+	
 
 	private Usuario usuarioDB;
 	
-	private MyAccountConf myAccountConf;
 	
 	private String sessionId;
 	
@@ -31,6 +33,11 @@ public class UsuarioSessionInfo {
 	
 	private AESDTO sessionAES;
 	
-	private ConcurrentMap<String,RequestIdDTO> requestIds = new ConcurrentHashMap<String,RequestIdDTO>();;
+	private ConcurrentMap<String,RequestIdDTO> requestIds = new ConcurrentHashMap<String,RequestIdDTO>();
+
+	public MyAccountConf getMyAccountConf() {
+		// TODO Auto-generated method stub
+		return usuarioDB.getMyAccountConf();
+	};
 
 }

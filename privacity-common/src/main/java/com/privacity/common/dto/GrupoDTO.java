@@ -15,8 +15,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class GrupoDTO{
 	@PrivacityId
-	
 	public String idGrupo;
+	@JsonInclude(Include.NON_NULL)
 	public String name;
 
 	@JsonInclude(Include.NON_NULL)
@@ -46,6 +46,7 @@ public class GrupoDTO{
 	//olds
 	
 	//public String nicknameForGrupo;
+	@JsonInclude(Include.NON_NULL)
 	public String alias;
 	
 	@JsonInclude(Include.NON_NULL)

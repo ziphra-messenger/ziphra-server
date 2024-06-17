@@ -141,7 +141,7 @@ public class UsuarioSessionInfoService{
     		t.setUsuarioDB(user);
     		
 
-    		t.setMyAccountConf(user.getMyAccountConf());
+    		t.getUsuarioDB().setMyAccountConf(user.getMyAccountConf());
     		
     		this.userSessionIds.put(user.getUsername(),t);
     		

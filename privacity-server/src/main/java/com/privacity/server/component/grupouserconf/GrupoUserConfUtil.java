@@ -27,13 +27,13 @@ public class GrupoUserConfUtil{
 		
 		Optional<GrupoUserConf> o = comps.repo().grupoUserConf().findById(new GrupoUserConfId(usuarioLogged, grupo));
 		
-		//if ( o.isPresent() ) {
+		if ( o.isPresent() ) {
 			return comps.common().mapper().doit(o.get());
-		//}
+		}
 		
-		//GrupoUserConfDTO r = new GrupoUserConfDTO();
-		//r.setIdGrupo(grupo.getIdGrupo()+"");
-		//return r;
+		GrupoUserConfDTO r = new GrupoUserConfDTO();
+		r.setIdGrupo(grupo.getIdGrupo()+"");
+		return r;
 	}
 	
 	public GrupoUserConf getDefaultGrupoUserConf(Grupo g, Usuario u) {
