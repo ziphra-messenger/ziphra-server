@@ -100,7 +100,7 @@ public class MainPrivateController extends ControllerBase{
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_GET_IDS_MY_GRUPOS, GrupoValidationService.class.getMethod("getIdsMisGrupos"));
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_GET_GRUPO_BY_ID, GrupoValidationService.class.getMethod("getGrupoById",IdDTO.class));
 		
-		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_GET_GRUPO_BY_IDS, GrupoValidationService.class.getMethod("getGrupoById",IdDTO[].class));
+		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_GET_GRUPO_BY_IDS, GrupoValidationService.class.getMethod("getGrupoByIds",IdDTO[].class));
 		
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_WRITTING, GrupoValidationService.class.getMethod("startWritting",WrittingDTO.class));
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_STOP_WRITTING, GrupoValidationService.class.getMethod("stopWritting",WrittingDTO.class));

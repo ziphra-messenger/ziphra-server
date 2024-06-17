@@ -70,6 +70,7 @@ public interface UserForGrupoRepository extends CrudRepository<UserForGrupo, Use
 			 " 	Select ufg From "
 			+ " 	UserForGrupo ufg "
 			+ " 	WHERE ufg.userForGrupoId.grupo.idGrupo = ?1 "
+			+ " 	and ufg.userForGrupoId.grupo.deleted = false "
 			+ " 	and ufg.userForGrupoId.user.idUser = ?2 ")
 			
 	UserForGrupo findByIdPrimitive(Long idGrupo, Long idUsuario);

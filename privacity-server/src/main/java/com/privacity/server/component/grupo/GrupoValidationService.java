@@ -328,7 +328,7 @@ public class GrupoValidationService {
 		return comps.process().grupo().getIdsMisGrupos(usuarioLogged);
 	}
 	
-	public GrupoDTO[] getGrupoById(IdDTO[] idDTO) throws Exception {
+	public GrupoDTO[] getGrupoByIds(IdDTO[] idDTO) throws Exception {
 		GrupoDTO[] r = new GrupoDTO[idDTO.length];
 		
 		for (int i = 0 ; i < idDTO.length; i++) {
