@@ -2,23 +2,19 @@ package com.privacity.server.component.grupo;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.privacity.common.dto.GrupoDTO;
-import com.privacity.common.dto.IdDTO;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
+import com.privacity.server.component.model.request.GrupoIdLocalDTO;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoGralConfLock;
-import com.privacity.server.model.GrupoGralConfPassword;
 import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.security.Usuario;
 
@@ -44,8 +40,8 @@ public class GrupoUtilService {
 	
 
 	
-	public Grupo getGrupoByIdValidation(IdDTO idGrupo) throws ValidationException {
-		return getGrupoByIdValidation(idGrupo.getId());
+	public Grupo getGrupoByIdValidation(GrupoIdLocalDTO idGrupo) throws ValidationException {
+		return getGrupoByIdValidation(idGrupo.getIdGrupo());
 	}
 	
 	public Grupo getGrupoByIdValidation(String idGrupo) throws ValidationException {
@@ -111,9 +107,9 @@ public class GrupoUtilService {
 		g.getGralConf().setAudiochatMaxTime(300);
 		g.getGralConf().setBlackMessageAttachMandatory(false);
 		g.getGralConf().setChangeNicknameToNumber(false);
-		g.getGralConf().setDownloadAllowImage(true);
-		g.getGralConf().setDownloadAllowAudio(true);
-		g.getGralConf().setDownloadAllowVideo(true);
+		g.getGralConf().setDownloadAllowImage(ConfigurationStateEnum.ALLOW);
+		g.getGralConf().setDownloadAllowAudio(ConfigurationStateEnum.ALLOW);
+		g.getGralConf().setDownloadAllowVideo(ConfigurationStateEnum.ALLOW);
 		g.getGralConf().setHideMessageDetails(false);
 		g.getGralConf().setHideMessageState(false);
 		g.getGralConf().setTimeMessageMandatory(false);

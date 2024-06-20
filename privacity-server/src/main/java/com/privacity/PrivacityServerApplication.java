@@ -1,17 +1,10 @@
 package com.privacity;
 
-import java.util.concurrent.Executors;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 @SpringBootApplication
 //@ComponentScan(basePackages = "com.privacity.server.component.grupo")
@@ -21,6 +14,13 @@ public class PrivacityServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PrivacityServerApplication.class, args);
+	}
+	
+	@Bean
+	public HttpFirewall getHttpFirewall() {
+	    StrictHttpFirewall strictHttpFirewall = new StrictHttpFirewall();
+	    strictHttpFirewall.setAllowSemicolon(true);
+	    return strictHttpFirewall;
 	}
 /*
 	@Bean

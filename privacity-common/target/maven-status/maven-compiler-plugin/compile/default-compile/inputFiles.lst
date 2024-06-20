@@ -32,6 +32,7 @@ C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\d
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\config\ConstantValidation.java
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\annotations\PrivacityId.java
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\dto\MyAccountConfDTO.java
+C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\dto\request\GrupoInfoNicknameRequestDTO.java
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\enumeration\GrupoRolesEnum.java
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\dto\servergralconf\SystemGralConf.java
 C:\privacity\privacity2024\privacity-common\src\main\java\com\privacity\common\dto\servergralconf\SGCGrupoGralConfDTO.java

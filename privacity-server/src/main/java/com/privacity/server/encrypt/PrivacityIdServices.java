@@ -26,9 +26,9 @@ import com.privacity.server.util.UtilService;
 @Service
 public class PrivacityIdServices {
 
-	private final String AesKey="1";
-	private final String AesSalt="1";
-	private final int AesIteration=1;
+	private static final String AesKey="1";
+	private static final String AesSalt="1";
+	private static final int AesIteration=1;
 	private Cipher decrypt;
 	private Cipher encrypt;
 

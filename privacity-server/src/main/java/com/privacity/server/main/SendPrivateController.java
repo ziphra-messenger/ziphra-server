@@ -2,7 +2,9 @@ package com.privacity.server.main;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,14 +22,24 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.privacity.common.RolesAllowed;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
+import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.interfaces.GrupoRoleInterface;
+import com.privacity.common.interfaces.UserForGrupoRoleInterface;
+import com.privacity.common.interfaces.UsuarioRoleInterface;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.message.MessageValidationService;
 import com.privacity.server.encrypt.PrivacityIdServices;
+import com.privacity.server.exceptions.ValidationException;
+import com.privacity.server.model.Grupo;
+import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.security.UserDetailsImpl;
+import com.privacity.server.security.Usuario;
 import com.privacity.server.util.LocalDateAdapter;
 
 
@@ -164,8 +176,37 @@ public class SendPrivateController {
 						comps.common().privacityId().transformarDesencriptarOut(dtoObject);
 						comps.common().privacityId().transformarDesencriptarOutOrder(dtoObject);
 					}
+					
+					//////////////////
+					
+						Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+
+
+						Grupo grupo = null;
+						Optional<Grupo> grupoO = comps.repo().grupo().findById(
+								
+								comps.util().grupo().convertIdGrupoStringToLong((dtoObject).getIdGrupo()));
+						
+						if (grupoO.isPresent()) {
+					
+							grupo =grupoO.get();
+
+							}
+						
+					
+
+						
+						UserForGrupo ufg = comps.repo().userForGrupo().findByIdPrimitive(
+								grupo.getIdGrupo(),
+
+								usuarioLogged.getIdUser());
+						
+						
+					
+					//////////
 				
-				objetoRetorno =comps.validation().message().send(dtoObject);
+					invokeUnderTrace(grupo,usuarioLogged,ufg);
+				objetoRetorno =comps.validation().message().send(dtoObject,grupo,usuarioLogged,ufg);
 					
 				
 			
@@ -233,6 +274,40 @@ public class SendPrivateController {
 		return true;
 	}
 
+	   protected void invokeUnderTrace(  Grupo g, Usuario u, UserForGrupo ufg ) 
+			      throws ValidationException {
+			        System.out.println("----->AppConfigurationMethodRolValidationInterceptor");
+			        
+
+
+
+
+			        		
+			        		if ( g == null ) {
+			        			throw new ValidationException(ExceptionReturnCode.GRUPO_NOT_EXISTS);	
+			        		}
+			        		
+							
+	
+
+							
+		
+			        	
+
+			        		
+			        		if ( ufg == null ) {
+			        			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO);	
+			        		}
+							
+
+			        
+			        
+			        
+
+			        
+			        if (ufg.getRole().equals(GrupoRolesEnum.READONLY))
+			        	throw new ValidationException(ExceptionReturnCode.GRUPO_ROLE_NOT_ALLOW_THIS_ACTION );
+			        }
 
 
 }

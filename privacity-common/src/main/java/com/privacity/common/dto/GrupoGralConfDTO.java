@@ -30,11 +30,11 @@ public class GrupoGralConfDTO {
 	@JsonInclude(Include.NON_NULL)
 	public boolean blackMessageAttachMandatory;
 	@JsonInclude(Include.NON_NULL)
-	public boolean downloadAllowImage;
+	public ConfigurationStateEnum downloadAllowImage;
 	@JsonInclude(Include.NON_NULL)
-	public boolean downloadAllowAudio;
+	public ConfigurationStateEnum downloadAllowAudio;
 	@JsonInclude(Include.NON_NULL)
-	public boolean downloadAllowVideo;
+	public ConfigurationStateEnum downloadAllowVideo;
 	@JsonInclude(Include.NON_NULL)
 	public boolean changeNicknameToNumber;
 	@JsonInclude(Include.NON_NULL)

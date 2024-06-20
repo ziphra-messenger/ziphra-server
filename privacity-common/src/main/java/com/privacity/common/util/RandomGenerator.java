@@ -10,6 +10,10 @@ import com.privacity.common.enumeration.RandomGeneratorType;
 public class RandomGenerator {
 	
 
+	private RandomGenerator() {
+		super();
+	}
+
 	public static String AESKey(SGCAESDTO a) {
 		return generate(
 				a.getRandomGeneratorType(),
@@ -32,25 +36,26 @@ public class RandomGenerator {
 	}		
 	
 	public static int betweenTwoNumber(int min, int max) {
-		return (int) ((Math.random() * (
-				max
-				- max)) 
-				+ min);
+		return getNewRandom(min, max);
 	}	
 	
 	public static String generate(RandomGeneratorType caseSetEnum, int min, int max) {
 		if (RandomGeneratorType.ALPHANUMERIC.equals(caseSetEnum)) {
-			return RandomStringUtils.randomAlphanumeric(new Random().nextInt(max-min) + min);	
+			return RandomStringUtils.randomAlphanumeric(getNewRandom(min, max));	
 		}else if (RandomGeneratorType.NUMERIC.equals(caseSetEnum)) {
-			return RandomStringUtils.randomNumeric(new Random().nextInt(max-min) + min);
+			return RandomStringUtils.randomNumeric(getNewRandom(min, max));
 		}else if (RandomGeneratorType.ALPHABETIC.equals(caseSetEnum)) {
-			return RandomStringUtils.randomAlphabetic(new Random().nextInt(max-min) + min);
+			return RandomStringUtils.randomAlphabetic(getNewRandom(min, max));
 		}else if (RandomGeneratorType.ASCII.equals(caseSetEnum)) {
-			return RandomStringUtils.randomAscii(new Random().nextInt(max-min) + min);
+			return RandomStringUtils.randomAscii(getNewRandom(min, max));
 		}
 		return null;
 
 
 		
+	}
+
+	private static int getNewRandom(int min, int max) {
+		return new Random().nextInt(max-min) + min;
 	}		
 }

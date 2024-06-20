@@ -9,6 +9,7 @@ import com.privacity.common.dto.EncryptKeysDTO;
 import com.privacity.common.dto.LockDTO;
 import com.privacity.common.dto.MyAccountConfDTO;
 import com.privacity.common.dto.UserInvitationCodeDTO;
+import com.privacity.common.dto.request.LoginRequestDTO;
 import com.privacity.common.dto.request.MyAccountNicknameRequestDTO;
 import com.privacity.common.dto.response.MyAccountGenerateInvitationCodeResponseDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
@@ -77,11 +78,11 @@ public class MyAccountValidationService {
 		
 	}
 	
-	public void savePassword(String request) throws ValidationException{
+	public void savePassword(LoginRequestDTO request) throws ValidationException{
 		
 		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
 		
-		String newPassword = comps.util().passwordEncoder().encode(request);
+		String newPassword = comps.util().passwordEncoder().encode(request.getPassword());
 		
 		usuarioLogged.getUsuarioPassword().setPassword(newPassword);
 		

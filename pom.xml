@@ -43,7 +43,7 @@
     
     <module>privacity-common</module>
           
-
+    <module>privacity-requestid</module>
       
   </modules>
     

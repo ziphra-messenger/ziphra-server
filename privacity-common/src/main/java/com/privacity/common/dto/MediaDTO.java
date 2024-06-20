@@ -1,7 +1,10 @@
 package com.privacity.common.dto;
 
+import java.util.Arrays;
+
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
+import com.privacity.common.enumeration.MediaTypeEnum;
 
 import lombok.Data;
 
@@ -23,11 +26,19 @@ public class MediaDTO {
     
     public byte miniatura[];
     
-	public String mediaType;
+	public MediaTypeEnum mediaType;
+
 	@Override
 	public String toString() {
-		return "MediaDTO [idGrupo=" + idGrupo + ", idMessage=" + idMessage + ", mediaType=" + mediaType + "]";
+		return "MediaDTO [idGrupo=" + idGrupo + ", idMessage=" + idMessage + ", downloadable=" + downloadable
+				+ ", data=" + 
+				
+				 
+				
+				", miniatura=" + Arrays.toString(miniatura) + ", mediaType="
+				+ mediaType + "]";
 	}
+	
 
 
 

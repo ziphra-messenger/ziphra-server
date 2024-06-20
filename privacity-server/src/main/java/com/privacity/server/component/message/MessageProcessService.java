@@ -164,7 +164,9 @@ public class MessageProcessService {
 			response.getMessagesDetailDTO()[i].setIdMessage(idMessage+"");
 			//response.getMessagesDetailDTO()[i].setIdMessageDetail(d.getMessageDetailId().getIdMessageDetail()+"");
 			
-			response.getMessagesDetailDTO()[i].setUsuarioDestino(comps.common().mapper().doit(d.getMessageDetailId().getUserDestino()));
+			response.getMessagesDetailDTO()[i].setUsuarioDestino(
+					comps.common().mapper().doitForGrupo(grupo, d.getMessageDetailId().getUserDestino())
+					);
 
 			response.getMessagesDetailDTO()[i].setEstado(d.getState().toString());
 

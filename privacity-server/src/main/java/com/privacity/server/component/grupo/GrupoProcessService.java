@@ -321,7 +321,7 @@ public class GrupoProcessService  {
 
 	public InitGrupoResponse initGrupo(Usuario u, Grupo g) throws Exception {
 
-		List<Usuario> usuarios = comps.repo().userForGrupo().findByUsuariosForGrupo(g.getIdGrupo());
+		List<Usuario> usuarios = comps.repo().userForGrupo().findByUsuariosForGrupoDeletedFalse(g.getIdGrupo());
 
 		InitGrupoResponse response = new InitGrupoResponse();
 		response.setUsersDTO(new UsuarioDTO[usuarios.size()]); 
@@ -391,29 +391,31 @@ public class GrupoProcessService  {
 		return u;
 	}
 
+//
+//	private void removeMeAnonimo(Usuario usuarioLogged, Grupo grupo) throws PrivacityException {
+//		List<Message> l = comps.repo().message().findByMessageIdGrupoUserAnonimo(grupo, usuarioLogged);
+//		
+////		for (Message m : l) {
+////			comps.process().message().deleteForEveryone(m);
+////		}
+//	}
 
-	private void removeMeAnonimo(Usuario usuarioLogged, Grupo grupo) throws PrivacityException {
-		List<Message> l = comps.repo().message().findByMessageIdGrupoUserAnonimo(grupo, usuarioLogged);
-		
-//		for (Message m : l) {
-//			comps.process().message().deleteForEveryone(m);
-//		}
-	}
 
-
-	public void removeMe(Usuario usuarioLogged, Usuario usuarioSystem, UserForGrupo userForGrupo) throws Exception {
-		Grupo grupo = userForGrupo.getUserForGrupoId().getGrupo();
-		removeMeAnonimo(usuarioLogged, grupo);
+	public void removeMe(Usuario usuarioLogged, Usuario usuarioSystem, Grupo grupo, UserForGrupo userForGrupo) throws Exception {
+		//Grupo grupo = userForGrupo.getUserForGrupoId().getGrupo();
+		//removeMeAnonimo(usuarioLogged, grupo);
 		
 		//mediaRepository.deleteAllMyMediaByGrupo(grupo, usuarioLogged);
-		comps.repo().media().deleteAllMyMediasByGrupo(grupo.getIdGrupo(), usuarioLogged.getIdUser());
-		comps.repo().messageDetail().deleteAllMyMessagesDetailByGrupo(grupo, usuarioLogged);
-		comps.repo().grupoUserConf().deleteById(new GrupoUserConfId(usuarioLogged,grupo));
-		comps.repo().message().deleteAllMyMessagesByGrupo(grupo, usuarioLogged);
+		//comps.repo().media().deleteAllMyMediasByGrupo(grupo.getIdGrupo(), usuarioLogged.getIdUser());
+		comps.repo().messageDetail().deleteLogicAllMyMessagesDetailByGrupo(grupo, usuarioLogged);
+		//comps.repo().grupoUserConf().deleteById(new GrupoUserConfId(usuarioLogged,grupo));
 		
-		comps.repo().userForGrupo().delete(userForGrupo);
+		comps.repo().message().deleteLogicAllMyMessagesByGrupo(grupo, usuarioLogged);
+		
+		userForGrupo.setDeleted(true);
+		comps.repo().userForGrupo().save(userForGrupo);
 
-		List<Usuario> usuarios = comps.repo().userForGrupo().findByUsuariosForGrupo(grupo.getIdGrupo());
+		List<Usuario> usuarios = comps.repo().userForGrupo().findByUsuariosForGrupoDeletedFalse(grupo.getIdGrupo());
 		//avisar q se fue, borrar todos los mensajes y sacarlo del grupo
 		
 		GrupoRemoveMeResponseDTO r = new GrupoRemoveMeResponseDTO();

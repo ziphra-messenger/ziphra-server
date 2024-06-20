@@ -85,13 +85,13 @@ public interface MessageDetailRepository extends CrudRepository<MessageDetail, M
 	//void deleteAllMyMediaByGrupo(Grupo grupo, Usuario usuario );	
 	@Transactional
 	@Modifying
-	@Query("DELETE FROM MessageDetail e	WHERE e.messageDetailId.message.messageId.grupo = ?1 "
+	@Query("Update MessageDetail e	set e.deleted=true WHERE e.messageDetailId.message.messageId.grupo = ?1 "
 			+ " and e.messageDetailId.message in (  "
 			+ " select u FROM Message u where "
 			+ " u.userCreation = ?2  "
 			+ " and u.messageId.grupo = ?1 )")
 	
-	void deleteAllMyMessagesDetailByGrupo(Grupo grupo, Usuario usuarioLogged);
+	void deleteLogicAllMyMessagesDetailByGrupo(Grupo grupo, Usuario usuarioLogged);
 
 	@Transactional
 	@Modifying

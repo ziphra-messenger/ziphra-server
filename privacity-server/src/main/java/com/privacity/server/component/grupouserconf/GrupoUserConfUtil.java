@@ -51,8 +51,9 @@ public class GrupoUserConfUtil{
 		
 		conf.setBlackMessageRecived(GrupoUserConfEnum.GRUPO_FALSE);
 		conf.setAnonimoRecived(GrupoUserConfEnum.GRUPO_FALSE);
-
-		
+conf.setDownloadAllowAudio(GrupoUserConfEnum.GRUPO_FALSE);
+conf.setDownloadAllowVideo(GrupoUserConfEnum.GRUPO_FALSE);
+conf.setDownloadAllowImage(GrupoUserConfEnum.GRUPO_FALSE);
 		return conf;
 
 	}

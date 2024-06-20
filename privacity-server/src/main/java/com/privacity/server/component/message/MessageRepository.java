@@ -37,10 +37,10 @@ public interface MessageRepository extends CrudRepository<Message, MessageId> {
 
 	@Transactional
 	@Modifying
-	@Query("DELETE FROM  Message u where "
+	@Query("update Message u set u.deleted=true where "
 			+ " u.userCreation = ?2  "
 			+ " and u.messageId.grupo = ?1 ")
-	void deleteAllMyMessagesByGrupo(Grupo grupo, Usuario usuarioLogged);
+	void deleteLogicAllMyMessagesByGrupo(Grupo grupo, Usuario usuario);
 
 	@Query("SELECT u FROM Message u where "
 			+ " u.userCreation = ?2  "

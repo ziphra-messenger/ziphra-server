@@ -24,6 +24,7 @@ import com.privacity.common.interfaces.GrupoRoleInterface;
 import com.privacity.common.interfaces.UserForGrupoRoleInterface;
 import com.privacity.common.interfaces.UsuarioRoleInterface;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
+import com.privacity.server.component.model.request.GrupoIdLocalDTO;
 import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.encrypt.PrivacityIdServices;
 import com.privacity.server.exceptions.ValidationException;
@@ -136,7 +137,16 @@ public abstract class ControllerBase {
 			        		break;
 			        	}
 			        }
-					
+			        
+			        System.out.println("dtoObject deserializado = " + dtoObject.toString());
+					if (showLog(request)) {
+						if ( dtoObject instanceof GrupoIdLocalDTO[]) {
+							for (int i = 0 ; i < ((GrupoIdLocalDTO[]) dtoObject).length ; i ++) {
+								 System.out.println("dtoObject array deserializado = " +  ((GrupoIdLocalDTO[]) dtoObject)[i].toString());
+							}
+						}
+						
+					}
 					objetoRetorno =getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()),  dtoObject);
 				
 			}

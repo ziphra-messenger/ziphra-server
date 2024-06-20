@@ -1,5 +1,6 @@
 package com.privacity.server.model;
 
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
@@ -28,6 +29,13 @@ public class GrupoUserConf {
 	
 	private GrupoUserConfEnum blackMessageRecived;
 	private GrupoUserConfEnum anonimoRecived;
+	
+	@Column(nullable = false)
+	private GrupoUserConfEnum downloadAllowImage;
+	@Column(nullable = false)
+	private GrupoUserConfEnum downloadAllowAudio;
+	@Column(nullable = false)
+	private GrupoUserConfEnum downloadAllowVideo;
 	
 
 

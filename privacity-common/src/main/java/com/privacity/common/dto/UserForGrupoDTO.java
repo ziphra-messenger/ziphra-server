@@ -24,13 +24,13 @@ public class UserForGrupoDTO {
 	public GrupoRolesEnum role;
 	public AESDTO aesDTO;
 	@JsonInclude(Include.NON_NULL)
-    private String nicknameGrupo;
+    private String nickname;
     @JsonInclude(Include.NON_NULL)
     private String alias;
 	@Override
 	public String toString() {
-		return "UserForGrupoDTO [idGrupo=" + idGrupo + ", usuario=" + usuario + ", role=" + role + ", nicknameGrupo="
-				+ nicknameGrupo + ", alias=" + alias + "]";
+		return "UserForGrupoDTO [idGrupo=" + idGrupo + ", usuario=" + usuario + ", role=" + role + ", nickname="
+				+ nickname + ", alias=" + alias + "]";
 	}	
 	
 }

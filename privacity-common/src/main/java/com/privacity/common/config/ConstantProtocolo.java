@@ -42,7 +42,7 @@ public class ConstantProtocolo {
 	public final static String PROTOCOLO_ACTION_GRUPO_WRITTING = "/grupo/writting/start";
 	public final static String PROTOCOLO_ACTION_GRUPO_BLOCK_REMOTO = "/grupo/blockGrupoRemoto";
 	 
-	
+	public static final String PROTOCOLO_ACTION_GRUPO_SAVE_NICKNAME = "/grupo/save/nickname";
 	public final static String PROTOCOLO_ACTION_GRUPO_HOW_MANY_MEMBERS_ONLINE = "/grupo/online/count";
 	
 	

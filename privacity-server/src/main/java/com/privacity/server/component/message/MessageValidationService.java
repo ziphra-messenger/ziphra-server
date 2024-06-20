@@ -186,32 +186,14 @@ public class MessageValidationService {
 	
 	
 	
-	
-	public MessageDTO send(MessageDTO request) throws Exception {
+
+	public MessageDTO send(MessageDTO request, Grupo grupo, Usuario usuarioLogged, UserForGrupo ufg) throws Exception {
 		
 		Date inicio = new Date();
 		
-		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo()); 
-
-
-		List<UserForGrupo> usersForGrupo = comps.repo().userForGrupo().findByForGrupo(idGrupo);
-		
-		Grupo grupo = comps.util().grupo().getGrupoByUsersForGrupo(usersForGrupo);
-		
-
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-		Usuario usuarioLogged = comps.util().userForGrupo().puedeEnviarMensaje(userDetail.getUsername(), grupo,usersForGrupo);
-		
-		if (usuarioLogged == null) {
-			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_CANT_SEND_MESSAGE_READ_ONLY);	
-		}
+		List<UserForGrupo> usersForGrupo = comps.repo().userForGrupo().findByForGrupo(grupo.getIdGrupo());
 		Message m = comps.common().mapper().doit(request, usuarioLogged,grupo,usersForGrupo, true);
-	
-		MessageDTO r = comps.process().message().send(usuarioLogged.getIdUser(), m, idGrupo);
+		MessageDTO r = comps.process().message().send(usuarioLogged.getIdUser(), m, grupo.getIdGrupo());
 		
 		Date fin = new Date();
 		

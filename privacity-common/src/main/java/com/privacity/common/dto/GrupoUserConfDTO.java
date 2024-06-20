@@ -31,6 +31,11 @@ public class GrupoUserConfDTO {
 	public GrupoUserConfEnum blackMessageRecived;
 	public GrupoUserConfEnum anonimoRecived;
 	
+	
+	public GrupoUserConfEnum downloadAllowImage;
+	public GrupoUserConfEnum downloadAllowAudio;
+	public GrupoUserConfEnum downloadAllowVideo;
+	
 	public String alias;
 
 	

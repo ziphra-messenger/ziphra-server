@@ -40,9 +40,9 @@ public class GrupoGralConf implements Serializable{
 	private int audiochatMaxTime;
 	private boolean blackMessageAttachMandatory;
 
-	private boolean downloadAllowImage;
-	private boolean downloadAllowAudio;
-	private boolean downloadAllowVideo;
+	private ConfigurationStateEnum downloadAllowImage;
+	private ConfigurationStateEnum downloadAllowAudio;
+	private ConfigurationStateEnum downloadAllowVideo;
 	
 	private boolean changeNicknameToNumber;
 	private boolean hideMessageDetails;

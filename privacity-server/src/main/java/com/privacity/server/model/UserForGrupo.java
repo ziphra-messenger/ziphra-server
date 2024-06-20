@@ -31,7 +31,11 @@ public class UserForGrupo {
     
     private AES aes;
 
+    //para el grupo
      private String alias;
+     //para el usuario
+     private String nickname;
+     private boolean deleted;
    
     private PasswordGrupoTypeEnum passwordGrupoType;
     private String passwordGrupo; // lo pide al ingresar...

@@ -23,7 +23,8 @@ public interface UserForGrupoRepository extends CrudRepository<UserForGrupo, Use
 
 	@Query("SELECT u.userForGrupoId.grupo.idGrupo FROM UserForGrupo u "
 			+ "WHERE u.userForGrupoId.user.idUser = ?1"
-			+ " and u.userForGrupoId.grupo.deleted = false")
+			+ " and u.userForGrupoId.grupo.deleted = false "
+	      + " and u.deleted = false ")
 	List<Long> findIdGrupoByUserForGrupoIdUser(Long usuarioId);
 
 	// olds 
@@ -33,23 +34,26 @@ public interface UserForGrupoRepository extends CrudRepository<UserForGrupo, Use
 	@Query("SELECT u.userForGrupoId.grupo FROM UserForGrupo u WHERE u.userForGrupoId.user.username = ?1")
 	List<Grupo> findByGrupoByUsername(String username);
 	
-	@Query("SELECT u.userForGrupoId.user FROM UserForGrupo u WHERE u.userForGrupoId.grupo.idGrupo = ?1")
-	List<Usuario> findByUsuariosForGrupo(Long idGrupo);
+	@Query("SELECT u.userForGrupoId.user FROM UserForGrupo u "
+			+ " WHERE u.userForGrupoId.grupo.idGrupo = ?1 "
+			+ " and u.deleted = false ")
+	List<Usuario> findByUsuariosForGrupoDeletedFalse(Long idGrupo);
 	
 	/*
 	 * 	@Query("SELECT u FROM UserForGrupo u WHERE u.userForGrupoId.grupo.idGrupo = ?1"
 			+ " and u.userForGrupoId.grupo.delete == false ") 
 	 */
-	@Query("SELECT u FROM UserForGrupo u WHERE u.userForGrupoId.grupo.idGrupo = ?1")
+	@Query("SELECT u FROM UserForGrupo u WHERE u.userForGrupoId.grupo.idGrupo = ?1 "
+			+ " and u.deleted = false")
 	List<UserForGrupo> findByForGrupo(Long idGrupo);
 	
 	@Query(" SELECT u.username FROM Usuario u "
 			+ " where u.idUser in ( "
 			+ " 	Select ufg.userForGrupoId.user.idUser From "
 			+ " 	UserForGrupo ufg "
-			+ " 	WHERE ufg.userForGrupoId.grupo.idGrupo = ?1 "
+			+ " 	WHERE ufg.userForGrupoId.grupo.idGrupo = ?1 and ufg.deleted=false "
 			+ " 	"
-			+ ")")
+			+ " )")
 	List<String> findByForGrupoAll(Long idGrupo);
 	
 	

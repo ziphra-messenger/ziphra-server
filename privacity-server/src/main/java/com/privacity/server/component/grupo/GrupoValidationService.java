@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import com.privacity.common.dto.IdDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.UserForGrupoDTO;
-import com.privacity.common.dto.UsuarioDTO;
 import com.privacity.common.dto.WrittingDTO;
 import com.privacity.common.dto.request.GrupoAddUserRequestDTO;
 import com.privacity.common.dto.request.GrupoInvitationAcceptRequestDTO;
@@ -31,6 +29,8 @@ import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysValidation;
 import com.privacity.server.component.model.request.GrupoBlockRemotoRequestLocalDTO;
+import com.privacity.server.component.model.request.GrupoIdLocalDTO;
+import com.privacity.server.component.model.request.GrupoInfoNicknameRequestLocalDTO;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.AES;
@@ -183,7 +183,7 @@ public class GrupoValidationService {
 	
 		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());		
 		
-		List<Usuario> users = comps.repo().userForGrupo().findByUsuariosForGrupo(idGrupo);
+		List<Usuario> users = comps.repo().userForGrupo().findByUsuariosForGrupoDeletedFalse(idGrupo);
 		
 		int count = 0;
 		for ( Usuario u : users ) {
@@ -227,18 +227,14 @@ public class GrupoValidationService {
 		comps.repo().grupo().save(g);
 	}
 	
+	@com.privacity.common.RolesAllowed({GrupoRolesEnum.ADMIN,GrupoRolesEnum.MODERATOR, GrupoRolesEnum.MEMBER, GrupoRolesEnum.READONLY} )
+	public void removeMe(GrupoIdLocalDTO request) throws PrivacityException {
 
-	public void removeMe(IdDTO request) throws PrivacityException {
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
-
-		//Grupo grupo = comps.util().grupo().getGrupoByIdValidation(request);
-		long idGrupo = Long.parseLong(request.getId());
-		UserForGrupo ufg = comps.util().userForGrupo().getValidation(usuarioLogged, idGrupo);
 		
 		Usuario usuarioSystem = comps.util().usuario().getUsuarioSystem();
 		
 		try {
-			comps.process().grupo().removeMe(usuarioLogged,usuarioSystem,ufg);
+			comps.process().grupo().removeMe(request.usuarioLoggued, usuarioSystem, request.grupo, request.userForGrupo);
 		} catch (Exception e) {
 			throw new PrivacityException(e.getMessage());
 		}
@@ -284,7 +280,7 @@ public class GrupoValidationService {
 		 
 			Optional<UserForGrupo> ufg = comps.repo().userForGrupo().findById(new UserForGrupoId(UserInvitationCode, g));
 			
-			if (ufg.isPresent()) {
+			if (ufg.isPresent() && !ufg.get().isDeleted()) {
 				throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_IN_THE_GRUPO);				
 			}
 		}
@@ -321,14 +317,14 @@ public class GrupoValidationService {
 		GrupoDTO grupoCreado = comps.process().grupo().newGrupo(usuarioLogged, g, aes);
 		
 		
-		return this.getGrupoById(new IdDTO(grupoCreado.getIdGrupo()));
+		return this.getGrupoById(new GrupoIdLocalDTO(grupoCreado.getIdGrupo()));
 	}	
 	public IdDTO[] getIdsMisGrupos() throws Exception {
 		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
 		return comps.process().grupo().getIdsMisGrupos(usuarioLogged);
 	}
 	
-	public GrupoDTO[] getGrupoByIds(IdDTO[] idDTO) throws Exception {
+	public GrupoDTO[] getGrupoByIds(GrupoIdLocalDTO[] idDTO) throws Exception {
 		GrupoDTO[] r = new GrupoDTO[idDTO.length];
 		
 		for (int i = 0 ; i < idDTO.length; i++) {
@@ -382,7 +378,7 @@ public class GrupoValidationService {
 	}
 	
 	//hacer q reciba un array
-	public GrupoDTO getGrupoById(IdDTO idDTO) throws Exception {
+	public GrupoDTO getGrupoById(GrupoIdLocalDTO idDTO) throws Exception {
 		Date inicio = new Date();
 		GrupoDTO r=null;
 		//log.info("1");
@@ -393,7 +389,7 @@ public class GrupoValidationService {
 		
 		//log.info("3");
 		
-		long idGrupo = Long.parseLong(idDTO.getId());
+		long idGrupo = Long.parseLong(idDTO.getIdGrupo());
 		
 		GrupoInvitation inv = comps.util().grupoInvitation().getGrupoInvitation(usuarioLogged.getIdUser(),idGrupo );
 		
@@ -476,6 +472,16 @@ public class GrupoValidationService {
 //		return comps.process().grupo().getGrupoUserConf(usuarioLogged, grupo);
 //	}
 //	*/
+	
+	
+	public void saveNickname(GrupoInfoNicknameRequestLocalDTO r) throws PrivacityException {
+		r.getUserForGrupo().setNickname(r.getNickname());
+		comps.repo().userForGrupo().save(r.getUserForGrupo());
+		
+		
+		
+		
+	}
 	public void saveGrupoUserConf(GrupoUserConfDTO request) throws PrivacityException {
 
 		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();

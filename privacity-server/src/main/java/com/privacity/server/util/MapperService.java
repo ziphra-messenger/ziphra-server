@@ -26,6 +26,7 @@ import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.dto.UserForGrupoDTO;
 import com.privacity.common.dto.UsuarioDTO;
 import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
+import com.privacity.common.enumeration.ConfigurationStateEnum;
 import com.privacity.common.enumeration.GrupoUserConfEnum;
 import com.privacity.common.enumeration.MediaTypeEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
@@ -66,7 +67,7 @@ public class MapperService {
 		ufgDTO.setAesDTO( doit(userForGrupo.getAes()));
 		
 		ufgDTO.setAlias(userForGrupo.getAlias());
-		//ufgDTO.setNicknameGrupo(userForGrupo.getNicknameGrupo());
+		ufgDTO.setNickname(userForGrupo.getNickname());
 		
 		return ufgDTO;
 	}	
@@ -78,7 +79,7 @@ public class MapperService {
 		//ufgDTO.setAesDTO( doit(userForGrupo.getAes()));
 		
 		ufgDTO.setAlias(userForGrupo.getAlias());
-		//ufgDTO.setNicknameGrupo(userForGrupo.get.getNicknameGrupo());
+		ufgDTO.setNickname(userForGrupo.getNickname());
 		
 		return ufgDTO;
 	}	
@@ -101,9 +102,9 @@ public class MapperService {
 		g.getGralConfDTO().setAudiochatMaxTime(grupo.getGralConf().getAudiochatMaxTime());
 		g.getGralConfDTO().setBlackMessageAttachMandatory(grupo.getGralConf().isBlackMessageAttachMandatory());
 		g.getGralConfDTO().setChangeNicknameToNumber(grupo.getGralConf().isChangeNicknameToNumber());
-		g.getGralConfDTO().setDownloadAllowAudio(grupo.getGralConf().isDownloadAllowAudio());
-		g.getGralConfDTO().setDownloadAllowImage(grupo.getGralConf().isDownloadAllowImage());
-		g.getGralConfDTO().setDownloadAllowVideo(grupo.getGralConf().isDownloadAllowVideo());
+		g.getGralConfDTO().setDownloadAllowAudio(ConfigurationStateEnum.ALLOW);
+		g.getGralConfDTO().setDownloadAllowImage(grupo.getGralConf().getDownloadAllowImage());
+		g.getGralConfDTO().setDownloadAllowVideo(ConfigurationStateEnum.ALLOW);
 		g.getGralConfDTO().setExtraEncrypt(grupo.getGralConf().getExtraEncrypt());
 		g.getGralConfDTO().setHideMessageDetails(grupo.getGralConf().isHideMessageDetails());
 		g.getGralConfDTO().setHideMessageState(grupo.getGralConf().isHideMessageState());
@@ -146,6 +147,10 @@ public class MapperService {
 		r.setExtraAesAlways(d.getSecretKeyPersonalAlways());
 		r.setTimeMessageAlways(d.getTimeMessageAlways());
 		r.setTimeMessageSeconds(d.getTimeMessageSeconds());
+		
+		r.setDownloadAllowAudio(d.getDownloadAllowAudio());
+		r.setDownloadAllowImage(d.getDownloadAllowImage());
+		r.setDownloadAllowVideo(d.getDownloadAllowVideo());
 		//r.setIdGrupo(d.getGrupoUserConfId().getGrupo().getIdGrupo()+"");
 		//r.setChangeNicknameToNumber(d.getChangeNicknameToNumber());
 		return r;
@@ -195,9 +200,9 @@ public class MapperService {
 		g.getGralConfDTO().setAudiochatMaxTime(grupo.getGralConf().getAudiochatMaxTime());
 		g.getGralConfDTO().setBlackMessageAttachMandatory(grupo.getGralConf().isBlackMessageAttachMandatory());
 		g.getGralConfDTO().setChangeNicknameToNumber(grupo.getGralConf().isChangeNicknameToNumber());
-		g.getGralConfDTO().setDownloadAllowAudio(grupo.getGralConf().isDownloadAllowAudio());
-		g.getGralConfDTO().setDownloadAllowImage(grupo.getGralConf().isDownloadAllowImage());
-		g.getGralConfDTO().setDownloadAllowVideo(grupo.getGralConf().isDownloadAllowVideo());
+		g.getGralConfDTO().setDownloadAllowAudio(ConfigurationStateEnum.ALLOW);
+		g.getGralConfDTO().setDownloadAllowImage(grupo.getGralConf().getDownloadAllowImage());
+		g.getGralConfDTO().setDownloadAllowVideo(ConfigurationStateEnum.ALLOW);
 		g.getGralConfDTO().setExtraEncrypt(grupo.getGralConf().getExtraEncrypt());
 		g.getGralConfDTO().setHideMessageDetails(grupo.getGralConf().isHideMessageDetails());
 		g.getGralConfDTO().setHideMessageState(grupo.getGralConf().isHideMessageState());
@@ -225,10 +230,10 @@ public class MapperService {
 		}
 		
 		mediaDTO.setMiniatura(m.getMiniatura());
-		
+		mediaDTO.setDownloadable(m.isDownloadable());
 		mediaDTO.setIdGrupo(m.getMediaId().getMessage().getMessageId().getGrupo().getIdGrupo()+"");
 		mediaDTO.setIdMessage(m.getMediaId().getMessage().getMessageId().getIdMessage()+"");
-		mediaDTO.setMediaType(m.getMediaType().name());
+		mediaDTO.setMediaType(m.getMediaType());
 
 		return mediaDTO;
 	}
@@ -247,8 +252,8 @@ public class MapperService {
 		UserForGrupo ugr = comps.repo().userForGrupo().findById(new UserForGrupoId(u, grupo)).get();
 		String nicknameForGrupo = ""; 
 		
-		if (ugr.getAlias() != null && !ugr.getAlias().equals("")) {
-			nicknameForGrupo=ugr.getAlias();
+		if (ugr.getNickname() != null && !ugr.getNickname().equals("")) {
+			nicknameForGrupo=ugr.getNickname();
 		}else {
 			nicknameForGrupo= u.getNickname();
 		}
@@ -330,8 +335,8 @@ public class MapperService {
 			media.setData(compress);
 		}
 		media.setMiniatura(dto.getMiniatura());
-		media.setMediaType(MediaTypeEnum.valueOf(dto.getMediaType()));
-
+		media.setMediaType(dto.getMediaType());
+		media.setDownloadable(dto.isDownloadable());
 		media.setMediaId(new MediaId());
 		media.getMediaId().setMessage(message);
 
@@ -623,7 +628,12 @@ public class MapperService {
 		r.setTimeMessageAlways(d.getTimeMessageAlways());
 		r.setTimeMessageSeconds(d.getTimeMessageSeconds());
 		r.setGrupoUserConfId(new GrupoUserConfId());
-
+		
+		r.setDownloadAllowAudio(d.getDownloadAllowAudio());
+		r.setDownloadAllowImage(d.getDownloadAllowImage());
+		r.setDownloadAllowVideo(d.getDownloadAllowVideo());
+		r.setDownloadAllowAudio(GrupoUserConfEnum.GENERAL_VALUE);
+		r.setDownloadAllowVideo(GrupoUserConfEnum.GENERAL_VALUE);
 		return r;
 	}
 
@@ -636,9 +646,9 @@ public class MapperService {
 		grupo.getGralConf().setAudiochatMaxTime(d.getAudiochatMaxTime());
 		grupo.getGralConf().setBlackMessageAttachMandatory(d.isBlackMessageAttachMandatory());
 		grupo.getGralConf().setChangeNicknameToNumber(d.isChangeNicknameToNumber());
-		grupo.getGralConf().setDownloadAllowAudio(d.isDownloadAllowAudio());
-		grupo.getGralConf().setDownloadAllowImage(d.isDownloadAllowImage());
-		grupo.getGralConf().setDownloadAllowVideo(d.isDownloadAllowVideo());
+		grupo.getGralConf().setDownloadAllowAudio(ConfigurationStateEnum.ALLOW);
+		grupo.getGralConf().setDownloadAllowImage(d.getDownloadAllowImage());
+		grupo.getGralConf().setDownloadAllowVideo(ConfigurationStateEnum.ALLOW);
 		grupo.getGralConf().setExtraEncrypt(d.getExtraEncrypt());
 		grupo.getGralConf().setHideMessageDetails(d.isHideMessageDetails());
 		grupo.getGralConf().setHideMessageState(d.isHideMessageState());

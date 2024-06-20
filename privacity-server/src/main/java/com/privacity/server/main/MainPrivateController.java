@@ -33,6 +33,7 @@ import com.privacity.common.dto.WrittingDTO;
 import com.privacity.common.dto.request.GrupoAddUserRequestDTO;
 import com.privacity.common.dto.request.GrupoInvitationAcceptRequestDTO;
 import com.privacity.common.dto.request.GrupoNewRequestDTO;
+import com.privacity.common.dto.request.LoginRequestDTO;
 import com.privacity.common.dto.request.MyAccountNicknameRequestDTO;
 import com.privacity.common.dto.request.PublicKeyByInvitationCodeRequestDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
@@ -42,6 +43,8 @@ import com.privacity.server.component.encryptkeys.EncryptKeysService;
 import com.privacity.server.component.grupo.GrupoValidationService;
 import com.privacity.server.component.message.MessageValidationService;
 import com.privacity.server.component.model.request.GrupoBlockRemotoRequestLocalDTO;
+import com.privacity.server.component.model.request.GrupoIdLocalDTO;
+import com.privacity.server.component.model.request.GrupoInfoNicknameRequestLocalDTO;
 import com.privacity.server.component.myaccount.MyAccountValidationService;
 import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.component.requestid.RequestIdValidationService;
@@ -98,9 +101,9 @@ public class MainPrivateController extends ControllerBase{
 //		getMapaMetodos().put(Constant.PROTOCOLO_ACTION_ENCRYPT_KEYS_CREATE, EncryptKeysValidationService.class.getMethod("create", EncryptKeysDTO.class));
 		
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_GET_IDS_MY_GRUPOS, GrupoValidationService.class.getMethod("getIdsMisGrupos"));
-		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_GET_GRUPO_BY_ID, GrupoValidationService.class.getMethod("getGrupoById",IdDTO.class));
+		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_GET_GRUPO_BY_ID, GrupoValidationService.class.getMethod("getGrupoById",GrupoIdLocalDTO.class));
 		
-		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_GET_GRUPO_BY_IDS, GrupoValidationService.class.getMethod("getGrupoByIds",IdDTO[].class));
+		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_GET_GRUPO_BY_IDS, GrupoValidationService.class.getMethod("getGrupoByIds",GrupoIdLocalDTO[].class));
 		
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_WRITTING, GrupoValidationService.class.getMethod("startWritting",WrittingDTO.class));
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_STOP_WRITTING, GrupoValidationService.class.getMethod("stopWritting",WrittingDTO.class));
@@ -112,11 +115,12 @@ public class MainPrivateController extends ControllerBase{
 //		getMapaMetodos().put("/grupo/initGrupo", GrupoValidationService.class.getMethod("initGrupo", String.class));
 		getMapaMetodos().put("/grupo/sentInvitation", GrupoValidationService.class.getMethod("sentInvitation", GrupoAddUserRequestDTO.class));
 		getMapaMetodos().put("/grupo/acceptInvitation", GrupoValidationService.class.getMethod("acceptInvitation", GrupoInvitationAcceptRequestDTO.class));
-		getMapaMetodos().put("/grupo/removeMe", GrupoValidationService.class.getMethod("removeMe", IdDTO.class));
+		getMapaMetodos().put("/grupo/removeMe", GrupoValidationService.class.getMethod("removeMe", GrupoIdLocalDTO.class));
 		getMapaMetodos().put("/grupo/delete", GrupoValidationService.class.getMethod("delete", IdDTO.class));
 		getMapaMetodos().put("/grupo/list/members", GrupoValidationService.class.getMethod("getMembers", GrupoDTO.class));
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_BLOCK_REMOTO, GrupoValidationService.class.getMethod("blockGrupoRemoto", GrupoBlockRemotoRequestLocalDTO.class));
-		
+		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_SAVE_NICKNAME, GrupoValidationService.class.getMethod("saveNickname", GrupoInfoNicknameRequestLocalDTO.class));
+	
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_SAVE_GENERAL_CONFIGURATION, GrupoValidationService.class.getMethod("saveGrupoGeneralConfiguration", GrupoGralConfDTO.class));
 		getMapaMetodos().put("/grupo/saveGrupoUserConf", GrupoValidationService.class.getMethod("saveGrupoUserConf", GrupoUserConfDTO.class));
 		getMapaMetodos().put("/grupo/gralConf/save/lock", GrupoValidationService.class.getMethod("saveGrupoGralConfLock", GrupoDTO.class));
@@ -151,7 +155,7 @@ public class MainPrivateController extends ControllerBase{
 		getMapaMetodos().put("/myAccount/isInvitationCodeAvailable", MyAccountValidationService.class.getMethod("isInvitationCodeAvailable", String.class));
 		getMapaMetodos().put("/myAccount/saveCodeAvailable", MyAccountValidationService.class.getMethod("saveCodeAvailable", UserInvitationCodeDTO.class));
 
-		getMapaMetodos().put("/myAccount/save/password", MyAccountValidationService.class.getMethod("savePassword", String.class));
+		getMapaMetodos().put("/myAccount/save/password", MyAccountValidationService.class.getMethod("savePassword", LoginRequestDTO.class));
 		getMapaMetodos().put("/myAccount/save/nickname", MyAccountValidationService.class.getMethod("saveNickname", MyAccountNicknameRequestDTO.class));
 		getMapaMetodos().put("/myAccount/save/lock", MyAccountValidationService.class.getMethod("saveLock", LockDTO.class));
 		
@@ -201,10 +205,17 @@ public class MainPrivateController extends ControllerBase{
 		ProtocoloDTO retornoFuncion = super.in(p);
 		String retornoFuncionJson = gson.toJson(retornoFuncion);
 		String retornoFuncionEncriptado = c.getAES(retornoFuncionJson);
-		
+
 		if (showLog(p)) {
+			
+			if ( retornoFuncion.getMessageDTO() != null)
+			{
+				System.out.println( " Salida >>  " + retornoFuncion.toString());
+			}
+			else {
 			System.out.println( " Salida >>  " + retornoFuncionJson);
 			System.out.println( " ================================================================================");
+			}
 		}
 		return ResponseEntity.ok().body(gson.toJson(retornoFuncionEncriptado));
 
@@ -261,7 +272,7 @@ public class MainPrivateController extends ControllerBase{
 			return true;
 		}
 		
-		return false;
+		return true;
 	}	
 
 }

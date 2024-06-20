@@ -2,6 +2,6 @@ package com.privacity.common.enumeration;
 
 public enum MediaTypeEnum {
 	IMAGE,
-	FILE,
+	VIDEO,	FILE,
 	AUDIO_MESSAGE;
 }
