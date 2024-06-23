@@ -10,6 +10,7 @@ import com.privacity.server.component.common.service.ZipUtilService;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
 import com.privacity.server.encrypt.PrivacityIdServices;
 import com.privacity.server.encrypt.RSA;
+
 import com.privacity.server.util.MapperService;
 
 import lombok.NoArgsConstructor;
@@ -30,15 +31,13 @@ public class FacadeCommonComponent {
 	@Autowired @Lazy
 	private ZipUtilService zip;
 	
-
+	
 
 	@Autowired @Lazy
 	private PrivacityRSAValidation privacityRSA;
 
 	@Autowired @Lazy
 	private RSA RSA;
-
-
 
 	@Autowired @Lazy
 	private PrivacityIdServices privacityId;	

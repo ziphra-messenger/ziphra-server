@@ -50,6 +50,7 @@ import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.component.requestid.RequestIdValidationService;
 import com.privacity.server.component.usuario.UserUtilService;
 import com.privacity.server.encrypt.PrivacityIdServices;
+
 import com.privacity.server.security.UserDetailsImpl;
 import com.privacity.server.util.LocalDateAdapter;
 
@@ -161,12 +162,13 @@ public class MainPrivateController extends ControllerBase{
 		
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_MY_ACCOUNT_SAVE_GENERAL_CONFIGURATION, MyAccountValidationService.class.getMethod("saveMessageConf", MyAccountConfDTO.class));
 		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_MY_ACCOUNT_SAVE_LOGIN_SKIP, MyAccountValidationService.class.getMethod("saveLoginSkip", boolean.class));
+		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_MY_ACCOUNT_CLOSE_SESSION, MyAccountValidationService.class.getMethod("closeSession"));
 		
 	}
 
 
 
-		
+
 
 	@PostMapping("/entry")
 	public ResponseEntity<String> inMain(@RequestBody String request) throws Exception {

@@ -11,34 +11,31 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
-import com.privacity.common.enumeration.GrupoRolesEnum;
-import com.privacity.common.util.RandomGenerator;
-import com.privacity.server.component.common.service.RandomGeneratorService;
-import com.privacity.server.component.encryptkeys.EncryptIdOrder;
-import com.privacity.server.util.UtilService;
+
+import lombok.Data;
 
 @Service
+@Data
 public class PrivacityIdServices {
 
-	private static final String AesKey="1";
-	private static final String AesSalt="1";
-	private static final int AesIteration=1;
+	private  final String AesKey="1";
+	private  final String AesSalt="1";
+	private  final int AesIteration=1;
 	private Cipher decrypt;
 	private Cipher encrypt;
 
 	private long privacityIdOrderSeed;
 	
-	public PrivacityIdServices(@Autowired RandomGeneratorService randomGeneratorService,
+	public PrivacityIdServices(
 			@Value("${serverconf.privacityIdAes.bits}") int bitsEncrypt
 			) throws Exception {
 		{
-			
+			bitsEncrypt=128;
 	//		privacityIdOrderSeed = RandomGenerator.betweenTwoNumber(1483647,7483647);
 //			AesKey = randomGeneratorService.privacityIdAesSecretKey();
 //			AesSalt = randomGeneratorService.privacityIdAesSecretSalt();

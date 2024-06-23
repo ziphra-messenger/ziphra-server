@@ -11,14 +11,23 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class AESToUse {
+import org.springframework.beans.factory.annotation.Value;
 
+import lombok.Getter;
+import lombok.ToString;
+
+@ToString
+public class AESToUse {
+	@Getter
 	private String secretKeyAES;
+	@Getter
 	private String saltAES;
-//	@Value("${privacity.security.encrypt.bits}")
+	@Getter
+	@Value("${privacity.security.encrypt.bits}")
 	private int bitsEncrypt;
 //	
-//	@Value("${privacity.security.encrypt.iteration.count}")
+	@Getter
+	@Value("${privacity.security.encrypt.iteration.count}")
 	private int interationCount;
 	
 	private Cipher decrypt;
@@ -29,6 +38,7 @@ public class AESToUse {
 		this.saltAES = saltAES;
 		this.bitsEncrypt =bitsEncrypt2;
 		this.interationCount=interationCount2;
+
 
 
 		{

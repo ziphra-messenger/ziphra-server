@@ -91,7 +91,8 @@ public abstract class ControllerBase {
 //			if (showLog()) System.out.println("MapaMetodos = " + getMapaMetodos());
 //			if (showLog()) System.out.println("MapaController = " + getMapaController());
 			
-			if ( getMapaMetodos().get(request.getAction()).getParameterTypes().length == 0) {
+			if (   getMapaMetodos().get(request.getAction()).getParameterTypes() != null &&
+					getMapaMetodos().get(request.getAction()).getParameterTypes().length == 0) {
 				
 				objetoRetorno = getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()));
 

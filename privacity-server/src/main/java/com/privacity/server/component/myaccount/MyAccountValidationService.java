@@ -15,9 +15,11 @@ import com.privacity.common.dto.response.MyAccountGenerateInvitationCodeResponse
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysValidation;
+import com.privacity.server.component.usuario.UserUtilService;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.EncryptKeys;
 import com.privacity.server.security.Usuario;
+import com.privacity.server.security.UsuarioSessionInfo;
 import com.privacity.server.util.UtilService;
 
 import lombok.AllArgsConstructor;
@@ -36,6 +38,14 @@ public class MyAccountValidationService {
 	@Autowired @Lazy
 	private FacadeComponent comps;
 	
+	
+	
+	public void closeSession(){
+	
+		Usuario u = utilService.getUser();
+		
+		comps.service().usuarioSessionInfo().remove(u.getUsername());
+	}
 	
 	public void saveLoginSkip(boolean request) throws ValidationException{
 		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();

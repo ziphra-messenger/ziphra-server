@@ -37,10 +37,9 @@ public class MyPerformanceMonitorInterceptor extends AbstractMonitoringIntercept
     		 return showReturn (invocation.proceed());
     	}
     	
-    	if ("privacity.server.component.grupo.GrupoUtilService.convertIdGrupoStringToLong"
-    			.equals(name.trim())){
-    		return showReturn (invocation.proceed());
-    		}
+    	if (name.contains("convertIdGrupoStringToLong")){
+    			return showReturn (invocation.proceed());
+    		}else {
         
         long start = System.currentTimeMillis();
       
@@ -67,6 +66,7 @@ public class MyPerformanceMonitorInterceptor extends AbstractMonitoringIntercept
             System.out.println("-----> Method "+name+" execution lasted:"+time+" ms");
             
         }
+    	}
     }
 
 	private Object showReturn(Object proceed) {

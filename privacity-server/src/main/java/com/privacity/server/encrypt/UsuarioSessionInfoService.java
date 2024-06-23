@@ -3,7 +3,6 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Security;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -15,9 +14,8 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.privacity.common.dto.AESDTO;
-import com.privacity.common.util.RandomGenerator;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.component.usuario.UserUtilService;
+import com.privacity.server.encrypt.pool2.ProducerConsumerDemonstrator;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.main.AESToUse;
@@ -105,9 +103,12 @@ public class UsuarioSessionInfoService{
     	
     	if ((this.userSessionIds.get(user.getUsername()) == null) 
     			|| create) {
-    		String AES = comps.common().randomGenerator().sessionAesSecretKey();
-    		String SaltAES = comps.common().randomGenerator().sessionAesSecretSalt();
-    		int AESIteration = comps.common().randomGenerator().sessionAesIteration();
+    		
+    		AESToUse aesToUse = ProducerConsumerDemonstrator.dataQueue.poll();
+    	        	
+    		String AES =aesToUse.getSecretKeyAES();
+    		String SaltAES = aesToUse.getSaltAES();
+    		int AESIteration = aesToUse.getInterationCount();
 
     		PublicKey publicKey=null;
     		EncryptKeys ek = user.getEncryptKeys();
@@ -128,10 +129,10 @@ public class UsuarioSessionInfoService{
 
     		}
     		
-    		AESDTO aes = new AESDTO();
+    		//AESDTO aes = new AESDTO();
     		{
     		
-    		aes.setSecretKeyAES(AES);
+    		//aes.setSecretKeyAES(AES);
     		}
     		UsuarioSessionInfo t = new UsuarioSessionInfo();
     		t.setSessionAES(new AESDTO(AES, SaltAES,AESIteration+""));
@@ -146,7 +147,7 @@ public class UsuarioSessionInfoService{
     		this.userSessionIds.put(user.getUsername(),t);
     		
     		try {
-				t.setSessionAESToUse(new AESToUse(bitsEncrypt, AESIteration ,AES, SaltAES));
+				t.setSessionAESToUse(aesToUse);
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new ValidationException("error de encriptacion");

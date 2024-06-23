@@ -34,7 +34,7 @@ public class ConstantProtocolo {
 	public static final String PROTOCOLO_ACTION_MY_ACCOUNT_SAVE_NICKNAME = "/myAccount/save/nickname";
 	public static final String PROTOCOLO_ACTION_MY_ACCOUNT_SAVE_LOCK = "/myAccount/save/lock";
 	public static final String PROTOCOLO_ACTION_MY_ACCOUNT_SAVE_LOGIN_SKIP = "/myAccount/save/loginSkip";
-	
+	public static final String PROTOCOLO_ACTION_MY_ACCOUNT_CLOSE_SESSION = "/myAccount/closeSession";
 	
 	public final static String PROTOCOLO_COMPONENT_GRUPO = "/grupo";
 	public final static String PROTOCOLO_ACTION_GRUPO_SAVE_GRAL_CONF_PASSWORD = "/grupo/save/gralConfPassword";

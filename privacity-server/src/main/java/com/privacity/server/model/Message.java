@@ -34,28 +34,29 @@ public class Message extends MessageBase implements Serializable {
 	
 	private static final long serialVersionUID = 2473293848377594179L;
 	
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
     @Getter
     @Setter
     private Message parentResend;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "parentResend")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "parentResend", cascade = {CascadeType.ALL})
     @Setter
     @Getter
     private Set<Message> childrenResend;
     
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
     @Getter
     @Setter
     private Message parentReply;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "parentReply")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "parentReply", cascade = {CascadeType.ALL})
     @Setter
     @Getter
     private Set<Message> childrenReply;	
     
-	@ManyToOne
+
+	@ManyToOne(cascade = {CascadeType.ALL})
 	@JoinColumn(name = "idUser")
     private Usuario userCreation;
 
@@ -83,7 +84,7 @@ public class Message extends MessageBase implements Serializable {
 	private boolean hideMessageState;
 	
 	
-	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+	@OneToMany(cascade = {CascadeType.ALL})
 	public Set<MessageDetail> getMessagesDetail() {
 		return messagesDetail;
 	}

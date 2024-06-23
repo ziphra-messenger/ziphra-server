@@ -99,5 +99,20 @@ public interface MessageDetailRepository extends CrudRepository<MessageDetail, M
 			+ " e.messageDetailId.message.messageId.grupo.idGrupo =  ?1 "
 			+ "and  e.messageDetailId.message.messageId.idMessage =  ?2 ")
 	void deleteLogicByMessageDetailIdMessage(Long idGrupo, Long idMessage);
+	@Transactional
+	@Modifying
+	@Query("DELETE FROM  MessageDetail u where "
+			+ "  u.deleted=true ")
+	void deleteLogicDelete();
+	
+	@Transactional
+	@Modifying
+	@Query("delete from MessageDetail e WHERE  "
+			+ "  e.messageDetailId.message not in (  "
+			+ " select u FROM Message u  "
+			+ ")")
+	
+	void deleteLogicDeleteSinMensaje();
+
 
 }

@@ -61,4 +61,17 @@ public interface MessageRepository extends CrudRepository<Message, MessageId> {
 			+ " u.messageId.idMessage = ?2  "
 			+ " and u.messageId.grupo.idGrupo = ?1 ")
 	void deleteLogic(Long idGrupo, Long idMessage);
+
+	@Transactional
+	@Modifying
+	@Query("DELETE FROM  Message u where "
+			+ "  u.deleted=true and u.parentReply is not null ")
+	void deleteLogicDeleteParentReply();
+	
+	@Transactional
+	@Modifying
+	@Query("DELETE FROM  Message u where "
+			+ "  u.deleted=true ")
+	void deleteLogicDelete();
+
 }

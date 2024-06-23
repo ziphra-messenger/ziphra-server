@@ -9,6 +9,7 @@ import com.privacity.server.component.grupoinvitation.GrupoInvitationRepository;
 import com.privacity.server.component.grupouserconf.GrupoUserConfRepository;
 import com.privacity.server.component.media.MediaRepository;
 import com.privacity.server.component.message.MessageRepository;
+import com.privacity.server.component.messagedetail.MessageDetailDeletedRepository;
 import com.privacity.server.component.messagedetail.MessageDetailRepository;
 import com.privacity.server.component.userforgrupo.UserForGrupoRepository;
 import com.privacity.server.security.RoleRepository;
@@ -43,6 +44,11 @@ public class FacadeRepositoryComponent {
 	@Autowired @Lazy
 	
 	private MessageDetailRepository messageDetail;
+	
+	@Autowired @Lazy
+	
+	private	MessageDetailDeletedRepository messageDetailDeleted;
+	
 	
 	@Autowired @Lazy
 	
@@ -88,6 +94,10 @@ public class FacadeRepositoryComponent {
 	}
 
 
+	public MessageDetailDeletedRepository messageDetailDeleted() {
+		return messageDetailDeleted;
+	}
+	
 	public RoleRepository role() {
 		return role;
 	}

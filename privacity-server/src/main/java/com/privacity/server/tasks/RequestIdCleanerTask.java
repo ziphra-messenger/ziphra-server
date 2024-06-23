@@ -38,7 +38,7 @@ public class RequestIdCleanerTask extends Thread {
     }
   @Override
   public void run(){
-	  ////System.out.println ("Request id thread start");
+	  System.out.println ("Request id thread start");
 	  while (true) {
 		  LocalDateTime date = LocalDateTime.now();
 		  date = date.minusSeconds(expiredSeconds);

@@ -1,10 +1,12 @@
 package com.privacity;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.firewall.StrictHttpFirewall;
+
 
 @SpringBootApplication
 //@ComponentScan(basePackages = "com.privacity.server.component.grupo")
@@ -15,14 +17,16 @@ public class PrivacityServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PrivacityServerApplication.class, args);
 	}
-	
+
+
+	/*
 	@Bean
 	public HttpFirewall getHttpFirewall() {
 	    StrictHttpFirewall strictHttpFirewall = new StrictHttpFirewall();
 	    strictHttpFirewall.setAllowSemicolon(true);
 	    return strictHttpFirewall;
 	}
-/*
+
 	@Bean
 	public ServerWebSocketContainer serverWebSocketContainer() {
 	    return new ServerWebSocketContainer("/messages")

@@ -11,6 +11,9 @@ import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
 import com.privacity.server.component.serverconf.ServerConfValidationService;
 import com.privacity.server.encrypt.PrivacityIdServices;
+import com.privacity.server.encrypt.pool2.Message;
+import com.privacity.server.encrypt.pool2.ProducerConsumerDemonstrator;
+
 
 
 @RestController
@@ -48,7 +51,28 @@ public class FreeController extends ControllerBase{
 
 	@PostMapping("/entry")
 	public ProtocoloDTO in(@RequestBody ProtocoloDTO request) throws Exception {
-		
+//    	new Thread(new Runnable() {
+//			
+//			@Override
+//			public void run() {
+//				// TODO Auto-generated method stub
+//				ProducerConsumerDemonstrator.demoMultipleProducersAndMultipleConsumers();		
+//			}
+//		}).start();
+//    	; 
+//        //demoSingleProducerAndSingleConsumer();
+//        
+        
+        
+        //Thread.sleep(1000);
+//        
+//        while ( true) {
+////        	//Thread.sleep(1000);
+////        	AESToUse m = ProducerConsumerDemonstrator.dataQueue.poll();
+////        	System.out.println("-------------> " + m.toString());
+//        }
+
+
 		return super.in(request);
 
 	}
