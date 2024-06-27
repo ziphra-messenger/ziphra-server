@@ -1,17 +1,14 @@
 package com.privacity;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 
 
 @SpringBootApplication
 //@ComponentScan(basePackages = "com.privacity.server.component.grupo")
 //@ComponentScan(basePackages = "com.privacity.server.security")
-//@ComponentScan(basePackages = "com.privacity.server.main")
+//@ComponentScan(basePackages = "com.privacity.server")
 public class PrivacityServerApplication {
 
 	public static void main(String[] args) {

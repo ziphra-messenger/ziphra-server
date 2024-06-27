@@ -67,10 +67,10 @@ public class RandomGeneratorService {
 	ServerConfService conf) {
 		this.conf = conf;
 	}
-	public Long idMessage() {
-		return Long.parseLong ((new Date().getTime()+"") + RandomStringUtils.randomNumeric(idMessageLenght));
-	}
-	
+//	public Long idMessage() {
+//		return Long.parseLong ((new Date().getTime()+"") + RandomStringUtils.randomNumeric(idMessageLenght));
+//	}
+//	
 	public String invitationCode() {
 		SGCInvitationCode a = conf.getSystemGralConf().getMyAccountConf().getInvitationCode();
 	    return RandomGenerator.generate(RandomGeneratorType.ALPHANUMERIC, a.getLenght().getMinLenght(), a.getLenght().getMaxLenght()); 

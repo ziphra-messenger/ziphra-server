@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.privacity.server.component.common.service.facade.FacadeComponent;
+import com.privacity.server.util.UtilService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -34,15 +35,29 @@ public class JwtUtils {
 	
 	@Autowired @Lazy
 	private FacadeComponent comps;
+
 	
-	public JwtUtils(@Value("${privacity.security.ramdom.jwtSecret}")
+	public JwtUtils(@Autowired UtilService utilService, @Value("${privacity.security.ramdom.jwtSecret}")
 	
-	boolean createRamdomJwtSecret , @Value("${privacity.security.jwtSecret}") String jwtSecretDefault) {
+	boolean createRamdomJwtSecret , @Value("${privacity.security.jwtSecret}") String jwtSecretDefault,
+	@Value("#{T(Boolean).parseBoolean('${privacity.security.jwtSecret.mix}')}")Boolean mix,
+	@Value("#{T(Integer).parseInt('${privacity.security.jwtSecret.mix.iteration}')}") int mixIteration,
+				
+				@Value("#{T(Boolean).parseBoolean('${privacity.security.ramdom.jwtSecret.mix.iteration}')}")Boolean mixIterationRandom
+			) {
+		//@Value("#{T(Boolean).jwtSecretDefault('${privacity.security.jwtSecret.mix}')}")Boolean mix,
 		super();
+		//Boolean.parseBoolean(jwtSecretDefault)
+		jwtSecret=jwtSecretDefault;
 		if (createRamdomJwtSecret) {
 			jwtSecret= comps.common().randomGenerator().jwtSecret();
-		}else {
-			jwtSecret=jwtSecretDefault;
+		}
+		if ( mix == true) {
+
+			jwtSecret = utilService.mix(jwtSecret,mixIterationRandom, mixIteration,10, 100);
+			//jwtSecret = utilService.shuffleString(jwtSecret);
+			
+		
 		}
 	}
 
@@ -57,7 +72,7 @@ public class JwtUtils {
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
 	}
-
+	
 	public String getUserNameFromJwtToken(String token) {
 		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
 	}

@@ -132,8 +132,9 @@ public class DownloadDataPrivateController {
 	
 
 			if(getEncryptIds()) {
-				getPrivacityIdServices().transformarEncriptarOut(objetoRetorno);
 				getPrivacityIdServices().transformarEncriptarOutOrder(objetoRetorno);
+				getPrivacityIdServices().transformarEncriptarOut(objetoRetorno);
+		
 			}
 
 	//	if(getEncryptIds()) {

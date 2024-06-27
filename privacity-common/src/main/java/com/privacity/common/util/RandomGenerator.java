@@ -50,9 +50,6 @@ public class RandomGenerator {
 			return RandomStringUtils.randomAscii(getNewRandom(min, max));
 		}
 		return null;
-
-
-		
 	}
 
 	private static int getNewRandom(int min, int max) {

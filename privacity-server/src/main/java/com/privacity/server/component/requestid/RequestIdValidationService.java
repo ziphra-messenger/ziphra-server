@@ -24,9 +24,10 @@ public class RequestIdValidationService {
 	private FacadeComponent comps;
 	@Value("${usuario.sessioninfo.requestid.expired.seconds}")  
 	private int expiredSeconds;
-//	public RequestIdDTO getNewRequestIdPrivate(RequestIdDTO halfId) throws ValidationException {
-//		return getNewRequestIdGeneral(halfId,true);
-//	}
+
+	public RequestIdDTO getNewRequestIdPrivate(RequestIdDTO halfId) throws ValidationException {
+		return getNewRequestIdGeneral(halfId,true);
+	}
 	public RequestIdDTO getNewRequestIdPublic(RequestIdDTO halfId) throws ValidationException {
 		return getNewRequestIdGeneral(halfId,false);
 	}
@@ -45,16 +46,17 @@ public class RequestIdValidationService {
 		serverRequestIdDTO.setRequestIdServerSide(comps.common().randomGenerator().requestIdServerSide());
 		serverRequestIdDTO.setRequestIdClientSide(halfId.getRequestIdClientSide());
 
-//		if (isPrivate) {
-//			ConcurrentMap<String, RequestIdDTO> map = comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getRequestIds();
-//			isRequestIdDuplicated(halfId, map);
-//			map.put(halfId.getRequestIdClientSide(), serverRequestIdDTO);
-//		}else {
+		if (isPrivate) {
+			ConcurrentMap<String, RequestIdDTO> map = comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getRequestIds();
+			//isRequestIdDuplicated(halfId, map);
+						
+			map.put(halfId.getRequestIdClientSide(), serverRequestIdDTO);
+		}else {
 			comps.service().requestIdPublic().isRequestIdDuplicated(halfId);
 			comps.service().requestIdPublic().getRequestIdsPublic().put(halfId.getRequestIdClientSide(), serverRequestIdDTO);
 			
 
-//		}
+		}
 		
 		RequestIdDTO r = comps.common().mapper().doitClientRequestIdDTO(serverRequestIdDTO);
 		

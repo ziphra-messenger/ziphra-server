@@ -44,7 +44,7 @@ public class RSA {
 	 * @throws NoSuchProviderException 
 	 */
 	public KeyPair generateKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException {
-		KeyPairGenerator pairgen = KeyPairGenerator.getInstance("RSA","BC");
+		KeyPairGenerator pairgen =   KeyPairGenerator.getInstance("RSA","BC");
 		SecureRandom random = new SecureRandom();
 		pairgen.initialize(rsa_key_size, random);
 		return pairgen.generateKeyPair();

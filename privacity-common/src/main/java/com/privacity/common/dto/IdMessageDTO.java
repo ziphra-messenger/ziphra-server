@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class IdMessageDTO{
 
-	@PrivacityId	
+	@PrivacityId
+	@PrivacityIdOrder
 	public String idGrupo;
 	
 	@PrivacityIdOrder
@@ -22,9 +23,7 @@ public class IdMessageDTO{
     	return idGrupo + "{-}" + idMessage;
     }	
 
-    
-	
-	public Long getIdGrupoLong() {
+    public Long getIdGrupoLong() {
 		return Long.parseLong(idGrupo);
 	}
 	

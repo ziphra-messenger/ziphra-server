@@ -4,6 +4,7 @@ package com.privacity.common.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.annotations.PrivacityId;
+import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.enumeration.GrupoUserConfEnum;
 
 import lombok.Data;
@@ -12,9 +13,12 @@ import lombok.Data;
 public class GrupoUserConfDTO {
 
 	@PrivacityId
+	@PrivacityIdOrder
 	@JsonInclude(Include.NON_NULL)
 	public String idGrupo;
+	
 	@PrivacityId
+	@PrivacityIdOrder
 	@JsonInclude(Include.NON_NULL)
 	public String idUsuario; 
 

@@ -9,8 +9,10 @@ import lombok.Data;
 public class LockDTO {
 	@JsonInclude(Include.NON_NULL)
 	public boolean enabled;
+	
 	@JsonInclude(Include.NON_NULL)
 	public Integer seconds;
+	
 	@JsonInclude(Include.NON_NULL)
 	public Integer minSecondsValidation;
 

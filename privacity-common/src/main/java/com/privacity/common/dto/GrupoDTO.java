@@ -3,6 +3,7 @@ package com.privacity.common.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.annotations.PrivacityId;
+import com.privacity.common.annotations.PrivacityIdOrder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,16 +16,21 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class GrupoDTO{
 	@PrivacityId
+	@PrivacityIdOrder
 	public String idGrupo;
 	@JsonInclude(Include.NON_NULL)
 	public String name;
 
 	@JsonInclude(Include.NON_NULL)
 	public GrupoInvitationDTO grupoInvitationDTO;
+	
 	@JsonInclude(Include.NON_NULL)
 	public UserForGrupoDTO userForGrupoDTO;
+	
 	@JsonInclude(Include.NON_NULL)
+	
 	public GrupoGralConfDTO gralConfDTO;
+	
 	@JsonInclude(Include.NON_NULL)
 	public GrupoUserConfDTO userConfDTO;
 	    

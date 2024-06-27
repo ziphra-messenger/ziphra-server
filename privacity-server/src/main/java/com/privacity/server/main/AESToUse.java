@@ -11,26 +11,43 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.springframework.beans.factory.annotation.Value;
 
-import lombok.Getter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 
-@ToString
+import lombok.Getter;
+
+
 public class AESToUse {
+	@Override
+	public String toString() {
+		return "AESToUse [secretKeyAES=" + secretKeyAES + ", saltAES=" + saltAES + ", bitsEncrypt=" + bitsEncrypt
+				+ ", interationCount=" + interationCount + "]";
+	}
+
 	@Getter
+	@Expose 
 	private String secretKeyAES;
 	@Getter
+	@Expose 
 	private String saltAES;
+	@Expose 
 	@Getter
 	@Value("${privacity.security.encrypt.bits}")
 	private int bitsEncrypt;
 //	
+	@Expose 
 	@Getter
 	@Value("${privacity.security.encrypt.iteration.count}")
 	private int interationCount;
-	
+	@JsonIgnore
+	@ToStringExclude
 	private Cipher decrypt;
+	@JsonIgnore
+	
+	@ToStringExclude
 	private Cipher encrypt;
 
 	public AESToUse(int bitsEncrypt2, int interationCount2 , String secretKeyAES, String saltAES) throws Exception {
@@ -71,7 +88,7 @@ public class AESToUse {
 	public String getAES(String data) {
 		try {
 
-			return Base64.getEncoder().encodeToString(encrypt.doFinal(data.getBytes(("UTF-8"))));
+			return Base64.getEncoder().encodeToString(encrypt.doFinal(data.getBytes()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

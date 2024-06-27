@@ -1,6 +1,7 @@
 package com.privacity.server.component.model.request;
 
 import com.privacity.common.annotations.PrivacityId;
+import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.interfaces.GrupoRoleInterface;
 import com.privacity.common.interfaces.UserForGrupoRoleInterface;
 import com.privacity.common.interfaces.UsuarioRoleInterface;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class GrupoInfoNicknameRequestLocalDTO  implements GrupoRoleInterface, UsuarioRoleInterface, UserForGrupoRoleInterface {
 
 	@PrivacityId
+	@PrivacityIdOrder
 	public String idGrupo;
 	public String nickname;
 	

@@ -15,6 +15,7 @@ public class MessageDTO implements Cloneable{
 	@PrivacityIdOrder
 	public String idMessage;
 	@PrivacityId
+	@PrivacityIdOrder
 	public String idGrupo;
 	
     public IdMessageDTO parentReply;

@@ -17,6 +17,7 @@ public class MediaDTO {
 //	public Grupo grupo;
 //	
 	@PrivacityId
+	@PrivacityIdOrder
 	public String idGrupo;
 
 	@PrivacityIdOrder

@@ -1,6 +1,7 @@
 package com.privacity.common.dto;
 
 import com.privacity.common.annotations.PrivacityId;
+import com.privacity.common.annotations.PrivacityIdOrder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class IdDTO{
 	@PrivacityId
+	@PrivacityIdOrder
 	public String id;
 	
 	public IdDTO(Long id) {

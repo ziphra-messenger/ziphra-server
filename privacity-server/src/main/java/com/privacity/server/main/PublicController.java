@@ -3,7 +3,6 @@ package com.privacity.server.main;
 import java.time.LocalDateTime;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,9 +22,7 @@ import com.privacity.common.dto.request.ValidateUsernameDTO;
 import com.privacity.server.component.auth.AuthValidationService;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.component.requestid.RequestIdValidationService;
 import com.privacity.server.encrypt.PrivacityIdServices;
-
 import com.privacity.server.util.LocalDateAdapter;
 
 

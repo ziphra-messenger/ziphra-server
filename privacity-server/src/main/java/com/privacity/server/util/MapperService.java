@@ -1,8 +1,6 @@
 package com.privacity.server.util;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +26,13 @@ import com.privacity.common.dto.UsuarioDTO;
 import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
 import com.privacity.common.enumeration.GrupoUserConfEnum;
-import com.privacity.common.enumeration.MediaTypeEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
+import com.privacity.server.dao.factory.MessageIdSequenceFactory;
 import com.privacity.server.exceptions.ProcessException;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.AES;
 import com.privacity.server.model.EncryptKeys;
 import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoGralConf;
 import com.privacity.server.model.GrupoInvitation;
 import com.privacity.server.model.GrupoUserConf;
 import com.privacity.server.model.GrupoUserConfId;
@@ -58,7 +55,9 @@ public class MapperService {
 	@Autowired
 	@Lazy
 	private FacadeComponent comps;
-	
+	@Autowired @Lazy
+	private MessageIdSequenceFactory messageIdSequenceFactory;
+
 	public UserForGrupoDTO getUserForGrupoDTOPropio(UserForGrupo userForGrupo) {
 		UserForGrupoDTO ufgDTO = new UserForGrupoDTO();
 //		ufgDTO.setIdGrupo(userForGrupo.getUserForGrupoId().getGrupo().getIdGrupo()+"");
@@ -245,7 +244,7 @@ public class MapperService {
 		if (u.getUsername().equals("SYSTEM")){
 			UsuarioDTO usuarioDTO = new UsuarioDTO();
 			usuarioDTO.setIdUsuario(u.getIdUser()+"");
-			usuarioDTO.setNickname(u.getNickname());
+			usuarioDTO.setNickname(u.getNickname()+"");
 			
 			return usuarioDTO;
 		}
@@ -305,7 +304,7 @@ public class MapperService {
 		idm.setGrupo(g);
 		
 		if (dto.getIdMessage() == null || newId) {
-			idm.setIdMessage(comps.common().randomGenerator().idMessage());	
+			idm.setIdMessage(messageIdSequenceFactory.getMessgeIdInterfaceDAO().getNextMessageId(g.getIdGrupo()));
 		}
 		
 		m.setMessageId(idm);
@@ -472,10 +471,10 @@ public class MapperService {
 		String idMessage = m.getMessageId().getIdMessage() +"";
 		
 		MessageDTO r = new MessageDTO();
-		r.setIdGrupo(idGrupo);
-		r.setText(m.getText());
+		r.setIdGrupo(idGrupo+"");
+		r.setText(m.getText()+"");
 		r.setUsuarioCreacion(doitForGrupo(m.getMessageId().getGrupo(), m.getUserCreation()));
-		r.setIdMessage(idMessage);
+		r.setIdMessage(idMessage+"");
 		r.setMessagesDetailDTO(new MessageDetailDTO[1]);
 		r.setSecretKeyPersonal(m.isSecretKeyPersonal());
 		Set<MessageDetail> details = m.getMessagesDetail();
@@ -509,11 +508,11 @@ public class MapperService {
 			r.getMessagesDetailDTO()[i].setIdMessage(idMessage);
 			//			r.getMessagesDetailDTO()[i].setIdMessageDetail(d.getMessageDetailId().getIdMessageDetail()+"");
 			
-			if (d.getMessageDetailId().getUserDestino().getIdUser() == m.getUserCreation().getIdUser()) {
-				r.getMessagesDetailDTO()[i].setUsuarioDestino(r.getUsuarioCreacion());
-			}else {
+//			if (d.getMessageDetailId().getUserDestino().getIdUser() == m.getUserCreation().getIdUser()) {
+//				r.getMessagesDetailDTO()[i].setUsuarioDestino(r.getUsuarioCreacion());
+//			}else {
 				r.getMessagesDetailDTO()[i].setUsuarioDestino( doitForGrupo(m.getMessageId().getGrupo(),d.getMessageDetailId().getUserDestino()));
-			}
+//			}
 			
 			//response.getMessagesDetailDTO()[i].setUserDestino(d.getMessageDetailId().getUserDestino().getUsername());
 			

@@ -245,6 +245,17 @@ public static void main(String...strings ) {
       throws ValidationException {
         System.out.println("----->AppConfigurationMethodRolValidationInterceptor");
         
+        System.out.println("-----> " + o.toString());
+        
+//        Gson gson = new GsonBuilder()
+//                .setPrettyPrinting()
+//                .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
+//                .create();
+//        String retornoJson = gson.toJson(o);
+//        System.out.println("-----> " +retornoJson);
+		
+        
+        
         RolesAllowed ann = (( RolesAllowed)ann2);
 
         

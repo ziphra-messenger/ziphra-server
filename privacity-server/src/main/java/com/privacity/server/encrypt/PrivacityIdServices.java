@@ -11,11 +11,14 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
+import com.privacity.common.util.RandomGenerator;
+import com.privacity.server.component.common.service.RandomGeneratorService;
 
 import lombok.Data;
 
@@ -23,27 +26,35 @@ import lombok.Data;
 @Data
 public class PrivacityIdServices {
 
-	private  final String AesKey="1";
-	private  final String AesSalt="1";
-	private  final int AesIteration=1;
 	private Cipher decrypt;
 	private Cipher encrypt;
 
 	private long privacityIdOrderSeed;
 	
-	public PrivacityIdServices(
-			@Value("${serverconf.privacityIdAes.bits}") int bitsEncrypt
-			) throws Exception {
+	private MutateDigitUtil mutateDigitUtil;
+	private long orderRamdomNumber = 92885769L;
+	
+	
+
+	private String aesKey;
+	private String aesSalt;
+	private int aesIteration;
+
+	
+	public PrivacityIdServices(@Autowired RandomGeneratorService randomGeneratorService, 
+			@Value("${serverconf.privacityIdAes.bits}") int bitsEncrypt )throws Exception {
 		{
-			bitsEncrypt=128;
-	//		privacityIdOrderSeed = RandomGenerator.betweenTwoNumber(1483647,7483647);
-//			AesKey = randomGeneratorService.privacityIdAesSecretKey();
-//			AesSalt = randomGeneratorService.privacityIdAesSecretSalt();
-//			AesIteration = randomGeneratorService.privacityIdAesIteration();
+			mutateDigitUtil = new MutateDigitUtil(true);
+			
+			privacityIdOrderSeed = RandomGenerator.betweenTwoNumber(1483647,7483647);
+			aesKey = randomGeneratorService.privacityIdAesSecretKey();
+			aesSalt = randomGeneratorService.privacityIdAesSecretSalt();
+			aesIteration = randomGeneratorService.privacityIdAesIteration();
+			
 			byte[] iv = new byte[16];
 			IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 			SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-			KeySpec keySpec = new PBEKeySpec((AesKey).toCharArray(), (AesSalt).getBytes(), AesIteration, bitsEncrypt);
+			KeySpec keySpec = new PBEKeySpec((aesKey).toCharArray(), (aesSalt).getBytes(), aesIteration, bitsEncrypt);
 			SecretKey secretKeyTemp = secretKeyFactory.generateSecret(keySpec);
 			SecretKeySpec secretKey = new SecretKeySpec(secretKeyTemp.getEncoded(), "AES");
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -55,7 +66,7 @@ public class PrivacityIdServices {
 			byte[] iv = new byte[16];
 			IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 			SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-			KeySpec keySpec = new PBEKeySpec((AesKey).toCharArray(), (AesSalt).getBytes(), AesIteration, bitsEncrypt);
+			KeySpec keySpec = new PBEKeySpec((aesKey).toCharArray(), (aesSalt).getBytes(), aesIteration, bitsEncrypt);
 			SecretKey secretKeyTemp = secretKeyFactory.generateSecret(keySpec);
 			SecretKeySpec secretKey = new SecretKeySpec(secretKeyTemp.getEncoded(), "AES");
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -64,28 +75,23 @@ public class PrivacityIdServices {
 		}
 	}
 
-
-
-	public String getAES(String data) {
+	private String getAES(String data) {
 		try {
-
-			return Base64.getEncoder().encodeToString(encrypt.doFinal(data.getBytes()));
+			return Base64.getEncoder().encodeToString(MixBytesUtil.mix(encrypt.doFinal(data.getBytes())));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public String getAESDecrypt(String data) {
-		
-		
+	private String getAESDecrypt(String data) {
 		if (data == null) return null;
 		if (data == "") return "";
 		////////System.out.println(data);
 
 		try {
 
-			return new String(decrypt.doFinal(Base64.getDecoder().decode(data)));
+			return new String(decrypt.doFinal(MixBytesUtil.unmix(Base64.getDecoder().decode(data))));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -148,18 +154,18 @@ public class PrivacityIdServices {
 							
 							
 						if (g.getClass().getDeclaredFields()[i].get(g) != null){
-								try {
-									Long.parseLong(g.getClass().getDeclaredFields()[i].get(g)+"");
+//								try {
+//									Long.parseLong(g.getClass().getDeclaredFields()[i].get(g)+"");
 									
 							g.getClass().getDeclaredFields()[i].set(g, this.getAES(g.getClass().getDeclaredFields()[i].get(g)+""));
 							//g.getClass().getDeclaredFields()[i].set(g,"xxxxxxxxx");
-				        } catch (NumberFormatException e) {
-				         
-				        	System.out.println ("YA ESTA ENCRIPTADO");
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} 
+//				        } catch (NumberFormatException e) {
+//				         
+//				        	System.out.println ("YA ESTA ENCRIPTADO");
+//						} catch (Exception e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						} 
 						
 						////////System.out.println(g.getClass().getDeclaredFields()[i]); 
 
@@ -227,12 +233,12 @@ public class PrivacityIdServices {
 						
 						if (g.getClass().getDeclaredFields()[i].get(g) != null){
 
-							try {
+//							try {
 								g.getClass().getDeclaredFields()[i].set(g, this.getAESDecrypt(g.getClass().getDeclaredFields()[i].get(g)+""));
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} 
+//							} catch (Exception e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							} 
 							//g.getClass().getDeclaredFields()[i].set(g,"xxxxxxxxx");
 
 						}
@@ -307,8 +313,12 @@ public class PrivacityIdServices {
 						if (g.getClass().getDeclaredFields()[i].get(g) != null){
 							try {
 								Long newId = Long.parseLong(g.getClass().getDeclaredFields()[i].get(g).toString()) +privacityIdOrderSeed;
-								newId = newId + 9288511499769L;
-								g.getClass().getDeclaredFields()[i].set(g, newId+"" );
+								newId = newId + this.orderRamdomNumber;
+								
+								String newIdS = MathBaseConverter.convertirBaseN(newId);
+								newIdS = this.mutateDigitUtil.mutate(newIdS);
+								
+								g.getClass().getDeclaredFields()[i].set(g, newIdS );
 						//g.getClass().getDeclaredFields()[i].set(g,"xxxxxxxxx");
 					} catch (Exception e) {
 						////System.out.println(g.getClass().getDeclaredFields()[i]); 
@@ -386,10 +396,15 @@ public class PrivacityIdServices {
 							try {
 								
 								
-								Long newId = Long.parseLong(g.getClass().getDeclaredFields()[i].get(g).toString()) - privacityIdOrderSeed;
-								newId = newId - 9288511499769L;
+								String newId = g.getClass().getDeclaredFields()[i].get(g).toString() ;
+					
+								String newIdS = this.mutateDigitUtil.unmutate(newId);
 								
-								g.getClass().getDeclaredFields()[i].set(g, newId+"" );
+								long newIdL = MathBaseConverter.convertirBase10(newIdS);
+								
+								newIdL = newIdL - privacityIdOrderSeed - this.orderRamdomNumber;
+								
+								g.getClass().getDeclaredFields()[i].set(g, newIdL+"" );
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								////System.out.println(g.getClass().getDeclaredFields()[i].get(g));

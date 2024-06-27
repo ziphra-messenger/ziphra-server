@@ -13,12 +13,16 @@ import lombok.NoArgsConstructor;
 public class GrupoGralConfPasswordDTO {
 	@JsonInclude(Include.NON_NULL)
 	public boolean enabled;
+	
 	@JsonInclude(Include.NON_NULL)
 	public boolean extraEncryptDefaultEnabled=true;
+	
 	@JsonInclude(Include.NON_NULL)
 	public String password;
+	
 	@JsonInclude(Include.NON_NULL)
 	public boolean deleteExtraEncryptEnabled=true;
+	
 	@JsonInclude(Include.NON_NULL)
 	public String passwordExtraEncrypt;
 	

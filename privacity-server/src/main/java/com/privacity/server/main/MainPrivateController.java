@@ -28,6 +28,7 @@ import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.MessageDetailDTO;
 import com.privacity.common.dto.MyAccountConfDTO;
 import com.privacity.common.dto.ProtocoloDTO;
+import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.dto.UserInvitationCodeDTO;
 import com.privacity.common.dto.WrittingDTO;
 import com.privacity.common.dto.request.GrupoAddUserRequestDTO;
@@ -50,7 +51,6 @@ import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.component.requestid.RequestIdValidationService;
 import com.privacity.server.component.usuario.UserUtilService;
 import com.privacity.server.encrypt.PrivacityIdServices;
-
 import com.privacity.server.security.UserDetailsImpl;
 import com.privacity.server.util.LocalDateAdapter;
 
@@ -91,7 +91,7 @@ public class MainPrivateController extends ControllerBase{
 
 		
 		getMapaController().put(ConstantProtocolo.PROTOCOLO_COMPONENT_REQUEST_ID, requestIdValidationService);
-		//getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_REQUEST_ID_PRIVATE_GET, RequestIdValidationService.class.getMethod("getNewRequestIdPrivate", RequestIdDTO.class));		
+		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_REQUEST_ID_PRIVATE_GET, RequestIdValidationService.class.getMethod("getNewRequestIdPrivate", RequestIdDTO.class));		
 		
 		getMapaController().put(ConstantProtocolo.PROTOCOLO_COMPONENT_ENCRYPT_KEYS, encryptKeysValidationService);
 		getMapaController().put("/grupo", grupoValidationService);

@@ -12,6 +12,7 @@ public class MessageDetailDTO{
 	@PrivacityIdOrder	
 	public String idMessage;
 	@PrivacityId
+	@PrivacityIdOrder	
 	public String idGrupo;
 	public UsuarioDTO usuarioDestino;
     public String estado;

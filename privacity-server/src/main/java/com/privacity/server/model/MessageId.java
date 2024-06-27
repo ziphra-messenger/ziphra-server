@@ -8,11 +8,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 
 import lombok.Data;
 
 
 @Embeddable
+@SequenceGenerator(name = "message_secuencia", initialValue = 10000, allocationSize = 1)
 public class MessageId implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -36,7 +38,7 @@ public class MessageId implements Serializable {
 	public void setIdMessage(Long idMessage) {
 		this.idMessage = idMessage;
 	}
-
+	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "message_secuencia")
 	private Long idMessage;
 
     public MessageId() {

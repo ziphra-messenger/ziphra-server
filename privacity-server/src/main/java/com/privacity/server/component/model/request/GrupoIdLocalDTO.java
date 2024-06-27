@@ -2,6 +2,7 @@ package com.privacity.server.component.model.request;
 
 import com.google.gson.annotations.SerializedName;
 import com.privacity.common.annotations.PrivacityId;
+import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.interfaces.GrupoRoleInterface;
 import com.privacity.common.interfaces.UserForGrupoRoleInterface;
 import com.privacity.common.interfaces.UsuarioRoleInterface;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 public class GrupoIdLocalDTO  implements GrupoRoleInterface, UsuarioRoleInterface, UserForGrupoRoleInterface {
 
 	@PrivacityId
+	@PrivacityIdOrder
 	@SerializedName("id")
 	public String idGrupo;
 	
