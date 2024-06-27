@@ -1,4 +1,4 @@
-package com.privacity.server.encrypt.pool2.copy;
+package com.privacity.server.encrypt.pool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +8,10 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
+import com.privacity.server.main.AESToUse;
 
 
+@Service
 public class ProducerConsumerDemonstrator {
 	
 	  
@@ -40,7 +42,7 @@ public class ProducerConsumerDemonstrator {
        // sleep(2000);
 
         // stop threads
-        producer.stop();
+        //producer.stop();
         //consumer.stop();
 
         //waitForAllThreadsToComplete(threads);
@@ -49,10 +51,10 @@ public class ProducerConsumerDemonstrator {
     public static void demoMultipleProducersAndMultipleConsumers() {
         dataQueue = new DataQueue(MAX_QUEUE_CAPACITY);
         int producerCount = 5;
-        int consumerCount = 5;
+        //int consumerCount = 5;
         List<Thread> threads = new ArrayList<>();
         List<Producer> producers = new ArrayList<>();
-        List<Consumer> consumers = new ArrayList<>();
+       // List<Consumer> consumers = new ArrayList<>();
 
         for(int i = 0; i < producerCount; i++) {
             Producer producer = new Producer(dataQueue);
@@ -96,11 +98,11 @@ public class ProducerConsumerDemonstrator {
         
         
         
-        Thread.sleep(1000);
+        //Thread.sleep(1000);
         
         while ( true) {
-        	Thread.sleep(1000);
-        	Message m = dataQueue.poll();
+        	//Thread.sleep(1000);
+        	AESToUse m = ProducerConsumerDemonstrator.dataQueue.poll();
         	log.info("-------------> " + m.toString());
         }
     }

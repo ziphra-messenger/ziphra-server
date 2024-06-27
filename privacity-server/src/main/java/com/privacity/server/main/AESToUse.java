@@ -21,11 +21,7 @@ import lombok.Getter;
 
 
 public class AESToUse {
-	@Override
-	public String toString() {
-		return "AESToUse [secretKeyAES=" + secretKeyAES + ", saltAES=" + saltAES + ", bitsEncrypt=" + bitsEncrypt
-				+ ", interationCount=" + interationCount + "]";
-	}
+
 
 	@Getter
 	@Expose 
@@ -129,6 +125,12 @@ public class AESToUse {
 		return decrypt.doFinal(data);
 
 
+	}
+	
+	@Override
+	public String toString() {
+		return "AESToUse [secretKeyAES=" + secretKeyAES + ", saltAES=" + saltAES + ", bitsEncrypt=" + bitsEncrypt
+				+ ", interationCount=" + interationCount + "]";
 	}
 
 }    

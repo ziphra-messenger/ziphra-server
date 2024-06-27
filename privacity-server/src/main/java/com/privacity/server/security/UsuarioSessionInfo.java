@@ -5,11 +5,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.privacity.common.dto.AESDTO;
-import com.privacity.common.dto.MyAccountConfDTO;
 import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.server.main.AESToUse;
 import com.privacity.server.model.MyAccountConf;
-import com.privacity.server.util.MapperService;
 
 import lombok.Data;
 
@@ -30,7 +28,6 @@ public class UsuarioSessionInfo {
 //	private String publicKeyToSend;
 //	private String privateKeyToSend;
 	private AESToUse sessionAESToUse;
-	
 	private AESDTO sessionAES;
 	
 	private ConcurrentMap<String,RequestIdDTO> requestIds = new ConcurrentHashMap<String,RequestIdDTO>();

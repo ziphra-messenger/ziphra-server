@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.encrypt.pool2.ProducerConsumerDemonstrator;
+import com.privacity.server.encrypt.pool.ProducerConsumerDemonstrator;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.main.AESToUse;
