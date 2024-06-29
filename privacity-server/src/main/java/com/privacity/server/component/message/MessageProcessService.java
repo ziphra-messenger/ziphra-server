@@ -21,6 +21,7 @@ import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.MessageDetailDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
+import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.MessageState;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.exceptions.PrivacityException;
@@ -510,7 +511,11 @@ public class MessageProcessService {
 			comps.repo().messageDetail().deleteLogicByMessageDetailIdMessage(message.getMessageId().getGrupo().getIdGrupo(), message.getMessageId().getIdMessage());
 			comps.repo().message().deleteLogic(message.getMessageId().getGrupo().getIdGrupo(), message.getMessageId().getIdMessage());
 
-			comps.webSocket().sender().senderMessageToGrupoMinusCreator( idUsuario+"",message.getMessageId().getGrupo().getIdGrupo()+"",  ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE, "/message/deleteForEveryone", mRemoveWS);
+			
+			this.senderToGrupoMinusCreator(ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE, "/message/deleteForEveryone",
+					message.getMessageId().getGrupo().getIdGrupo(), mRemoveWS);
+			
+			
 		
 		mRemoveReturn.setIdGrupo(message.getMessageId().getGrupo().getIdGrupo()+"");
 		mRemoveReturn.setIdMessage(message.getMessageId().getIdMessage()+"");
@@ -529,4 +534,61 @@ public class MessageProcessService {
 		Usuario u = comps.repo().user().findByUsername(userDetail.getUsername()).get();
 		return u;
 	}    
+	public void senderToGrupo(
+			String componente, String action, long idGrupo,  MessageDTO g
+			) throws PrivacityException {
+		sendTo(true, componente, action, idGrupo, g);
+	}
+	
+	public void senderToGrupoMinusCreator(String componente, String action, long idGrupo,  MessageDTO g
+			) throws PrivacityException {
+		sendTo(false, componente, action, idGrupo, g);
+					
+	}
+	
+
+	private void sendTo(boolean toAll , 
+			String componente, String action, long idGrupo,  MessageDTO g
+			) throws PrivacityException {
+					
+					List<String> lista;
+					if (toAll) {
+						lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get().getUsuarioDB().getIdUser());
+					}else {
+						lista = comps.repo().userForGrupo().findByForGrupoAll(idGrupo);	
+					}
+					
+					
+					Iterator<String> i = lista.iterator();
+					
+					while (i.hasNext()){
+						String destino = i.next();
+						ProtocoloDTO p;
+
+
+						MessageDTO newR =  (MessageDTO) comps.util().utilService().clon(MessageDTO.class, g);
+			
+						try {
+					
+								comps.service().usuarioSessionInfo().get(destino).getPrivacityIdServices().encryptIds(newR);
+							
+							
+							
+						} catch (Exception e) {
+							throw new PrivacityException(ExceptionReturnCode.ENCRYPT_PROCESS);
+						}
+						
+						p = comps.webSocket().sender().buildProtocoloDTO(
+								componente,
+								action);
+						p.setMessageDTO(newR);
+						
+						comps.webSocket().sender().sender(new WsMessage (destino , p ));
+					
+					
+					
+				}}
+
+	
 }
+

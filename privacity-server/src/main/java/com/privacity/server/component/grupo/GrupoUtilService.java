@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.ProtocoloDTO;
+import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
@@ -193,4 +194,61 @@ public class GrupoUtilService {
 				}}
 
 	
+	public void senderSaveGrupoGralConfLockToGrupo(
+			String componente, String action, long idGrupo,  SaveGrupoGralConfLockResponseDTO g
+			) throws PrivacityException {
+		sendTo(true, componente, action, idGrupo, g);
+	}
+	
+	public void senderSaveGrupoGralConfLockToGrupoMinusCreator(String componente, String action, long idGrupo,  SaveGrupoGralConfLockResponseDTO g
+			) throws PrivacityException {
+		sendTo(false, componente, action, idGrupo, g);
+					
+	}
+	
+
+	private void sendTo(boolean toAll , 
+			String componente, String action, long idGrupo,  SaveGrupoGralConfLockResponseDTO g
+			) throws PrivacityException {
+					
+					List<String> lista;
+					if (toAll) {
+						lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get().getUsuarioDB().getIdUser());
+					}else {
+						lista = comps.repo().userForGrupo().findByForGrupoAll(idGrupo);	
+					}
+					
+					
+					Iterator<String> i = lista.iterator();
+					
+					while (i.hasNext()){
+						String destino = i.next();
+						ProtocoloDTO p;
+
+
+						SaveGrupoGralConfLockResponseDTO newR =  (SaveGrupoGralConfLockResponseDTO) comps.util().utilService().clon(SaveGrupoGralConfLockResponseDTO.class, g);
+			
+						try {
+					
+								comps.service().usuarioSessionInfo().get(destino).getPrivacityIdServices().encryptIds(newR);
+							
+							
+							
+						} catch (Exception e) {
+							throw new PrivacityException(ExceptionReturnCode.ENCRYPT_PROCESS);
+						}
+						
+						p = comps.webSocket().sender().buildProtocoloDTO(
+								componente,
+								action);
+						p.setSaveGrupoGralConfLockResponseDTO(newR);
+						
+						comps.webSocket().sender().sender(new WsMessage (destino , p ));
+					
+					
+					
+				}}
+
+	
 }
+

@@ -161,17 +161,15 @@ public class GrupoValidationService {
 			Message mensaje = comps.common().mapper().doit(mensajeD, comps.util().usuario().getUsuarioSystem(), g);
 			comps.process().message().sendNormal(comps.util().usuario().getUsuarioSystem().getIdUser(), mensaje, g.getIdGrupo());
 			
-			GrupoDTO grupoDTO = comps.process().grupo().getGrupoDTO(u, v);
 			
-		ProtocoloDTO p;
-			p = comps.webSocket().sender().buildProtocoloDTO(
-					ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
-		        ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK);
+			
+			comps.util().grupo().senderSaveGrupoGralConfLockToGrupo(ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO
+					,ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK
+					, g.getIdGrupo(),  c);
+			
 		
-				p.setSaveGrupoGralConfLockResponseDTO(c);
-				
-				comps.webSocket().sender().senderToGrupoMinusCreator( comps.util().usuario().getUsuarioSystem().getIdUser(), g.getIdGrupo(), p);
-			} catch (Exception e) {
+	
+					} catch (Exception e) {
 				e.printStackTrace();
 				throw new ValidationException(ExceptionReturnCode.GRUPO_GRUPOID_BADFORMAT);
 			}			

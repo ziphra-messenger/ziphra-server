@@ -42,7 +42,7 @@ public class PrivacityIdServices {
 	public PrivacityIdServices(boolean privacityIdAESOn, AESDTO aesDTO )throws Exception {
 		{
 			this.privacityIdAESOn= privacityIdAESOn;
-			mutateDigitUtil = new MutateDigitUtil(true);
+			mutateDigitUtil = new MutateDigitUtil();
 			
 			privacityIdOrderSeed = RandomGenerator.betweenTwoNumber(1483647,7483647);
 			aesKey = aesDTO.getSecretKeyAES();

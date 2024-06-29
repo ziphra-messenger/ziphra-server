@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import com.google.gson.GsonBuilder;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.server.component.grupo.Grupo2Repository;
-import com.privacity.server.component.grupo.GtupobaseRepository;
+import com.privacity.server.component.grupo.GrupobaseRepository;
 import com.privacity.server.model.Grupo2;
 import com.privacity.server.model.Grupobase;
 import com.privacity.server.security.ERole;

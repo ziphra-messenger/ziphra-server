@@ -420,6 +420,7 @@ public class GrupoProcessService  {
 		
 		GrupoRemoveMeResponseDTO r = new GrupoRemoveMeResponseDTO();
 		
+		
 		GrupoDTO grupoRemove = new GrupoDTO();
 		grupoRemove.setIdGrupo(grupo.getIdGrupo()+"");
 		
@@ -429,14 +430,10 @@ public class GrupoProcessService  {
 		usuarioRemove.setIdUsuario(usuarioLogged.getIdUser()+"");
 		r.setUsuariosDTO(usuarioRemove);
 		
-		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-				ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
-				ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_REMOVE_USER, 
-				grupoRemove);
-		
-		for (Usuario usuarioToAvisarRemove : usuarios){
-			q.put(new WsMessage(usuarioToAvisarRemove.getUsername() ,p));
-		}
+		comps.util().grupo().senderToGrupoMinusCreator(ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
+				ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_REMOVE_USER,  grupo.getIdGrupo(), grupoRemove);
+	
+
 		//ACA DEBE INFORMAR A TODOS LOS SUSCRIPTORES EL INGRESO DEL NUEVO MIEMBRO
 	
 
