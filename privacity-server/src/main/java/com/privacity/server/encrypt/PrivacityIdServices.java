@@ -11,18 +11,15 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
+import com.privacity.common.dto.AESDTO;
 import com.privacity.common.util.RandomGenerator;
 import com.privacity.server.component.common.service.RandomGeneratorService;
 
 import lombok.Data;
 
-@Service
+
 @Data
 public class PrivacityIdServices {
 
@@ -39,22 +36,23 @@ public class PrivacityIdServices {
 	private String aesKey;
 	private String aesSalt;
 	private int aesIteration;
-
 	
-	public PrivacityIdServices(@Autowired RandomGeneratorService randomGeneratorService, 
-			@Value("${serverconf.privacityIdAes.bits}") int bitsEncrypt )throws Exception {
+	private boolean privacityIdAESOn;
+	
+	public PrivacityIdServices(boolean privacityIdAESOn, AESDTO aesDTO )throws Exception {
 		{
+			this.privacityIdAESOn= privacityIdAESOn;
 			mutateDigitUtil = new MutateDigitUtil(true);
 			
 			privacityIdOrderSeed = RandomGenerator.betweenTwoNumber(1483647,7483647);
-			aesKey = randomGeneratorService.privacityIdAesSecretKey();
-			aesSalt = randomGeneratorService.privacityIdAesSecretSalt();
-			aesIteration = randomGeneratorService.privacityIdAesIteration();
+			aesKey = aesDTO.getSecretKeyAES();
+			aesSalt = aesDTO.getSaltAES();
+			aesIteration = Integer.parseInt( aesDTO.getIteration());
 			
 			byte[] iv = new byte[16];
 			IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 			SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-			KeySpec keySpec = new PBEKeySpec((aesKey).toCharArray(), (aesSalt).getBytes(), aesIteration, bitsEncrypt);
+			KeySpec keySpec = new PBEKeySpec((aesKey).toCharArray(), (aesSalt).getBytes(), aesIteration, Integer.parseInt( aesDTO.getBitsEncrypt()));
 			SecretKey secretKeyTemp = secretKeyFactory.generateSecret(keySpec);
 			SecretKeySpec secretKey = new SecretKeySpec(secretKeyTemp.getEncoded(), "AES");
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -66,7 +64,7 @@ public class PrivacityIdServices {
 			byte[] iv = new byte[16];
 			IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 			SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-			KeySpec keySpec = new PBEKeySpec((aesKey).toCharArray(), (aesSalt).getBytes(), aesIteration, bitsEncrypt);
+			KeySpec keySpec = new PBEKeySpec((aesKey).toCharArray(), (aesSalt).getBytes(), aesIteration, Integer.parseInt( aesDTO.getBitsEncrypt()));
 			SecretKey secretKeyTemp = secretKeyFactory.generateSecret(keySpec);
 			SecretKeySpec secretKey = new SecretKeySpec(secretKeyTemp.getEncoded(), "AES");
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -75,6 +73,19 @@ public class PrivacityIdServices {
 		}
 	}
 
+
+	public void encryptIds(Object g) throws Exception {
+		if (! privacityIdAESOn) return; 
+		 transformarEncriptarOutOrder(g);
+		 transformarEncriptarOut(g);
+	}
+	
+	public void decryptIds(Object g1) throws Exception {
+		if (! privacityIdAESOn) return; 
+			transformarDesencriptarOut(g1);
+		 transformarDesencriptarOutOrder(g1);
+	}
+	
 	private String getAES(String data) {
 		try {
 			return Base64.getEncoder().encodeToString(MixBytesUtil.mix(encrypt.doFinal(data.getBytes())));
@@ -99,7 +110,7 @@ public class PrivacityIdServices {
 	}
 
 
-	public Object transformarEncriptarOut(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
+	private Object transformarEncriptarOut(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
 		
 
 		if (g == null) return null;
@@ -184,7 +195,7 @@ public class PrivacityIdServices {
 		
 		return g;
 	}
-	public Object transformarDesencriptarOut(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
+	private Object transformarDesencriptarOut(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
 		if (g == null) return null;
 
 		System.out.println(g.getClass().getName());
@@ -259,7 +270,7 @@ public class PrivacityIdServices {
 	}
 
 
-	public Object transformarEncriptarOutOrder(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
+	private Object transformarEncriptarOutOrder(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
 		if (g == null) return null;
 
 		if ( g.getClass().getEnumConstants() != null) return null;
@@ -348,7 +359,7 @@ public class PrivacityIdServices {
 		
 		return g;
 	}
-	public Object transformarDesencriptarOutOrder(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
+	private Object transformarDesencriptarOutOrder(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
 		if (g == null) return null;
 		if ( g.getClass().getEnumConstants() != null) return null;
 		////////System.out.println(g.getClass().getName());

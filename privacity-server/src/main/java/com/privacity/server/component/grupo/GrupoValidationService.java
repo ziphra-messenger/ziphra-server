@@ -3,6 +3,7 @@ package com.privacity.server.component.grupo;
 
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -42,6 +43,7 @@ import com.privacity.server.model.Message;
 import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.model.UserForGrupoId;
 import com.privacity.server.security.Usuario;
+import com.privacity.server.websocket.WsMessage;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -335,27 +337,14 @@ public class GrupoValidationService {
 	}
 
 	public void startWritting (WrittingDTO request) throws Exception {
-		
-		String username = comps.util().usuario().getUsernameLogged();
-		
-		Usuario usuarioLogged = comps.service().usuarioSessionInfo().get(username).getUsuarioDB();
-
-		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());
-		
-		Grupo g = comps.repo().grupo().findById(idGrupo).get();
-		
-		
-		
-		ProtocoloDTO p;
-			p = comps.webSocket().sender().buildProtocoloDTO(
-					ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
-			        ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_WRITTING,
-			        request);
-
-			comps.webSocket().sender().senderToGrupoMinusCreator( usuarioLogged.getIdUser(),g.getIdGrupo(), p);
-		
+		generalWritting(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_WRITTING, request);
 	}
 	public void stopWritting (WrittingDTO request) throws Exception {
+		generalWritting(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_STOP_WRITTING, request);
+	}
+
+
+	private void generalWritting (String protocoloAction, WrittingDTO request) throws Exception {
 		
 		String username = comps.util().usuario().getUsernameLogged();
 		
@@ -365,16 +354,30 @@ public class GrupoValidationService {
 		
 		Grupo g = comps.repo().grupo().findById(idGrupo).get();
 		
+		List<String> lista;
+		lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, usuarioLogged.getIdUser());	
 		
+		Iterator<String> i = lista.iterator();
 		
-		ProtocoloDTO p;
+		while (i.hasNext()){
+			String destino = i.next();
+			ProtocoloDTO p;
+
+			WrittingDTO w = (WrittingDTO) comps.util().utilService().clon(WrittingDTO.class, request);
+			
+	
+				comps.service().usuarioSessionInfo().get(destino).getPrivacityIdServices().encryptIds(w);
+		
+			
 			p = comps.webSocket().sender().buildProtocoloDTO(
 					ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
-			        ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_STOP_WRITTING,
-			        request);
+					protocoloAction,
+			        w);
+			
+			
 
-			comps.webSocket().sender().senderToGrupoMinusCreator( usuarioLogged.getIdUser(),g.getIdGrupo(), p);		
-		
+			comps.webSocket().sender().sender(new WsMessage (destino , p ));
+		}
 	}
 	
 	//hacer q reciba un array

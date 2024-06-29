@@ -8,9 +8,7 @@ import com.privacity.server.component.common.service.RandomGeneratorService;
 import com.privacity.server.component.common.service.ServerConfService;
 import com.privacity.server.component.common.service.ZipUtilService;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
-import com.privacity.server.encrypt.PrivacityIdServices;
 import com.privacity.server.encrypt.RSA;
-
 import com.privacity.server.util.MapperService;
 
 import lombok.NoArgsConstructor;
@@ -39,8 +37,7 @@ public class FacadeCommonComponent {
 	@Autowired @Lazy
 	private RSA RSA;
 
-	@Autowired @Lazy
-	private PrivacityIdServices privacityId;	
+
 	public ServerConfService serverConf() {
 		return serverConf;
 	}
@@ -64,10 +61,6 @@ public class FacadeCommonComponent {
 
 	public ZipUtilService zip() {
 		return zip;
-	}
-
-	public PrivacityIdServices privacityId() {
-		return privacityId;
 	}
 
 

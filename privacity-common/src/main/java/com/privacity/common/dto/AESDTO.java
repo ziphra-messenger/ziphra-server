@@ -15,6 +15,8 @@ public class AESDTO {
 	public String secretKeyAES;
 	public String saltAES;
 	public String iteration;
+	public String bitsEncrypt;
+	
 	@Override
 	public String toString() {
 		return "AESDTO [secretKeyAES=" + check(secretKeyAES)
@@ -30,5 +32,18 @@ public class AESDTO {
 			return "null";
 		}
 	}
+	
+	
 
+	public void setIteration(String iteration) {
+		this.iteration=iteration;
+	}
+	public AESDTO(String secretKeyAES, String saltAES, int iteration, int bitsEncrypt) {
+		this.setSecretKeyAES(secretKeyAES);
+		this.setSaltAES(saltAES);
+		this.setIteration(iteration+"");
+		this.setBitsEncrypt(bitsEncrypt+"");
+		
+		
+	}
 }

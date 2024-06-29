@@ -172,12 +172,7 @@ public class SendPrivateController {
 			
 				 dtoObject =  request.getMessageDTO();
 				
-					if(getEncryptIds()) {
-						
-						comps.common().privacityId().transformarDesencriptarOut(dtoObject);
-						comps.common().privacityId().transformarDesencriptarOutOrder(dtoObject);
-					}
-					
+					comps.service().usuarioSessionInfo().get().getPrivacityIdServices().decryptIds(dtoObject);
 					//////////////////
 					
 						Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
@@ -233,10 +228,8 @@ public class SendPrivateController {
 			
 		} 
 
-		if(getEncryptIds()) {
-			comps.common().privacityId().transformarEncriptarOutOrder(objetoRetorno);
-			comps.common().privacityId().transformarEncriptarOut(objetoRetorno);
-		}
+
+			comps.service().usuarioSessionInfo().get().getPrivacityIdServices().encryptIds(objetoRetorno);
 
 
 

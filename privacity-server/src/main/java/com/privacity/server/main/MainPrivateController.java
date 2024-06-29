@@ -50,7 +50,6 @@ import com.privacity.server.component.myaccount.MyAccountValidationService;
 import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.component.requestid.RequestIdValidationService;
 import com.privacity.server.component.usuario.UserUtilService;
-import com.privacity.server.encrypt.PrivacityIdServices;
 import com.privacity.server.security.UserDetailsImpl;
 import com.privacity.server.util.LocalDateAdapter;
 
@@ -63,7 +62,7 @@ public class MainPrivateController extends ControllerBase{
 	@Value("${serverconf.privacityIdAESOn}")
 	private boolean encryptIds;
 	
-	private PrivacityIdServices privacityIdServices;
+
 	private GrupoValidationService grupoValidationService;
 	private MessageValidationService messageValidationService;
 	private EncryptKeysService encryptKeysValidationService;
@@ -77,7 +76,7 @@ public class MainPrivateController extends ControllerBase{
 	public MainPrivateController(GrupoValidationService grupoValidationService,
 			MessageValidationService messageValidationService, MyAccountValidationService myAccountValidationService,
 			UserUtilService	usuarioService,EncryptKeysService encryptKeysValidationService,
-			PrivacityIdServices privacityIdServices,
+		
 			RequestIdValidationService	requestIdValidationService,
 			RequestIdUtilService requestIdUtil) throws Exception {
 		super();
@@ -85,7 +84,7 @@ public class MainPrivateController extends ControllerBase{
 		this.grupoValidationService = grupoValidationService;
 		this.messageValidationService = messageValidationService;
 		this.myAccountValidationService = myAccountValidationService;
-		this.privacityIdServices = privacityIdServices;
+
 		this.encryptKeysValidationService=encryptKeysValidationService;
 		this.requestIdValidationService=requestIdValidationService;
 
@@ -223,11 +222,6 @@ public class MainPrivateController extends ControllerBase{
 
 	}
 
-	@Override
-	public PrivacityIdServices getPrivacityIdServices() {
-		// TODO Auto-generated method stub
-		return this.privacityIdServices;
-	}
 
 	@Override
 	public boolean getEncryptIds() {

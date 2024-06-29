@@ -73,6 +73,21 @@ public class UsuarioSessionInfoService{
     	
     }
 
+    public UsuarioSessionInfo get() throws ValidationException {
+    	
+    	try {
+    		if (userSessionIds.containsKey(comps.util().usuario().getUsernameLogged())) {
+    			return get(userSessionIds.get(comps.util().usuario().getUsernameLogged()).getUsuarioDB(),false);
+    		}else {
+    			return get(comps.util().usuario().getUsernameLogged(),false);	
+    		}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null; 
+		}
+    	
+    }
     public UsuarioSessionInfo get(String username) throws ValidationException {
     	try {
     		if (userSessionIds.containsKey(username)) {
@@ -135,10 +150,14 @@ public class UsuarioSessionInfoService{
     		//aes.setSecretKeyAES(AES);
     		}
     		UsuarioSessionInfo t = new UsuarioSessionInfo();
-    		t.setSessionAES(new AESDTO(AES, SaltAES,AESIteration+""));
+    		t.setSessionAES(new AESDTO(AES, SaltAES,AESIteration,128));
     		t.setPublicKey(publicKey);
 			t.setSessionAESToUseWS(ProducerConsumerDemonstrator.dataQueue.poll());
 			t.setSessionAESToUseServerEncrypt(ProducerConsumerDemonstrator.dataQueue.poll());
+			t.setPrivacityIdServices(new PrivacityIdServices(
+comps.common().serverConf().getSystemGralConf().isPrivacityIdAESOn(),
+					ProducerConsumerDemonstrator.dataQueue.poll().getAESDTO()));
+			
     		
     		t.setUsuarioDB(user);
     		

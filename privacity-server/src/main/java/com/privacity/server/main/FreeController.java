@@ -10,7 +10,6 @@ import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
 import com.privacity.server.component.serverconf.ServerConfValidationService;
-import com.privacity.server.encrypt.PrivacityIdServices;
 
 
 
@@ -75,10 +74,7 @@ public class FreeController extends ControllerBase{
 
 	}
 
-	@Override
-	public PrivacityIdServices getPrivacityIdServices() {
-		return null;
-	}
+
 
 	
 	@Override

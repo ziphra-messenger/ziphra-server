@@ -1,5 +1,6 @@
 package com.privacity.server.util;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.privacity.common.enumeration.RandomGeneratorType;
 import com.privacity.common.util.RandomGenerator;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
@@ -22,6 +25,26 @@ public class UtilService {
 	@Autowired
 	@Lazy
 	private FacadeComponent comps;
+	
+	private Gson gson;
+	
+	public UtilService() {
+		super();
+		 gson = new GsonBuilder()
+	                .setPrettyPrinting()
+	                .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
+	                .create();
+	}
+	
+	public Object clon(Class clazz, Object o ) {
+		
+	       
+        String j = gson.toJson(o);
+        
+        Object fromJson = gson.fromJson(j, clazz);
+		return fromJson;
+		
+	}
 
 	public Usuario getUser() {
 		Authentication auth = SecurityContextHolder

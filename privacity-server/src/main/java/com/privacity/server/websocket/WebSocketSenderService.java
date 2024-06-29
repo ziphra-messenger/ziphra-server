@@ -10,21 +10,14 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.privacity.common.config.ConstantProtocolo;
-import com.privacity.common.dto.IdDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
-import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.encrypt.PrivacityIdServices;
-import com.privacity.server.encrypt.UsuarioSessionInfoService;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ProcessException;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.main.AESToUse;
 import com.privacity.server.model.Grupo;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageDetail;
 import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.security.Usuario;
 import com.privacity.server.util.LocalDateAdapter;
@@ -35,11 +28,6 @@ public class WebSocketSenderService {
 	
 	@Value("${serverconf.privacityIdAESOn}")
 	private boolean encryptIds;
-	
-	@Autowired
-	@Lazy
-	
-	private PrivacityIdServices privacityIdServices;
 
 	private static final String WEBSOCKET_CHANNEL = "/topic/reply";
 	
@@ -138,15 +126,7 @@ public class WebSocketSenderService {
 		p.setComponent(component);
 		p.setAction(action);
 		
-		if (encryptIds) {
-			try {
-				comps.common().privacityId().transformarEncriptarOutOrder(dto);
-				comps.common().privacityId().transformarEncriptarOut(dto);
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new ProcessException(ExceptionReturnCode.ENCRYPT_PROCESS);	
-			} 
-		}
+
 		p.setObjectDTO(new Gson().toJson(dto));
 
 		return p;
@@ -173,15 +153,7 @@ public class WebSocketSenderService {
 		
 	public void senderMessageToGrupoMinusCreator(String idUsuario, String idGrupo, String componente, String action, MessageDTO messageDTO ) throws PrivacityException {
 
-		if(encryptIds) {
-			try {
-				privacityIdServices.transformarEncriptarOutOrder(messageDTO);
-				privacityIdServices.transformarEncriptarOut(messageDTO);
-			} catch (Exception e) {
-				throw new PrivacityException(ExceptionReturnCode.ENCRYPT_PROCESS);
-			}
-			
-		}
+
 		
 		List<String> lista;
 		
@@ -212,19 +184,6 @@ public class WebSocketSenderService {
 		List<String> lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, idUsuario);
 		
 		
-	
-		if(encryptIds) {
-			try {
-				privacityIdServices.transformarEncriptarOutOrder(p.getGrupoDTO());
-				privacityIdServices.transformarEncriptarOut(p.getGrupoDTO());
-				
-				privacityIdServices.transformarEncriptarOutOrder(p.getSaveGrupoGralConfLockResponseDTO());
-				privacityIdServices.transformarEncriptarOut(p.getSaveGrupoGralConfLockResponseDTO());
-				
-			} catch (Exception e) {
-				throw new PrivacityException(ExceptionReturnCode.ENCRYPT_PROCESS);
-			}
-		}
 		
 		lista.stream().forEach( username -> 
 		

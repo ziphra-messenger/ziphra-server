@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.aopalliance.intercept.MethodInvocation;
-import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +24,6 @@ import com.privacity.common.interfaces.UsuarioRoleInterface;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.model.request.GrupoIdLocalDTO;
 import com.privacity.server.component.requestid.RequestIdUtilService;
-import com.privacity.server.encrypt.PrivacityIdServices;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.Grupo;
 import com.privacity.server.model.UserForGrupo;
@@ -99,11 +96,10 @@ public abstract class ControllerBase {
 			}else {
 				dtoObject =  getDTOObject(request, request.getObjectDTO(),getMapaMetodos().get(request.getAction()).getParameterTypes()[0]);
 				
-				if(getEncryptIds()) {
-					getPrivacityIdServices().transformarDesencriptarOut(dtoObject);
-					getPrivacityIdServices().transformarDesencriptarOutOrder(dtoObject);
+				if ( this.isSecure() ) {
+					comps.service().usuarioSessionInfo().get().getPrivacityIdServices().decryptIds(dtoObject);
+	
 				}
-					
 					if (dtoObject instanceof UsuarioRoleInterface) {
 						((UsuarioRoleInterface) dtoObject).setUsuarioLoggued(comps.util().usuario().getUsuarioLoggedValidate());
 					}
@@ -175,12 +171,10 @@ public abstract class ControllerBase {
 		} 
 
 	
+		if ( this.isSecure()){
 
-			if(getEncryptIds()) {
-				getPrivacityIdServices().transformarEncriptarOutOrder(objetoRetorno);
-				getPrivacityIdServices().transformarEncriptarOut(objetoRetorno);
-			}
-
+			comps.service().usuarioSessionInfo().get().getPrivacityIdServices().encryptIds(objetoRetorno);
+		}
 	//	if(getEncryptIds()) {
 	//		objetoRetorno = getPrivacityIdServices().transformarDesencriptarOut(getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject));
 	//	}else {
@@ -221,7 +215,8 @@ public abstract class ControllerBase {
 public abstract boolean getEncryptIds();
 public abstract boolean isSecure();
 
-public abstract PrivacityIdServices getPrivacityIdServices();
+
+
 
 public static void main(String...strings ) {
 

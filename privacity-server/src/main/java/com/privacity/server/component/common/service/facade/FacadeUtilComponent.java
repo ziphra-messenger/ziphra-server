@@ -16,6 +16,7 @@ import com.privacity.server.component.myaccount.MyAccountConfUtilService;
 import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.component.userforgrupo.UserForGrupoUtil;
 import com.privacity.server.component.usuario.UserUtilService;
+import com.privacity.server.util.UtilService;
 
 import lombok.NoArgsConstructor;
 
@@ -71,6 +72,12 @@ public class FacadeUtilComponent{
 	@Lazy
 	private GrupoInvitationUtil grupoInvitation;
 	
+	@Autowired
+	@Lazy
+	private UtilService utilService;
+	public UtilService utilService() {
+		return utilService;
+	}	
 	public GrupoInvitationUtil grupoInvitation() {
 		return grupoInvitation;
 	}

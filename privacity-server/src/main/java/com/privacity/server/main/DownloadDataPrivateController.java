@@ -21,7 +21,6 @@ import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.message.MessageValidationService;
-import com.privacity.server.encrypt.PrivacityIdServices;
 import com.privacity.server.security.UserDetailsImpl;
 import com.privacity.server.util.LocalDateAdapter;
 
@@ -33,7 +32,7 @@ public class DownloadDataPrivateController {
 
 	@Value("${serverconf.privacityIdAESOn}")
 	private boolean encryptIds;
-	private PrivacityIdServices privacityIdServices;
+
 	private MessageValidationService messageValidationService;
 	
 
@@ -43,9 +42,9 @@ public class DownloadDataPrivateController {
 
 		
 
-	public DownloadDataPrivateController(PrivacityIdServices privacityIdServices, MessageValidationService messageValidationService) {
+	public DownloadDataPrivateController(MessageValidationService messageValidationService) {
 		super();
-		this.privacityIdServices = privacityIdServices;
+	
 		this.messageValidationService = messageValidationService;
 	}
 
@@ -89,10 +88,6 @@ public class DownloadDataPrivateController {
 	}
 
 
-	public PrivacityIdServices getPrivacityIdServices() {
-		// TODO Auto-generated method stub
-		return this.privacityIdServices;
-	}
 
 
 	public boolean getEncryptIds() {
@@ -119,11 +114,7 @@ public class DownloadDataPrivateController {
 			
 				MessageDTO dtoObject =  request.getMessageDTO();
 				
-				if(getEncryptIds()) {
-					getPrivacityIdServices().transformarDesencriptarOut(dtoObject);
-					getPrivacityIdServices().transformarDesencriptarOutOrder(dtoObject);
-					
-				}
+				comps.service().usuarioSessionInfo().get().getPrivacityIdServices().decryptIds(dtoObject);
 				
 				objetoRetorno = messageValidationService.getDataMedia(dtoObject);
 					
@@ -131,11 +122,7 @@ public class DownloadDataPrivateController {
 
 	
 
-			if(getEncryptIds()) {
-				getPrivacityIdServices().transformarEncriptarOutOrder(objetoRetorno);
-				getPrivacityIdServices().transformarEncriptarOut(objetoRetorno);
-		
-			}
+				comps.service().usuarioSessionInfo().get().getPrivacityIdServices().encryptIds(objetoRetorno);
 
 	//	if(getEncryptIds()) {
 	//		objetoRetorno = getPrivacityIdServices().transformarDesencriptarOut(getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject));

@@ -59,7 +59,8 @@ public class AESToUse {
 		this.AESDTO= new AESDTO();
 		this.AESDTO.setSecretKeyAES(secretKeyAES);
 		this.AESDTO.setSaltAES(saltAES2);
-		this.AESDTO.setIteration(interationCount2+"");
+		this.AESDTO.setIteration(interationCount2 +"");
+		this.AESDTO.setBitsEncrypt(bitsEncrypt+"");
 
 
 		{

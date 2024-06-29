@@ -22,7 +22,6 @@ import com.privacity.common.dto.request.ValidateUsernameDTO;
 import com.privacity.server.component.auth.AuthValidationService;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.encrypt.PrivacityIdServices;
 import com.privacity.server.util.LocalDateAdapter;
 
 
@@ -82,10 +81,6 @@ public class PublicController extends ControllerBase{
 		return ResponseEntity.ok().body(retorno);
 	}
 
-	@Override
-	public PrivacityIdServices getPrivacityIdServices() {
-		return comps.common().privacityId();
-	}
 
 	
 	@Override

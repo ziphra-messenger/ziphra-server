@@ -70,8 +70,9 @@ public interface UserForGrupoRepository extends CrudRepository<UserForGrupo, Use
 			+ " where u.idUser in ( "
 			+ " 	Select ufg.userForGrupoId.user.idUser From "
 			+ " 	UserForGrupo ufg "
-			+ " 	WHERE ufg.userForGrupoId.grupo.idGrupo = ?1 "
+			+ " 	WHERE ufg.userForGrupoId.grupo.idGrupo = ?1  and ufg.deleted=false "
 			+ " 	and ufg.userForGrupoId.user.idUser != ?2 "
+			+ " 	and ufg.userForGrupoId.grupo.deleted = false   "
 			+ ")")
 	List<String> findByForGrupoMinusCreator(Long idGrupo, Long idUsuario);
 	

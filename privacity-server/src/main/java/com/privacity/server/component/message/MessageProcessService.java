@@ -1,13 +1,13 @@
 package com.privacity.server.component.message;
 
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.config.ConstantProtocolo;
 import com.privacity.common.dto.GrupoDTO;
-import com.privacity.common.dto.IdDTO;
 import com.privacity.common.dto.IdMessageDTO;
 import com.privacity.common.dto.MediaDTO;
 import com.privacity.common.dto.MessageDTO;
@@ -241,50 +240,77 @@ public class MessageProcessService {
 
 	public MessageDetailDTO changeState(Usuario u, Message m, MessageDetail md, MessageState state, MessageDetailDTO request) throws Exception {
 
-	
+		
 		if (m.isTimeMessage() && state.equals(MessageState.DESTINY_READED)) {
 			md.setDeleted(true);
 		}
 		md.setState(state);
 		
-		MessageDetailDTO retornoWS = comps.common().mapper().doit(md);
+
 		MessageDetailDTO retornoServer = comps.common().mapper().doit(md);
 		
-		Thread saveT = new Thread() {
 
-			public void run() {
 				comps.repo().messageDetail().save(md);		
 
-			}
-		};
 		
-		saveT.start();
-		
-		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-				ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE,
-		        ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_CHANGE_STATE,
-		        retornoWS);
 
 
-		Thread t = new Thread() {
-		
-			public void run() {
+
+//		Thread allT = new Thread() {
+//
+//			@Override
+//			public void run() {
 				
-				try {
 
+				
 
+				List<String> lista;
+				
+			      
+					lista = comps.repo().userForGrupo().findByForGrupoAll(m.getMessageId().getGrupo().getIdGrupo());
 
-					comps.webSocket().sender().senderToGrupoMinusCreator(u.getIdUser(), m.getMessageId().getGrupo().getIdGrupo(), p);
+				
+				Iterator<String> i = lista.iterator();
+				
+				while (i.hasNext()){
+					try {
+						
+					String username = i.next();
+					if (comps.service().usuarioSessionInfo().isOnline(username)){
+					MessageDetailDTO retornoWS = comps.common().mapper().doit(md);
+//					MessageDTO responseWs = comps.common().mapper().doit(m);
 					
+						comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(retornoWS);
 					
-				} catch (PrivacityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
+							ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE,
+					        ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_CHANGE_STATE,
+					        retornoWS);
+			
+					
+
+					
+					comps.webSocket().sender().sender(new WsMessage (username , p ));
+					
+						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE, ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
+					}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	
+					
 				}
-			}
 
-		};
-		t.start();
+
+
+
+
+						
+		
+//					
+//
+//			}};
+//			allT.start();
 		return retornoServer;
 		
 	}
@@ -383,7 +409,7 @@ public class MessageProcessService {
 		
 		MessageDTO responseServer = comps.common().mapper().doit(m);
 		
-		MessageDTO responseWs = comps.common().mapper().doit(m);
+		//MessageDTO responseWs = comps.common().mapper().doit(m);
 		comps.repo().message().save(m);
 		Thread allT = new Thread() {
 
@@ -400,16 +426,39 @@ public class MessageProcessService {
 //					}};
 //					messageSaveT.start();
 
-
+				List<String> lista;
+				
+			      
+				if (responseServer.isSystemMessage() ) {
+					lista = comps.repo().userForGrupo().findByForGrupoAll(idGrupo);
+				}else {
+					lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, idUsuario);	
+				}
+				
+				Iterator<String> i = lista.iterator();
+				
+				while (i.hasNext()){
+					try {
+					String username = i.next();
+			
+					MessageDTO responseWs = comps.common().mapper().doit(m);
 					
-
+					
+						comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(responseWs);
+					
 					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-								ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE,
-								ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_RECIVIED);
-						p.setMessageDTO(responseWs);
-						
+							ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE,
+							ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_RECIVIED);
+					p.setMessageDTO( responseWs);
+					
 					if (objecto != null) {
 						if (objecto instanceof GrupoDTO) {
+							GrupoDTO gr = new GrupoDTO();
+							gr.setIdGrupo(((GrupoDTO)objecto).getIdGrupo()+"");
+						
+								comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(gr);
+								((GrupoDTO)objecto).setIdGrupo(gr.getIdGrupo());
+		
 							p.setGrupoDTO((GrupoDTO)objecto);
 						}else if(objecto instanceof SaveGrupoGralConfLockResponseDTO) {
 							p.setSaveGrupoGralConfLockResponseDTO((SaveGrupoGralConfLockResponseDTO) objecto);
@@ -418,13 +467,25 @@ public class MessageProcessService {
 						
 					}
 					
-
-					try {
-						comps.webSocket().sender().senderMessageToGrupoMinusCreator( idUsuario+"", idGrupo+"",  ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE, ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
-					} catch (PrivacityException e) {
+					comps.webSocket().sender().sender(new WsMessage (username , p ));
+					
+						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE, ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
+					
+					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}			
+					}	
+					
+				}
+				{
+				
+				};
+
+
+
+
+						
+		
 					
 
 			}};

@@ -1,6 +1,7 @@
 package com.privacity.server.component.grupo;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -8,15 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.privacity.common.dto.GrupoDTO;
+import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.model.request.GrupoIdLocalDTO;
+import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.Grupo;
 import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.security.Usuario;
+import com.privacity.server.websocket.WsMessage;
 
 import lombok.AllArgsConstructor;
 
@@ -131,7 +136,61 @@ public class GrupoUtilService {
 		return usersForGrupo.get(0).getUserForGrupoId().getGrupo();// TODO Auto-generated method stub
 
 	}
+	
+	public void senderToGrupo(
+			String componente, String action, long idGrupo,  GrupoDTO g
+			) throws PrivacityException {
+		sendTo(true, componente, action, idGrupo, g);
+	}
+	
+	public void senderToGrupoMinusCreator(String componente, String action, long idGrupo,  GrupoDTO g
+			) throws PrivacityException {
+		sendTo(false, componente, action, idGrupo, g);
+					
+	}
+	
 
+	private void sendTo(boolean toAll , 
+			String componente, String action, long idGrupo,  GrupoDTO g
+			) throws PrivacityException {
+					
+					List<String> lista;
+					if (toAll) {
+						lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get().getUsuarioDB().getIdUser());
+					}else {
+						lista = comps.repo().userForGrupo().findByForGrupoAll(idGrupo);	
+					}
+					
+					
+					Iterator<String> i = lista.iterator();
+					
+					while (i.hasNext()){
+						String destino = i.next();
+						ProtocoloDTO p;
+
+
+						GrupoDTO newR =  (GrupoDTO) comps.util().utilService().clon(GrupoDTO.class, g);
+			
+						try {
+					
+								comps.service().usuarioSessionInfo().get(destino).getPrivacityIdServices().encryptIds(newR);
+							
+							
+							
+						} catch (Exception e) {
+							throw new PrivacityException(ExceptionReturnCode.ENCRYPT_PROCESS);
+						}
+						
+						p = comps.webSocket().sender().buildProtocoloDTO(
+								componente,
+								action,
+						        newR);
+						
+						comps.webSocket().sender().sender(new WsMessage (destino , p ));
+					
+					
+					
+				}}
 
 	
 }

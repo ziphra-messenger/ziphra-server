@@ -6,10 +6,10 @@ import java.util.concurrent.ConcurrentMap;
 
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.RequestIdDTO;
+import com.privacity.server.encrypt.PrivacityIdServices;
 import com.privacity.server.main.AESToUse;
 import com.privacity.server.model.MyAccountConf;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,7 +36,9 @@ public class UsuarioSessionInfo {
 	private AESDTO sessionAES;
 	private AESToUse sessionAESToUseWS;
 	private AESToUse sessionAESToUseServerEncrypt;
-	;
+	
+	private PrivacityIdServices privacityIdServices;
+	
 	private ConcurrentMap<String,RequestIdDTO> requestIds = new ConcurrentHashMap<String,RequestIdDTO>();
 
 	public MyAccountConf getMyAccountConf() {

@@ -76,6 +76,10 @@ public class AuthValidationService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new ValidationException(ExceptionReturnCode.AUTH_BAD_CREDENTIAL);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new ValidationException(e.getMessage());
 		}
 	}
 	public void registerUser(RegisterUserRequestDTO request) throws ValidationException {

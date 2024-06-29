@@ -1,8 +1,6 @@
 package com.privacity.server.component.auth;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
@@ -46,8 +44,7 @@ public class AuthProcesor {
 	
 	@Autowired @Lazy
 	private AuthenticationManager authenticationManager;
-	@Autowired @Lazy
-	private PrivacityIdServices privacityIdServices;
+
 	
 	@Autowired @Lazy
 	private PrivacityLogguer privacityLogguer;
@@ -59,7 +56,7 @@ public class AuthProcesor {
 	@Autowired @Lazy
 	private FacadeComponent comps;
 	
-	public LoginDTOResponse login( Usuario loginRequest) throws IllegalAccessException, NoSuchFieldException, SecurityException, ValidationException, IOException, GeneralSecurityException {
+	public LoginDTOResponse login( Usuario loginRequest) throws Exception {
 
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getUsuarioPassword().getPassword()));
@@ -114,10 +111,10 @@ public class AuthProcesor {
 		data.setSessionAESDTOServerEncrypt(info.getSessionAESToUseServerEncrypt().getAESDTO());
 		privacityLogguer.write(data);
 
-		if(encryptIds) {
+		info.getPrivacityIdServices().encryptIds(data);
 
 			privacityLogguer.write(data);
-		}
+	
 //		
 		
 		

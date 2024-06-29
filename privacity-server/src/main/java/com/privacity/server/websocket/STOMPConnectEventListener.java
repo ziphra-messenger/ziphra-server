@@ -1,4 +1,5 @@
 package com.privacity.server.websocket;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,7 +7,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import com.privacity.common.config.ConstantProtocolo;
 import com.privacity.common.dto.GrupoDTO;
@@ -61,16 +61,11 @@ public class STOMPConnectEventListener  implements ApplicationListener<SessionCo
 				
 				if (r.getMembersOnLine() != 0) {
 					ProtocoloDTO p;
-					p = comps.webSocket().sender().buildProtocoloDTO(
-							ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
-					        ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_HOW_MANY_MEMBERS_ONLINE,
-					        r);
 					
-					comps.webSocket().sender().senderToGrupoMinusCreator(
-							comps.service().usuarioSessionInfo().get(agentId).getUsuarioDB().getIdUser(),
-							g.getIdGrupo(), p);
+					senderToGrupoMinusCreator(agentId,
+							 g.getIdGrupo(), r);
 				}
-			} catch (PrivacityException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -85,4 +80,37 @@ public class STOMPConnectEventListener  implements ApplicationListener<SessionCo
         
         t.start();
 } 
-};
+    
+	private void senderToGrupoMinusCreator(String username, long idGrupo, GrupoDTO g) throws Exception {
+		
+		
+		
+		List<String> lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get(username).getUsuarioDB().getIdUser());
+		
+		Iterator<String> i = lista.iterator();
+		
+		while (i.hasNext()){
+			String destino = i.next();
+			ProtocoloDTO p;
+
+
+			GrupoDTO newR =  (GrupoDTO) comps.util().utilService().clon(GrupoDTO.class, g);
+
+		
+					comps.service().usuarioSessionInfo().get(destino).getPrivacityIdServices() 
+					.encryptIds(newR);
+				
+				
+				
+
+			p = comps.webSocket().sender().buildProtocoloDTO(
+					ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
+			        ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_HOW_MANY_MEMBERS_ONLINE,
+			        newR);
+			
+			comps.webSocket().sender().sender(new WsMessage (destino , p ));
+		}
+		
+		
+	}
+}
