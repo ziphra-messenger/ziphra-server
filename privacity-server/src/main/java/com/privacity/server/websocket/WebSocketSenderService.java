@@ -108,7 +108,7 @@ public class WebSocketSenderService {
 			
 		AESToUse c;
 		try {
-			c = comps.service().usuarioSessionInfo().get(user).getSessionAESToUse();
+			c = comps.service().usuarioSessionInfo().get(user).getSessionAESToUseWS();
 		
 			String retornoFuncionEncriptado = c.getAES(mensaje);
 

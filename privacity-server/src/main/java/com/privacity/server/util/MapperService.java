@@ -26,6 +26,7 @@ import com.privacity.common.dto.UsuarioDTO;
 import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
 import com.privacity.common.enumeration.GrupoUserConfEnum;
+import com.privacity.common.enumeration.MessageState;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.dao.factory.MessageIdSequenceFactory;
 import com.privacity.server.exceptions.ProcessException;
@@ -383,7 +384,7 @@ public class MapperService {
 			
 			//response.getMessagesDetailDTO()[i].setUserDestino(d.getMessageDetailId().getUserDestino().getUsername());
 			
-			r.getMessagesDetailDTO()[i].setEstado(d.getState().toString());
+			r.getMessagesDetailDTO()[i].setEstado(d.getState());
 
 			i++;
 		}
@@ -459,7 +460,7 @@ public class MapperService {
 			
 			//response.getMessagesDetailDTO()[i].setUserDestino(d.getMessageDetailId().getUserDestino().getUsername());
 			
-			r.getMessagesDetailDTO()[i].setEstado(d.getState().toString());
+			r.getMessagesDetailDTO()[i].setEstado(d.getState());
 
 			i++;
 		}
@@ -516,7 +517,7 @@ public class MapperService {
 			
 			//response.getMessagesDetailDTO()[i].setUserDestino(d.getMessageDetailId().getUserDestino().getUsername());
 			
-			r.getMessagesDetailDTO()[i].setEstado(d.getState().toString());
+			r.getMessagesDetailDTO()[i].setEstado(d.getState());
 
 			i++;
 		}
@@ -561,7 +562,7 @@ public class MapperService {
 				
 				//response.getMessagesDetailDTO()[i].setUserDestino(d.getMessageDetailId().getUserDestino().getUsername());
 				
-				r.getMessagesDetailDTO()[i].setEstado(d.getState().toString());
+				r.getMessagesDetailDTO()[i].setEstado(d.getState());
 			}
 			
 		}
@@ -600,14 +601,14 @@ public class MapperService {
 
 	public MessageDetailDTO doit(MessageDetail md) {
 		MessageDetailDTO r = new MessageDetailDTO();
-		r.setEstado(md.getState().name());
+		r.setEstado(md.getState());
 		r.setIdGrupo(md.getMessageDetailId().getMessage().getMessageId().getGrupo().getIdGrupo()+"");
 		r.setIdMessage(md.getMessageDetailId().getMessage().getMessageId().getIdMessage()+"");
 		r.setUsuarioDestino( doit(md.getMessageDetailId().getUserDestino()));
 		return r;
 	}
 	
-	public MessageDetailDTO doitChangeState(String state, String idGrupo, String idMessage, UsuarioDTO destino) {
+	public MessageDetailDTO doitChangeState(MessageState state, String idGrupo, String idMessage, UsuarioDTO destino) {
 		MessageDetailDTO r = new MessageDetailDTO();
 		r.setEstado(state);
 		r.setIdGrupo(idGrupo);

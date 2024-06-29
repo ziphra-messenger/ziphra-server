@@ -101,7 +101,7 @@ public class MessageProcessService {
 
 				response.getMessagesDetailDTO()[i].setUsuarioDestino(comps.common().mapper().doit(d.getMessageDetailId().getUserDestino()));
 				
-				response.getMessagesDetailDTO()[i].setEstado(d.getState().toString());
+				response.getMessagesDetailDTO()[i].setEstado(d.getState());
 
 				i++;
 			}
@@ -118,7 +118,7 @@ public class MessageProcessService {
 					response.getMessagesDetailDTO()[0].setIdGrupo(m.getMessageId().getGrupo().getIdGrupo()+"");
 					response.getMessagesDetailDTO()[0].setIdMessage(m.getMessageId().getIdMessage()+"");
 					response.getMessagesDetailDTO()[0].setUsuarioDestino(comps.common().mapper().doit(d.getMessageDetailId().getUserDestino()));
-					response.getMessagesDetailDTO()[0].setEstado(d.getState().toString());
+					response.getMessagesDetailDTO()[0].setEstado(d.getState());
 				
 				}
 				//i++;
@@ -168,7 +168,7 @@ public class MessageProcessService {
 					comps.common().mapper().doitForGrupo(grupo, d.getMessageDetailId().getUserDestino())
 					);
 
-			response.getMessagesDetailDTO()[i].setEstado(d.getState().toString());
+			response.getMessagesDetailDTO()[i].setEstado(d.getState());
 
 			i++;
 		}

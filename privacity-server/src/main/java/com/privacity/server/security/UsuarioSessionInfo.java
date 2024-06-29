@@ -10,8 +10,13 @@ import com.privacity.server.main.AESToUse;
 import com.privacity.server.model.MyAccountConf;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class UsuarioSessionInfo {
 	
 
@@ -29,12 +34,16 @@ public class UsuarioSessionInfo {
 //	private String privateKeyToSend;
 	private AESToUse sessionAESToUse;
 	private AESDTO sessionAES;
-	
+	private AESToUse sessionAESToUseWS;
+	private AESToUse sessionAESToUseServerEncrypt;
+	;
 	private ConcurrentMap<String,RequestIdDTO> requestIds = new ConcurrentHashMap<String,RequestIdDTO>();
 
 	public MyAccountConf getMyAccountConf() {
 		// TODO Auto-generated method stub
 		return usuarioDB.getMyAccountConf();
-	};
+	}
+
+
 
 }

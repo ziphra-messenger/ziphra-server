@@ -2,6 +2,7 @@ package com.privacity.common.dto;
 
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
+import com.privacity.common.enumeration.MessageState;
 
 import lombok.Data;
 
@@ -15,7 +16,7 @@ public class MessageDetailDTO{
 	@PrivacityIdOrder	
 	public String idGrupo;
 	public UsuarioDTO usuarioDestino;
-    public String estado;
+    public MessageState estado;
     private boolean deleted;
     
     public String getIdMessageDetailToMap() {

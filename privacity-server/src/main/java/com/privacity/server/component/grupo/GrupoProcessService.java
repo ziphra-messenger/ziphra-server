@@ -358,7 +358,7 @@ public class GrupoProcessService  {
 	    		MessageDetailDTO dto = new MessageDetailDTO();
 	    		//dto.setIdMessageDetail(d.getMessageDetailId().getIdMessageDetail().toString());
 	    		
-	    		dto.setEstado(d.getState().name());
+	    		dto.setEstado(d.getState());
 	    		
 				dto.setUsuarioDestino(comps.common().mapper().doit(d.getMessageDetailId().getUserDestino()));
 				

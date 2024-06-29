@@ -137,7 +137,8 @@ public class UsuarioSessionInfoService{
     		UsuarioSessionInfo t = new UsuarioSessionInfo();
     		t.setSessionAES(new AESDTO(AES, SaltAES,AESIteration+""));
     		t.setPublicKey(publicKey);
-
+			t.setSessionAESToUseWS(ProducerConsumerDemonstrator.dataQueue.poll());
+			t.setSessionAESToUseServerEncrypt(ProducerConsumerDemonstrator.dataQueue.poll());
     		
     		t.setUsuarioDB(user);
     		

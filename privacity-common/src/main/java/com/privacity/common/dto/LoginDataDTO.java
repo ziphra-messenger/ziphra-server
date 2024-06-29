@@ -7,7 +7,6 @@ import com.privacity.common.annotations.PrivacityIdOrder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-@AllArgsConstructor
 @Data
 public class LoginDataDTO {
 	public String token;
@@ -21,6 +20,8 @@ public class LoginDataDTO {
 	public String invitationCode;
 	public String publicKey;
 	
+	public AESDTO sessionAESDTOWS;
+	public AESDTO sessionAESDTOServerEncrypt;
 	public MyAccountConfDTO myAccountGralConfDTO;
 	
 }

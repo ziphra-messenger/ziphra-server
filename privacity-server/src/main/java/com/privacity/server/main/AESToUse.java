@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.annotations.Expose;
+import com.privacity.common.dto.AESDTO;
 
 import lombok.Getter;
 
@@ -45,13 +46,20 @@ public class AESToUse {
 	
 	@ToStringExclude
 	private Cipher encrypt;
+	
+	@Getter
+	private AESDTO AESDTO;
 
-	public AESToUse(int bitsEncrypt2, int interationCount2 , String secretKeyAES, String saltAES) throws Exception {
-		this.secretKeyAES = secretKeyAES;
-		this.saltAES = saltAES;
+	public AESToUse(int bitsEncrypt2, int interationCount2 , String secretKeyAES2, String saltAES2) throws Exception {
+		this.secretKeyAES = secretKeyAES2;
+		this.saltAES = saltAES2;
 		this.bitsEncrypt =bitsEncrypt2;
 		this.interationCount=interationCount2;
-
+		
+		this.AESDTO= new AESDTO();
+		this.AESDTO.setSecretKeyAES(secretKeyAES);
+		this.AESDTO.setSaltAES(saltAES2);
+		this.AESDTO.setIteration(interationCount2+"");
 
 
 		{

@@ -175,7 +175,7 @@ public class MessageValidationService {
 		Message m = comps.util().message().getMessage(idGrupo, idMessage);
 		MessageDetail md = comps.util().messageDetail().getMessageDetail(m, usuarioLogged);
 		
-		MessageState state = MessageState.valueOf(request.getEstado());
+		MessageState state =request.getEstado();
 		
 		return comps.process().message().changeState(usuarioLogged, m, md, state,request);
 	}

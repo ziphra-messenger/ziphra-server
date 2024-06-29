@@ -206,7 +206,7 @@ public class MainPrivateController extends ControllerBase{
 		
 		ProtocoloDTO retornoFuncion = super.in(p);
 		String retornoFuncionJson = gson.toJson(retornoFuncion);
-		String retornoFuncionEncriptado = c.getAES(retornoFuncionJson);
+		String retornoFuncionEncriptado = comps.service().usuarioSessionInfo().get(u.getUsername()).getSessionAESToUseServerEncrypt().getAES(retornoFuncionJson);
 
 		if (showLog(p)) {
 			

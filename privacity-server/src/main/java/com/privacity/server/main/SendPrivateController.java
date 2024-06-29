@@ -132,7 +132,8 @@ public class SendPrivateController {
 		
 		String retornoFuncionJson = gson.toJson(retornoFuncion);
 		if (showLog()) System.out.println(">>" + retornoFuncionJson);
-		String retornoFuncionEncriptado = c.getAES(retornoFuncionJson);
+		String retornoFuncionEncriptado = comps.service().usuarioSessionInfo().get(u.getUsername()).getSessionAESToUseServerEncrypt().getAES(retornoFuncionJson);
+
 		
 		if (showLog()) System.out.println("ENCRIPTADO >>" + retornoFuncionEncriptado);
 		return ResponseEntity.ok().body(gson.toJson(retornoFuncionEncriptado));
