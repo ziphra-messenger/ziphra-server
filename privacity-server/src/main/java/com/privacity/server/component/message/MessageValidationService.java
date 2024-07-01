@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.privacity.common.config.ConstantProtocolo;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.IdMessageDTO;
 import com.privacity.common.dto.MediaDTO;
@@ -68,8 +68,8 @@ public class MessageValidationService {
 		
 		
 		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-				ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE,
-				"/message/deleteForEveryone");
+				ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
+				ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_DELETE_FOR_EVERYONE);
 		
 		IdMessageDTO mRemove = new IdMessageDTO();
 		p.setMessageDTO(new MessageDTO());
@@ -206,3 +206,4 @@ public class MessageValidationService {
 
 
 }
+

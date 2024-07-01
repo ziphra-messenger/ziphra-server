@@ -112,15 +112,15 @@ public class PrivacityIdServices {
 
 	private Object transformarEncriptarOut(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
 		
-
+		
 		if (g == null) return null;
-
+		System.out.println(g.getClass().getName());
 		if ( g.getClass().getEnumConstants() != null) return null;
 		
 		if ("com.privacity.common.enumeration.ConfigurationStateEnum".equals(g.getClass().getName())){
 			////////System.out.println(g.getClass().getName());
 		}
-		////////System.out.println(g.getClass().getName());
+		///////
 
 
 		if(
@@ -196,10 +196,11 @@ public class PrivacityIdServices {
 		return g;
 	}
 	private Object transformarDesencriptarOut(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
+		
+
+		
 		if (g == null) return null;
-
 		System.out.println(g.getClass().getName());
-
 		if ( g.getClass().getEnumConstants() != null){
 			return null;
 		}
@@ -271,8 +272,9 @@ public class PrivacityIdServices {
 
 
 	private Object transformarEncriptarOutOrder(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
-		if (g == null) return null;
 
+		if (g == null) return null;
+		System.out.println(g.getClass().getName());
 		if ( g.getClass().getEnumConstants() != null) return null;
 		
 		if ("com.privacity.common.enumeration.ConfigurationStateEnum".equals(g.getClass().getName())){
@@ -360,7 +362,9 @@ public class PrivacityIdServices {
 		return g;
 	}
 	private Object transformarDesencriptarOutOrder(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
+	
 		if (g == null) return null;
+		System.out.println(g.getClass().getName());
 		if ( g.getClass().getEnumConstants() != null) return null;
 		////////System.out.println(g.getClass().getName());
 

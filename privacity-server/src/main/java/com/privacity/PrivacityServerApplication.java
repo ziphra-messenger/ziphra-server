@@ -2,7 +2,12 @@ package com.privacity;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+
+import com.privacity.server.security.CustomAccessDeniedHandler;
+import com.privacity.server.security.CustomAuthenticationFailureHandler;
 
 
 @SpringBootApplication
@@ -15,7 +20,16 @@ public class PrivacityServerApplication {
 		SpringApplication.run(PrivacityServerApplication.class, args);
 	}
 
-
+	@Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+	   return new CustomAccessDeniedHandler();
+	}
+	
+	@Bean
+	public AuthenticationFailureHandler authenticationFailureHandler() {
+	    return new CustomAuthenticationFailureHandler();
+	} 
+	
 	/*
 	@Bean
 	public HttpFirewall getHttpFirewall() {

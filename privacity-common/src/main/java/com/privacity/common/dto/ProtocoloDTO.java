@@ -3,24 +3,27 @@ package com.privacity.common.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 
 import lombok.Data;
 
 @Data
+@JsonInclude(Include.NON_NULL)
 public class ProtocoloDTO {
 
 	public ProtocoloDTO() {
 		super();
 	}
 
-	public ProtocoloDTO(String component, String action) {
+	public ProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action) {
 		super();
 		this.component = component;
 		this.action = action;
 	}
 
-    private String component;
-    private String action;
+    private ProtocoloComponentsEnum component;
+    private ProtocoloActionsEnum action;
     
     @JsonInclude(Include.NON_NULL)
     private String asyncId;

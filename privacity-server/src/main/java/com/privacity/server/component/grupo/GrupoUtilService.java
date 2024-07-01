@@ -15,6 +15,8 @@ import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.model.request.GrupoIdLocalDTO;
 import com.privacity.server.exceptions.PrivacityException;
@@ -139,12 +141,12 @@ public class GrupoUtilService {
 	}
 	
 	public void senderToGrupo(
-			String componente, String action, long idGrupo,  GrupoDTO g
+			ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  GrupoDTO g
 			) throws PrivacityException {
 		sendTo(true, componente, action, idGrupo, g);
 	}
 	
-	public void senderToGrupoMinusCreator(String componente, String action, long idGrupo,  GrupoDTO g
+	public void senderToGrupoMinusCreator(ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  GrupoDTO g
 			) throws PrivacityException {
 		sendTo(false, componente, action, idGrupo, g);
 					
@@ -152,7 +154,7 @@ public class GrupoUtilService {
 	
 
 	private void sendTo(boolean toAll , 
-			String componente, String action, long idGrupo,  GrupoDTO g
+			ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  GrupoDTO g
 			) throws PrivacityException {
 					
 					List<String> lista;
@@ -195,12 +197,12 @@ public class GrupoUtilService {
 
 	
 	public void senderSaveGrupoGralConfLockToGrupo(
-			String componente, String action, long idGrupo,  SaveGrupoGralConfLockResponseDTO g
+			ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  SaveGrupoGralConfLockResponseDTO g
 			) throws PrivacityException {
 		sendTo(true, componente, action, idGrupo, g);
 	}
 	
-	public void senderSaveGrupoGralConfLockToGrupoMinusCreator(String componente, String action, long idGrupo,  SaveGrupoGralConfLockResponseDTO g
+	public void senderSaveGrupoGralConfLockToGrupoMinusCreator(ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  SaveGrupoGralConfLockResponseDTO g
 			) throws PrivacityException {
 		sendTo(false, componente, action, idGrupo, g);
 					
@@ -208,7 +210,7 @@ public class GrupoUtilService {
 	
 
 	private void sendTo(boolean toAll , 
-			String componente, String action, long idGrupo,  SaveGrupoGralConfLockResponseDTO g
+			ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  SaveGrupoGralConfLockResponseDTO g
 			) throws PrivacityException {
 					
 					List<String> lista;

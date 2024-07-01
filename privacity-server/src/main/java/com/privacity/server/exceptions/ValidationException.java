@@ -2,10 +2,16 @@ package com.privacity.server.exceptions;
 
 import com.privacity.common.enumeration.ExceptionReturnCode;
 
+import lombok.Getter;
+
 public class ValidationException extends PrivacityException {
 
+	@Getter
+	private String description;
 	public ValidationException(ExceptionReturnCode userUserNotLogger) {
 		super(userUserNotLogger.getCode());
+		
+		description = userUserNotLogger.getDescription();
 	}
 
 	public ValidationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {

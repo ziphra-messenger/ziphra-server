@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.privacity.common.config.ConstantProtocolo;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.IdMessageDTO;
 import com.privacity.common.dto.MediaDTO;
@@ -23,6 +23,8 @@ import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.MessageState;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ProcessException;
@@ -284,8 +286,8 @@ public class MessageProcessService {
 						comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(retornoWS);
 					
 					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-							ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE,
-					        ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_CHANGE_STATE,
+							ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
+					        ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_CHANGE_STATE,
 					        retornoWS);
 			
 					
@@ -293,7 +295,7 @@ public class MessageProcessService {
 					
 					comps.webSocket().sender().sender(new WsMessage (username , p ));
 					
-						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE, ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
+						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE, ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
 					}
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -371,8 +373,8 @@ public class MessageProcessService {
 //						
 //						
 //						ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-//								ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE,
-//								ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_RECIVIED);
+//								ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
+//								ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED);
 //						
 //						p.setObjectDTO(new Gson().toJson(p));
 //				
@@ -448,8 +450,8 @@ public class MessageProcessService {
 						comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(responseWs);
 					
 					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-							ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE,
-							ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_RECIVIED);
+							ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
+							ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED);
 					p.setMessageDTO( responseWs);
 					
 					if (objecto != null) {
@@ -470,7 +472,7 @@ public class MessageProcessService {
 					
 					comps.webSocket().sender().sender(new WsMessage (username , p ));
 					
-						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE, ConstantProtocolo.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
+						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE, ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
 					
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -512,7 +514,9 @@ public class MessageProcessService {
 			comps.repo().message().deleteLogic(message.getMessageId().getGrupo().getIdGrupo(), message.getMessageId().getIdMessage());
 
 			
-			this.senderToGrupoMinusCreator(ConstantProtocolo.PROTOCOLO_COMPONENT_MESSAGE, "/message/deleteForEveryone",
+			this.senderToGrupoMinusCreator(
+					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
+					ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_DELETE_FOR_EVERYONE,
 					message.getMessageId().getGrupo().getIdGrupo(), mRemoveWS);
 			
 			
@@ -535,12 +539,12 @@ public class MessageProcessService {
 		return u;
 	}    
 	public void senderToGrupo(
-			String componente, String action, long idGrupo,  MessageDTO g
+			ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  MessageDTO g
 			) throws PrivacityException {
 		sendTo(true, componente, action, idGrupo, g);
 	}
 	
-	public void senderToGrupoMinusCreator(String componente, String action, long idGrupo,  MessageDTO g
+	public void senderToGrupoMinusCreator(ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  MessageDTO g
 			) throws PrivacityException {
 		sendTo(false, componente, action, idGrupo, g);
 					
@@ -548,7 +552,7 @@ public class MessageProcessService {
 	
 
 	private void sendTo(boolean toAll , 
-			String componente, String action, long idGrupo,  MessageDTO g
+			ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  MessageDTO g
 			) throws PrivacityException {
 					
 					List<String> lista;

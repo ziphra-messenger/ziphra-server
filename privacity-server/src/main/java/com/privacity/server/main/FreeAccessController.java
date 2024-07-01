@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.privacity.common.config.ConstantProtocolo;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
@@ -15,7 +15,7 @@ import com.privacity.server.component.serverconf.ServerConfValidationService;
 
 @RestController
 @RequestMapping(path = "/free")
-public class FreeController extends ControllerBase{
+public class FreeAccessController extends ControllerBase{
 	
 	@SuppressWarnings("unused")
 	private ServerConfValidationService serverConfValidationService;
@@ -23,23 +23,23 @@ public class FreeController extends ControllerBase{
 	@SuppressWarnings("unused")
 	private PrivacityRSAValidation privacityRSAValidation;
 	
-	public FreeController(
+	public FreeAccessController(
 			ServerConfValidationService serverConfValidationService,
 			PrivacityRSAValidation privacityRSAValidation) throws Exception {
 		
 		this.serverConfValidationService = serverConfValidationService;
 		this.privacityRSAValidation = privacityRSAValidation;
 
-		getMapaController().put(ConstantProtocolo.PROTOCOLO_COMPONENT_SERVER_CONF_UNSECURE, serverConfValidationService);
-		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_SERVER_CONF_UNSECURE_GET_TIME, serverConfValidationService.getClass().getMethod(
+		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_SERVER_CONF_UNSECURE, serverConfValidationService);
+		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_SERVER_CONF_UNSECURE_GET_TIME, serverConfValidationService.getClass().getMethod(
 				"getTime"));	
 		
-		getMapaController().put(ConstantProtocolo.PROTOCOLO_COMPONENT_PRIVACITY_RSA, privacityRSAValidation);
-		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_PRIVACITY_RSA_GET_PUBLIC_KEY, privacityRSAValidation.getClass().getMethod(
+		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_PRIVACITY_RSA, privacityRSAValidation);
+		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_PRIVACITY_RSA_GET_PUBLIC_KEY, privacityRSAValidation.getClass().getMethod(
 				"getPublicKeyToSend"));	
 
-		getMapaController().put(ConstantProtocolo.PROTOCOLO_COMPONENT_SERVER_CONF_UNSECURE, serverConfValidationService);
-		getMapaMetodos().put(ConstantProtocolo.PROTOCOLO_ACTION_SERVER_CONF_UNSECURE_GET_GRAL_CONF, serverConfValidationService.getClass().getMethod(
+		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_SERVER_CONF_UNSECURE, serverConfValidationService);
+		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_SERVER_CONF_UNSECURE_GET_GRAL_CONF, serverConfValidationService.getClass().getMethod(
 				"getSystemGralConf"));
 		
 		

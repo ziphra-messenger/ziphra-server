@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 
-import com.privacity.common.config.ConstantProtocolo;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
@@ -104,8 +104,8 @@ public class STOMPConnectEventListener  implements ApplicationListener<SessionCo
 				
 
 			p = comps.webSocket().sender().buildProtocoloDTO(
-					ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
-			        ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_HOW_MANY_MEMBERS_ONLINE,
+					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
+			        ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_HOW_MANY_MEMBERS_ONLINE,
 			        newR);
 			
 			comps.webSocket().sender().sender(new WsMessage (destino , p ));

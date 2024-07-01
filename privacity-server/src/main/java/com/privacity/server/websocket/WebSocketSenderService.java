@@ -12,6 +12,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ProcessException;
@@ -113,15 +115,15 @@ public class WebSocketSenderService {
 		
 	}
 	 
-	public ProtocoloDTO buildProtocoloDTO(String component, String action, Object dto) throws ProcessException {
+	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, Object dto) throws ProcessException {
 		return buildProtocoloDTO(component, action, dto, null);
 	}
 	
-	public ProtocoloDTO buildProtocoloDTO(String component, String action, MessageDTO messageDTO) throws ProcessException {
+	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, MessageDTO messageDTO) throws ProcessException {
 		return buildProtocoloDTO(component, action, null, messageDTO);
 	}
 	
-	public ProtocoloDTO buildProtocoloDTO(String component, String action, Object dto, MessageDTO messageDTO) throws ProcessException {
+	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, Object dto, MessageDTO messageDTO) throws ProcessException {
 		ProtocoloDTO p = new ProtocoloDTO();
 		p.setComponent(component);
 		p.setAction(action);
@@ -132,7 +134,7 @@ public class WebSocketSenderService {
 		return p;
 	}
 
-	public ProtocoloDTO buildProtocoloDTO(String component, String action) {
+	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action) {
 		ProtocoloDTO p = new ProtocoloDTO();
 		p.setComponent(component);
 		p.setAction(action);
@@ -145,13 +147,13 @@ public class WebSocketSenderService {
 //
 //
 	public void senderPing(String username) throws PrivacityException {
-		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO("PING_COMPONENT", "PING ACTION");
+		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.PING_COMPONENT, ProtocoloActionsEnum.PING_ACTION);
 			addMessageCola(p, username);
 	}
 	
 
 		
-	public void senderMessageToGrupoMinusCreator(String idUsuario, String idGrupo, String componente, String action, MessageDTO messageDTO ) throws PrivacityException {
+	public void senderMessageToGrupoMinusCreator(String idUsuario, String idGrupo, ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, MessageDTO messageDTO ) throws PrivacityException {
 
 
 		
@@ -169,7 +171,7 @@ public class WebSocketSenderService {
 	);
 		
 	}
-	private void senderMessageToGrupoMinusCreatorThread (String username, String componente, String action, MessageDTO messageDTO ){
+	private void senderMessageToGrupoMinusCreatorThread (String username, ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, MessageDTO messageDTO ){
 		
 		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
 				componente,

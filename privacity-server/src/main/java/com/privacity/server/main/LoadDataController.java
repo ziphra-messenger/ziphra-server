@@ -25,37 +25,43 @@ import com.privacity.server.util.MapperService;
 @Component
 public class LoadDataController {
 
-//	@Autowired
-//	RoleRepository roleRepository;
-//	@Autowired
-//	UsuarioRepository usuarioRepository;
+	@Autowired
+	RoleRepository roleRepository;
+	@Autowired
+	UsuarioRepository usuarioRepository;
 //	@Autowired
 //	Grupo2Repository grupoRepository2;
 //	@Autowired
 //	GtupobaseRepository grupoRepository;
 //	
-//	@Autowired
-//	
-//	MapperService mapperService;
+	@Autowired
+	
+	MapperService mapperService;
 	@PostConstruct
 	public void load() throws Exception {
 		
-//		Role role = new Role();
-//		role.setId(1);
-//		role.setName(ERole.ROLE_ADMIN);
-//		roleRepository.save(role);
-//
-//		Role role2 = new Role();
-//		role2.setId(2);
-//		role2.setName(ERole.ROLE_USER);
-//
-//		roleRepository.save(role2);
-//		
-//		Usuario u =  new Usuario();
-//		u.setIdUser(1L);
-//		u.setNickname("INFO");
-//		u.setUsername("SYSTEM");
-//		usuarioRepository.save(u);
+		Usuario u;
+		try {
+			Role role = new Role();
+			role.setId(1);
+			role.setName(ERole.ROLE_ADMIN);
+			roleRepository.save(role);
+
+			Role role2 = new Role();
+			role2.setId(2);
+			role2.setName(ERole.ROLE_USER);
+
+			roleRepository.save(role2);
+			
+			u = new Usuario();
+			u.setIdUser(1L);
+			u.setNickname("INFO");
+			u.setUsername("SYSTEM");
+			usuarioRepository.save(u);
+		} catch (Exception e) {
+
+		}
+
 //	{	
 //		Grupobase ggg = new Grupobase();
 //		ggg.setIdGrupo(1L);

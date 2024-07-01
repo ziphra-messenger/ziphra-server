@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.privacity.common.config.ConstantProtocolo;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.GrupoGralConfDTO;
 import com.privacity.common.dto.GrupoUserConfDTO;
@@ -85,8 +85,8 @@ public class GrupoValidationService {
 			
 		ProtocoloDTO p;
 			p = comps.webSocket().sender().buildProtocoloDTO(
-					ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
-					"/grupo/blockGrupoRemoto");
+					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
+					ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_BLOCK_REMOTO);
 		
 				
 				comps.webSocket().sender().senderToGrupoMinusCreator( comps.util().usuario().getUsuarioSystem().getIdUser(), grupoBlockRemotoRequestLocalDTO.getGrupo().getIdGrupo(), p);
@@ -163,8 +163,8 @@ public class GrupoValidationService {
 			
 			
 			
-			comps.util().grupo().senderSaveGrupoGralConfLockToGrupo(ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO
-					,ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK
+			comps.util().grupo().senderSaveGrupoGralConfLockToGrupo(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO
+					,ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK
 					, g.getIdGrupo(),  c);
 			
 		
@@ -335,14 +335,14 @@ public class GrupoValidationService {
 	}
 
 	public void startWritting (WrittingDTO request) throws Exception {
-		generalWritting(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_WRITTING, request);
+		generalWritting(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_WRITTING, request);
 	}
 	public void stopWritting (WrittingDTO request) throws Exception {
-		generalWritting(ConstantProtocolo.PROTOCOLO_ACTION_GRUPO_STOP_WRITTING, request);
+		generalWritting(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_STOP_WRITTING, request);
 	}
 
 
-	private void generalWritting (String protocoloAction, WrittingDTO request) throws Exception {
+	private void generalWritting (ProtocoloActionsEnum protocoloAction, WrittingDTO request) throws Exception {
 		
 		String username = comps.util().usuario().getUsernameLogged();
 		
@@ -368,7 +368,7 @@ public class GrupoValidationService {
 		
 			
 			p = comps.webSocket().sender().buildProtocoloDTO(
-					ConstantProtocolo.PROTOCOLO_COMPONENT_GRUPO,
+					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
 					protocoloAction,
 			        w);
 			
