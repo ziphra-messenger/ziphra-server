@@ -3,7 +3,7 @@ package com.privacity.server.encrypt.pool;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.privacity.server.main.AESToUse;
+import com.privacity.server.common.util.AESToUse;
 
 import lombok.Getter;
 

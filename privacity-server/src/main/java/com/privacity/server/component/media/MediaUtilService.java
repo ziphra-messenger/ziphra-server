@@ -6,10 +6,10 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.enumeration.ExceptionReturnCode;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageId;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.Message;
+import com.privacity.server.common.model.MessageId;
 
 @Service
 public class MediaUtilService {

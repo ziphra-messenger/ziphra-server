@@ -17,9 +17,9 @@ import com.privacity.common.dto.servergralconf.SGCMyAccountConfDTO;
 import com.privacity.common.dto.servergralconf.SGCServerInfo;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.RandomGeneratorType;
+import com.privacity.server.common.exceptions.PrivacityException;
+import com.privacity.server.common.exceptions.ValidationException;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ValidationException;
 
 import lombok.AllArgsConstructor;
 

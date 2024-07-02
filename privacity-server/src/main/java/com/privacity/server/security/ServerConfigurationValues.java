@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.privacity.server.main.AESToUse;
+import com.privacity.server.common.util.AESToUse;
 import com.privacity.server.util.LocalDateAdapter;
 
 public class ServerConfigurationValues {

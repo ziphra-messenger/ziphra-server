@@ -5,13 +5,13 @@ import org.apache.commons.logging.Log;
 import org.springframework.aop.interceptor.AbstractMonitoringInterceptor;
 
 import com.privacity.common.RolesAllowed;
-import com.privacity.common.interfaces.GrupoRoleInterface;
-import com.privacity.common.interfaces.UserForGrupoRoleInterface;
-import com.privacity.common.interfaces.UsuarioRoleInterface;
+import com.privacity.server.common.interfaces.GrupoRoleInterface;
+import com.privacity.server.common.interfaces.UserForGrupoRoleInterface;
+import com.privacity.server.common.interfaces.UsuarioRoleInterface;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.UserForGrupo;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.security.Usuario;
 
 public class AppConfigurationMethodRolValidationInterceptor extends AbstractMonitoringInterceptor {
     

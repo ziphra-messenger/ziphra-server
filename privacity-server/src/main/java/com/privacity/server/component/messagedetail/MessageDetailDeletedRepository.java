@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import com.privacity.server.model.MessageDetailDeleted;
-import com.privacity.server.model.MessageDetailId;
+import com.privacity.server.common.model.MessageDetailDeleted;
+import com.privacity.server.common.model.MessageDetailId;
 
 
 

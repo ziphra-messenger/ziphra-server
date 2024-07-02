@@ -13,13 +13,11 @@ import com.privacity.common.dto.request.LoginRequestDTO;
 import com.privacity.common.dto.request.MyAccountNicknameRequestDTO;
 import com.privacity.common.dto.response.MyAccountGenerateInvitationCodeResponseDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.model.EncryptKeys;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysValidation;
-import com.privacity.server.component.usuario.UserUtilService;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.EncryptKeys;
-import com.privacity.server.security.Usuario;
-import com.privacity.server.security.UsuarioSessionInfo;
 import com.privacity.server.util.UtilService;
 
 import lombok.AllArgsConstructor;
@@ -50,7 +48,7 @@ public class MyAccountValidationService {
 	public void saveLoginSkip(boolean request) throws ValidationException{
 		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
 		usuarioLogged.getMyAccountConf().setLoginSkip(request);
-		comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getMyAccountConf().setLoginSkip(request);
+		//usuarioLogged.getMyAccountConf().setLoginSkip(request);
 		
 		myAccountService.saveMyAccountGeneralConfiguration(usuarioLogged);
 		

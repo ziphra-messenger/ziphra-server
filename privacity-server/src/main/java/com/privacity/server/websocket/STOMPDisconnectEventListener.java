@@ -11,9 +11,9 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.ProtocoloDTO;
+import com.privacity.server.common.exceptions.PrivacityException;
+import com.privacity.server.common.model.Grupo;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.model.Grupo;
 
 /**
  * Created by baiguantao on 2017/8/4.
@@ -72,7 +72,7 @@ public class STOMPDisconnectEventListener  implements ApplicationListener<Sessio
 		
 		
 		
-		List<String> lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get(username).getUsuarioDB().getIdUser());
+		List<String> lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get(username).getUsuarioId());
 		
 		Iterator<String> i = lista.iterator();
 		
@@ -91,8 +91,8 @@ public class STOMPDisconnectEventListener  implements ApplicationListener<Sessio
 				
 
 			p = comps.webSocket().sender().buildProtocoloDTO(
-					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
-			        ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_HOW_MANY_MEMBERS_ONLINE,
+					ProtocoloComponentsEnum.GRUPO,
+			        ProtocoloActionsEnum.GRUPO_HOW_MANY_MEMBERS_ONLINE,
 			        newR);
 			
 			comps.webSocket().sender().sender(new WsMessage (destino , p ));

@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.MessageState;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.model.Message;
+import com.privacity.server.common.model.MessageDetail;
+import com.privacity.server.common.model.MessageDetailId;
+import com.privacity.server.common.model.UserForGrupo;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageDetail;
-import com.privacity.server.model.MessageDetailId;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.security.Usuario;
 
 import lombok.AllArgsConstructor;
 

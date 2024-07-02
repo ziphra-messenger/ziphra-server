@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.GsonBuilder;
 import com.privacity.common.dto.GrupoDTO;
+import com.privacity.server.common.enumeration.ERole;
+import com.privacity.server.common.model.Grupo2;
+import com.privacity.server.common.model.Grupobase;
+import com.privacity.server.common.model.Role;
+import com.privacity.server.common.model.Usuario;
+import com.privacity.server.common.repositories.UsuarioRepository;
 import com.privacity.server.component.grupo.Grupo2Repository;
 import com.privacity.server.component.grupo.GrupobaseRepository;
-import com.privacity.server.model.Grupo2;
-import com.privacity.server.model.Grupobase;
-import com.privacity.server.security.ERole;
-import com.privacity.server.security.Role;
 import com.privacity.server.security.RoleRepository;
-import com.privacity.server.security.Usuario;
-import com.privacity.server.security.UsuarioRepository;
 import com.privacity.server.util.LocalDateAdapter;
 import com.privacity.server.util.MapperService;
 

@@ -18,16 +18,16 @@ import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.priva
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
-import com.privacity.common.interfaces.GrupoRoleInterface;
-import com.privacity.common.interfaces.UserForGrupoRoleInterface;
-import com.privacity.common.interfaces.UsuarioRoleInterface;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.interfaces.GrupoRoleInterface;
+import com.privacity.server.common.interfaces.UserForGrupoRoleInterface;
+import com.privacity.server.common.interfaces.UsuarioRoleInterface;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.UserForGrupo;
+import com.privacity.server.common.model.Usuario;
+import com.privacity.server.common.model.request.GrupoIdLocalDTO;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.component.model.request.GrupoIdLocalDTO;
 import com.privacity.server.component.requestid.RequestIdUtilService;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.security.Usuario;
 import com.privacity.server.util.LocalDateAdapter;
 
 public abstract class ControllerBase {
@@ -81,9 +81,9 @@ public abstract class ControllerBase {
 			if (getMapaMetodos().get(request.getAction()) == null) {
 				throw new ValidationException(ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL);
 			}
-			if ( this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.PROTOCOLO_ACTION_REQUEST_ID_PRIVATE_GET)) {
+			if ( this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.REQUEST_ID_PRIVATE_GET)) {
 				requestIdUtil.existsRequestId(request.getRequestIdDTO(), true) ;
-			}else if ( !this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.PROTOCOLO_ACTION_REQUEST_ID_PUBLIC_GET)) {
+			}else if ( !this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.REQUEST_ID_PUBLIC_GET)) {
 				requestIdUtil.existsRequestId(request.getRequestIdDTO(),false) ;
 			}
 
@@ -101,7 +101,8 @@ public abstract class ControllerBase {
 				dtoObject =  getDTOObject(request, request.getObjectDTO(),getMapaMetodos().get(request.getAction()).getParameterTypes()[0]);
 
 				if ( this.isSecure() ) {
-					comps.service().usuarioSessionInfo().get().getPrivacityIdServices().decryptIds(dtoObject);
+					comps.service().usuarioSessionInfo().decryptIds(comps.util().usuario().getUsernameLogged(), dtoObject);
+					
 
 				}
 				if (dtoObject instanceof UsuarioRoleInterface) {
@@ -185,7 +186,8 @@ public abstract class ControllerBase {
 
 		if ( this.isSecure()){
 
-			comps.service().usuarioSessionInfo().get().getPrivacityIdServices().encryptIds(objetoRetorno);
+
+			comps.service().usuarioSessionInfo().encryptIds(comps.util().usuario().getUsernameLogged(), objetoRetorno);
 		}
 		//	if(getEncryptIds()) {
 		//		objetoRetorno = getPrivacityIdServices().transformarDesencriptarOut(getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject));

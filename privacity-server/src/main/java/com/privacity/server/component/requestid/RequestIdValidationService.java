@@ -1,7 +1,7 @@
 package com.privacity.server.component.requestid;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,11 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.dto.servergralconf.MinMaxLenghtDTO;
-import com.privacity.common.dto.servergralconf.SystemGralConf;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.security.Usuario;
 
 @Service
 
@@ -47,7 +46,7 @@ public class RequestIdValidationService {
 		serverRequestIdDTO.setRequestIdClientSide(halfId.getRequestIdClientSide());
 
 		if (isPrivate) {
-			ConcurrentMap<String, RequestIdDTO> map = comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getRequestIds();
+			Map<String, RequestIdDTO> map = null;// comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getRequestIds();
 			//isRequestIdDuplicated(halfId, map);
 						
 			map.put(halfId.getRequestIdClientSide(), serverRequestIdDTO);

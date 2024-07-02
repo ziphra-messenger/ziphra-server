@@ -27,22 +27,22 @@ import com.privacity.common.dto.request.GrupoNewRequestDTO;
 import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.server.common.exceptions.PrivacityException;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.model.AES;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.GrupoInvitation;
+import com.privacity.server.common.model.GrupoInvitationId;
+import com.privacity.server.common.model.GrupoUserConf;
+import com.privacity.server.common.model.Message;
+import com.privacity.server.common.model.UserForGrupo;
+import com.privacity.server.common.model.UserForGrupoId;
+import com.privacity.server.common.model.Usuario;
+import com.privacity.server.common.model.request.GrupoBlockRemotoRequestLocalDTO;
+import com.privacity.server.common.model.request.GrupoIdLocalDTO;
+import com.privacity.server.common.model.request.GrupoInfoNicknameRequestLocalDTO;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysValidation;
-import com.privacity.server.component.model.request.GrupoBlockRemotoRequestLocalDTO;
-import com.privacity.server.component.model.request.GrupoIdLocalDTO;
-import com.privacity.server.component.model.request.GrupoInfoNicknameRequestLocalDTO;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.AES;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoInvitation;
-import com.privacity.server.model.GrupoInvitationId;
-import com.privacity.server.model.GrupoUserConf;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.model.UserForGrupoId;
-import com.privacity.server.security.Usuario;
 import com.privacity.server.websocket.WsMessage;
 
 import lombok.AllArgsConstructor;
@@ -85,8 +85,8 @@ public class GrupoValidationService {
 			
 		ProtocoloDTO p;
 			p = comps.webSocket().sender().buildProtocoloDTO(
-					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
-					ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_BLOCK_REMOTO);
+					ProtocoloComponentsEnum.GRUPO,
+					ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO);
 		
 				
 				comps.webSocket().sender().senderToGrupoMinusCreator( comps.util().usuario().getUsuarioSystem().getIdUser(), grupoBlockRemotoRequestLocalDTO.getGrupo().getIdGrupo(), p);
@@ -163,8 +163,8 @@ public class GrupoValidationService {
 			
 			
 			
-			comps.util().grupo().senderSaveGrupoGralConfLockToGrupo(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO
-					,ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK
+			comps.util().grupo().senderSaveGrupoGralConfLockToGrupo(ProtocoloComponentsEnum.GRUPO
+					,ProtocoloActionsEnum.GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK
 					, g.getIdGrupo(),  c);
 			
 		
@@ -335,10 +335,10 @@ public class GrupoValidationService {
 	}
 
 	public void startWritting (WrittingDTO request) throws Exception {
-		generalWritting(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_WRITTING, request);
+		generalWritting(ProtocoloActionsEnum.GRUPO_WRITTING, request);
 	}
 	public void stopWritting (WrittingDTO request) throws Exception {
-		generalWritting(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_STOP_WRITTING, request);
+		generalWritting(ProtocoloActionsEnum.GRUPO_STOP_WRITTING, request);
 	}
 
 
@@ -346,7 +346,7 @@ public class GrupoValidationService {
 		
 		String username = comps.util().usuario().getUsernameLogged();
 		
-		Usuario usuarioLogged = comps.service().usuarioSessionInfo().get(username).getUsuarioDB();
+		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
 
 		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());
 		
@@ -368,7 +368,7 @@ public class GrupoValidationService {
 		
 			
 			p = comps.webSocket().sender().buildProtocoloDTO(
-					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
+					ProtocoloComponentsEnum.GRUPO,
 					protocoloAction,
 			        w);
 			
@@ -385,7 +385,7 @@ public class GrupoValidationService {
 		//log.info("1");
 		String username = comps.util().usuario().getUsernameLogged();
 		
-		Usuario usuarioLogged = comps.service().usuarioSessionInfo().get(username).getUsuarioDB();
+		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
 		//log.info("2");
 		
 		//log.info("3");

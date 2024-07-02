@@ -25,14 +25,14 @@ import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.MessageState;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.server.common.exceptions.PrivacityException;
+import com.privacity.server.common.exceptions.ProcessException;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.Media;
+import com.privacity.server.common.model.Message;
+import com.privacity.server.common.model.MessageDetail;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ProcessException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.Media;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageDetail;
-import com.privacity.server.security.Usuario;
 import com.privacity.server.util.PrivacityLogguer;
 import com.privacity.server.websocket.WsMessage;
 import com.privacity.server.websocket.WsQueue;
@@ -286,8 +286,8 @@ public class MessageProcessService {
 						comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(retornoWS);
 					
 					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-							ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
-					        ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_CHANGE_STATE,
+							ProtocoloComponentsEnum.MESSAGE,
+					        ProtocoloActionsEnum.MESSAGE_CHANGE_STATE,
 					        retornoWS);
 			
 					
@@ -295,7 +295,7 @@ public class MessageProcessService {
 					
 					comps.webSocket().sender().sender(new WsMessage (username , p ));
 					
-						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE, ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
+						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE, ProtocoloActionsEnum.MESSAGE_RECIVIED, responseWs);
 					}
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -374,7 +374,7 @@ public class MessageProcessService {
 //						
 //						ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
 //								ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
-//								ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED);
+//								ProtocoloActionsEnum.MESSAGE_RECIVIED);
 //						
 //						p.setObjectDTO(new Gson().toJson(p));
 //				
@@ -450,8 +450,8 @@ public class MessageProcessService {
 						comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(responseWs);
 					
 					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-							ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
-							ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED);
+							ProtocoloComponentsEnum.MESSAGE,
+							ProtocoloActionsEnum.MESSAGE_RECIVIED);
 					p.setMessageDTO( responseWs);
 					
 					if (objecto != null) {
@@ -472,7 +472,7 @@ public class MessageProcessService {
 					
 					comps.webSocket().sender().sender(new WsMessage (username , p ));
 					
-						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE, ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
+						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE, ProtocoloActionsEnum.MESSAGE_RECIVIED, responseWs);
 					
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -515,8 +515,8 @@ public class MessageProcessService {
 
 			
 			this.senderToGrupoMinusCreator(
-					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
-					ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_DELETE_FOR_EVERYONE,
+					ProtocoloComponentsEnum.MESSAGE,
+					ProtocoloActionsEnum.MESSAGE_DELETE_FOR_EVERYONE,
 					message.getMessageId().getGrupo().getIdGrupo(), mRemoveWS);
 			
 			
@@ -557,7 +557,7 @@ public class MessageProcessService {
 					
 					List<String> lista;
 					if (toAll) {
-						lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get().getUsuarioDB().getIdUser());
+						lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.util().usuario().getUsuarioLoggedValidate().getIdUser());
 					}else {
 						lista = comps.repo().userForGrupo().findByForGrupoAll(idGrupo);	
 					}

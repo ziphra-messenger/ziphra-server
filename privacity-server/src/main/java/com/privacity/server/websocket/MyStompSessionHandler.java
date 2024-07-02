@@ -7,7 +7,7 @@ import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
 
-import com.privacity.server.model.Message;
+import com.privacity.server.common.model.Message;
 
 import lombok.extern.java.Log;
 @Log

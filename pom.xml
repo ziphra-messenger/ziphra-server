@@ -39,7 +39,8 @@
     
     <module>privacity-server</module>
               
-    
+           <module>privacity-server-common</module> 
+       <module>privacity-server-session-2</module> 
     
     <module>privacity-common</module>
           

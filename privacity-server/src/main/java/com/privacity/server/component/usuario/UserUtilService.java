@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.server.common.exceptions.ProcessException;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.UserForGrupo;
+import com.privacity.server.common.model.UserForGrupoId;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.ProcessException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.model.UserForGrupoId;
-import com.privacity.server.security.Usuario;
 
 @Service
 public class UserUtilService {

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import com.privacity.server.common.repositories.UsuarioRepository;
 import com.privacity.server.component.grupo.GrupoRepository;
 import com.privacity.server.component.grupoinvitation.GrupoInvitationRepository;
 import com.privacity.server.component.grupouserconf.GrupoUserConfRepository;
@@ -13,7 +14,6 @@ import com.privacity.server.component.messagedetail.MessageDetailDeletedReposito
 import com.privacity.server.component.messagedetail.MessageDetailRepository;
 import com.privacity.server.component.userforgrupo.UserForGrupoRepository;
 import com.privacity.server.security.RoleRepository;
-import com.privacity.server.security.UsuarioRepository;
 
 import lombok.NoArgsConstructor;
 

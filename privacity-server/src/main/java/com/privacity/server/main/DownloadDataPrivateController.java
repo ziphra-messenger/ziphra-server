@@ -19,6 +19,7 @@ import com.google.gson.GsonBuilder;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
+import com.privacity.server.common.util.AESToUse;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.message.MessageValidationService;
 import com.privacity.server.security.UserDetailsImpl;
@@ -114,15 +115,15 @@ public class DownloadDataPrivateController {
 			
 				MessageDTO dtoObject =  request.getMessageDTO();
 				
-				comps.service().usuarioSessionInfo().get().getPrivacityIdServices().decryptIds(dtoObject);
+				comps.service().usuarioSessionInfo().decryptIds(comps.util().usuario().getUsernameLogged(), dtoObject);
 				
 				objetoRetorno = messageValidationService.getDataMedia(dtoObject);
 					
 
 
-	
+				comps.service().usuarioSessionInfo().encryptIds(comps.util().usuario().getUsernameLogged(), objetoRetorno);
 
-				comps.service().usuarioSessionInfo().get().getPrivacityIdServices().encryptIds(objetoRetorno);
+	
 
 	//	if(getEncryptIds()) {
 	//		objetoRetorno = getPrivacityIdServices().transformarDesencriptarOut(getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject));

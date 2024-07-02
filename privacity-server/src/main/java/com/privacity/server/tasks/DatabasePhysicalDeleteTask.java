@@ -1,19 +1,13 @@
 package com.privacity.server.tasks;
 
-import java.time.LocalDateTime;
-import java.util.concurrent.ConcurrentMap;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.security.UsuarioSessionInfo;
 
 import lombok.extern.java.Log;
 

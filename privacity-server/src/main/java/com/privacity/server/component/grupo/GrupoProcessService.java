@@ -25,23 +25,23 @@ import com.privacity.common.dto.response.GrupoRemoveMeResponseDTO;
 import com.privacity.common.dto.response.InitGrupoResponse;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.server.common.exceptions.PrivacityException;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.model.AES;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.GrupoGralConf;
+import com.privacity.server.common.model.GrupoGralConfLock;
+import com.privacity.server.common.model.GrupoGralConfPassword;
+import com.privacity.server.common.model.GrupoInvitation;
+import com.privacity.server.common.model.GrupoInvitationId;
+import com.privacity.server.common.model.GrupoUserConf;
+import com.privacity.server.common.model.GrupoUserConfId;
+import com.privacity.server.common.model.Message;
+import com.privacity.server.common.model.MessageDetail;
+import com.privacity.server.common.model.UserForGrupo;
+import com.privacity.server.common.model.UserForGrupoId;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.AES;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoGralConf;
-import com.privacity.server.model.GrupoGralConfLock;
-import com.privacity.server.model.GrupoGralConfPassword;
-import com.privacity.server.model.GrupoInvitation;
-import com.privacity.server.model.GrupoInvitationId;
-import com.privacity.server.model.GrupoUserConf;
-import com.privacity.server.model.GrupoUserConfId;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageDetail;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.model.UserForGrupoId;
-import com.privacity.server.security.Usuario;
 import com.privacity.server.websocket.WsMessage;
 import com.privacity.server.websocket.WsQueue;
 
@@ -218,8 +218,8 @@ public class GrupoProcessService  {
 		// enviar invitacion
 		
 		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-				ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
-				ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_INVITATION_RECIVED, 
+				ProtocoloComponentsEnum.GRUPO,
+				ProtocoloActionsEnum.GRUPO_INVITATION_RECIVED, 
 				ginfo);
 		
 		
@@ -430,8 +430,8 @@ public class GrupoProcessService  {
 		usuarioRemove.setIdUsuario(usuarioLogged.getIdUser()+"");
 		r.setUsuariosDTO(usuarioRemove);
 		
-		comps.util().grupo().senderToGrupoMinusCreator(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
-				ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_REMOVE_USER,  grupo.getIdGrupo(), grupoRemove);
+		comps.util().grupo().senderToGrupoMinusCreator(ProtocoloComponentsEnum.GRUPO,
+				ProtocoloActionsEnum.GRUPO_REMOVE_USER,  grupo.getIdGrupo(), grupoRemove);
 	
 
 		//ACA DEBE INFORMAR A TODOS LOS SUSCRIPTORES EL INGRESO DEL NUEVO MIEMBRO
@@ -500,7 +500,7 @@ public class GrupoProcessService  {
 		
 		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
 				ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
-				ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_DELETE_GRUPO, 
+				ProtocoloActionsEnum.GRUPO_DELETE_GRUPO, 
 				grupoRemove);
 		
 		for (Usuario usuarioToAvisarRemove : usuarios){

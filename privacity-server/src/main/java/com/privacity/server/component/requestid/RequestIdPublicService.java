@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.server.common.exceptions.ValidationException;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.ValidationException;
 
 import lombok.Getter;
 

@@ -8,7 +8,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
-import com.privacity.server.main.AESToUse;
+import com.privacity.server.common.util.AESToUse;
 
 
 @Service

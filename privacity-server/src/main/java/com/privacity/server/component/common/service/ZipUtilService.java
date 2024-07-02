@@ -9,7 +9,7 @@ import java.util.zip.GZIPOutputStream;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.enumeration.ExceptionReturnCode;
-import com.privacity.server.exceptions.ProcessException;
+import com.privacity.server.common.exceptions.ProcessException;
 
 import lombok.Data;
 

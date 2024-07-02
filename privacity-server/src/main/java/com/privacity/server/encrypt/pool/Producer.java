@@ -7,7 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import com.privacity.common.enumeration.RandomGeneratorType;
 import com.privacity.common.util.RandomGenerator;
-import com.privacity.server.main.AESToUse;
+import com.privacity.server.common.util.AESToUse;
 
 public class Producer implements Runnable {
     private static final Logger log = Logger.getLogger(Producer.class.getCanonicalName());

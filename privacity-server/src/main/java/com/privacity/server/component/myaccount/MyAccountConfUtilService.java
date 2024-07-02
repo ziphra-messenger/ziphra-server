@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.LockDTO;
 import com.privacity.common.dto.servergralconf.SGCMyAccountConfDTO;
+import com.privacity.server.common.model.MyAccountConfLock;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.model.MyAccountConfLock;
-import com.privacity.server.security.Usuario;
 
 import lombok.AllArgsConstructor;
 

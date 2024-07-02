@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoInvitation;
-import com.privacity.server.model.GrupoInvitationId;
-import com.privacity.server.security.Usuario;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.GrupoInvitation;
+import com.privacity.server.common.model.GrupoInvitationId;
+import com.privacity.server.common.model.Usuario;
 
 
 

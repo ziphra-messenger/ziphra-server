@@ -28,18 +28,19 @@ import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
-import com.privacity.common.interfaces.GrupoRoleInterface;
-import com.privacity.common.interfaces.UserForGrupoRoleInterface;
-import com.privacity.common.interfaces.UsuarioRoleInterface;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.interfaces.GrupoRoleInterface;
+import com.privacity.server.common.interfaces.UserForGrupoRoleInterface;
+import com.privacity.server.common.interfaces.UsuarioRoleInterface;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.UserForGrupo;
+import com.privacity.server.common.model.Usuario;
+import com.privacity.server.common.util.AESToUse;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.message.MessageValidationService;
-import com.privacity.server.encrypt.PrivacityIdServices;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.security.UserDetailsImpl;
-import com.privacity.server.security.Usuario;
+import com.privacity.server.session.PrivacityIdServices;
 import com.privacity.server.util.LocalDateAdapter;
 
 
@@ -171,8 +172,8 @@ public class SendPrivateController {
 
 			
 				 dtoObject =  request.getMessageDTO();
-				
-					comps.service().usuarioSessionInfo().get().getPrivacityIdServices().decryptIds(dtoObject);
+					comps.service().usuarioSessionInfo().decryptIds(comps.util().usuario().getUsernameLogged(), dtoObject);
+
 					//////////////////
 					
 						Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
@@ -229,7 +230,9 @@ public class SendPrivateController {
 		} 
 
 
-			comps.service().usuarioSessionInfo().get().getPrivacityIdServices().encryptIds(objetoRetorno);
+			comps.service().usuarioSessionInfo().encryptIds(comps.util().usuario().getUsernameLogged(), objetoRetorno);
+			
+
 
 
 

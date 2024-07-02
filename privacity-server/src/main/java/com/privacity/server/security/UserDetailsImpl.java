@@ -10,9 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.privacity.common.dto.AESDTO;
-import com.privacity.server.encrypt.UsuarioSessionInfoService;
-import com.privacity.server.model.EncryptKeys;
+import com.privacity.server.common.model.Usuario;
 
 public class UserDetailsImpl implements UserDetails {
 	private static final long serialVersionUID = 1L;

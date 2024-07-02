@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.server.component.grupouserconf.GrupoUserConfService;
 import com.privacity.server.component.requestid.RequestIdPublicService;
-import com.privacity.server.encrypt.UsuarioSessionInfoService;
+import com.privacity.server.session.UsuarioSessionInfoService;
 
 import lombok.NoArgsConstructor;
 

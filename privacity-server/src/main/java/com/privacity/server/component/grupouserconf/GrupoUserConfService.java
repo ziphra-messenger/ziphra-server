@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.GrupoUserConf;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoUserConf;
-import com.privacity.server.security.Usuario;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

@@ -8,11 +8,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.Message;
+import com.privacity.server.common.model.MessageId;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageId;
 
 @Service
 public class MessageUtilService {

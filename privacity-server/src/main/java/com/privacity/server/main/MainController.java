@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.privacity.server.security.Urls;
+import com.privacity.server.common.enumeration.Urls;
 
 
 

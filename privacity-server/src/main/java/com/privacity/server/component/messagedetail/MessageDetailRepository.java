@@ -11,10 +11,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import com.privacity.common.enumeration.MessageState;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.MessageDetail;
-import com.privacity.server.model.MessageDetailId;
-import com.privacity.server.security.Usuario;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.MessageDetail;
+import com.privacity.server.common.model.MessageDetailId;
+import com.privacity.server.common.model.Usuario;
 
 
 

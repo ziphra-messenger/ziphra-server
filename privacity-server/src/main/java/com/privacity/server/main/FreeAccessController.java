@@ -30,17 +30,7 @@ public class FreeAccessController extends ControllerBase{
 		this.serverConfValidationService = serverConfValidationService;
 		this.privacityRSAValidation = privacityRSAValidation;
 
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_SERVER_CONF_UNSECURE, serverConfValidationService);
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_SERVER_CONF_UNSECURE_GET_TIME, serverConfValidationService.getClass().getMethod(
-				"getTime"));	
-		
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_PRIVACITY_RSA, privacityRSAValidation);
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_PRIVACITY_RSA_GET_PUBLIC_KEY, privacityRSAValidation.getClass().getMethod(
-				"getPublicKeyToSend"));	
 
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_SERVER_CONF_UNSECURE, serverConfValidationService);
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_SERVER_CONF_UNSECURE_GET_GRAL_CONF, serverConfValidationService.getClass().getMethod(
-				"getSystemGralConf"));
 		
 		
 	

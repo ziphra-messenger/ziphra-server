@@ -17,13 +17,13 @@ import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.server.common.exceptions.PrivacityException;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.UserForGrupo;
+import com.privacity.server.common.model.Usuario;
+import com.privacity.server.common.model.request.GrupoIdLocalDTO;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.component.model.request.GrupoIdLocalDTO;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.security.Usuario;
 import com.privacity.server.websocket.WsMessage;
 
 import lombok.AllArgsConstructor;
@@ -159,7 +159,7 @@ public class GrupoUtilService {
 					
 					List<String> lista;
 					if (toAll) {
-						lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get().getUsuarioDB().getIdUser());
+						lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo,  comps.util().usuario().getUsuarioLoggedValidate().getIdUser());
 					}else {
 						lista = comps.repo().userForGrupo().findByForGrupoAll(idGrupo);	
 					}
@@ -215,7 +215,7 @@ public class GrupoUtilService {
 					
 					List<String> lista;
 					if (toAll) {
-						lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get().getUsuarioDB().getIdUser());
+						lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.util().usuario().getUsuarioLoggedValidate().getIdUser());
 					}else {
 						lista = comps.repo().userForGrupo().findByForGrupoAll(idGrupo);	
 					}

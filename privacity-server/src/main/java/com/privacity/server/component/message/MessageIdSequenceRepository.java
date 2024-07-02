@@ -2,7 +2,7 @@ package com.privacity.server.component.message;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.privacity.server.model.MessageIdSequence;
+import com.privacity.server.common.model.MessageIdSequence;
 
 
 

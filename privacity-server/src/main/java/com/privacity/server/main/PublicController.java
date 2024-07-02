@@ -19,6 +19,7 @@ import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.dto.request.LoginRequestDTO;
 import com.privacity.common.dto.request.RegisterUserRequestDTO;
 import com.privacity.common.dto.request.ValidateUsernameDTO;
+import com.privacity.server.common.util.AESToUse;
 import com.privacity.server.component.auth.AuthValidationService;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
@@ -43,13 +44,13 @@ public class PublicController extends ControllerBase{
 	public PublicController(FacadeComponent comps) throws Exception {
 		
 		this.comps = comps;
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_AUTH, comps.validation().auth());
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_AUTH_LOGIN, comps.validation().auth().getClass().getMethod(AuthValidationService.METHOD_ACTION_AUTH_LOGIN, LoginRequestDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_AUTH_REGISTER, comps.validation().auth().getClass().getMethod(AuthValidationService.METHOD_ACTION_AUTH_REGISTER, RegisterUserRequestDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_AUTH_VALIDATE_USERNAME, comps.validation().auth().getClass().getMethod(AuthValidationService.METHOD_ACTION_AUTH_VALIDATE_USERNAME, ValidateUsernameDTO.class));
+		getMapaController().put(ProtocoloComponentsEnum.AUTH, comps.validation().auth());
+		getMapaMetodos().put(ProtocoloActionsEnum.AUTH_LOGIN, comps.validation().auth().getClass().getMethod(AuthValidationService.METHOD_ACTION_AUTH_LOGIN, LoginRequestDTO.class));
+		getMapaMetodos().put(ProtocoloActionsEnum.AUTH_REGISTER, comps.validation().auth().getClass().getMethod(AuthValidationService.METHOD_ACTION_AUTH_REGISTER, RegisterUserRequestDTO.class));
+		getMapaMetodos().put(ProtocoloActionsEnum.AUTH_VALIDATE_USERNAME, comps.validation().auth().getClass().getMethod(AuthValidationService.METHOD_ACTION_AUTH_VALIDATE_USERNAME, ValidateUsernameDTO.class));
 
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_REQUEST_ID, comps.validation().requestId());
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_REQUEST_ID_PUBLIC_GET, comps.validation().requestId().getClass().getMethod("getNewRequestIdPublic", RequestIdDTO.class));		
+		getMapaController().put(ProtocoloComponentsEnum.REQUEST_ID, comps.validation().requestId());
+		getMapaMetodos().put(ProtocoloActionsEnum.REQUEST_ID_PUBLIC_GET, comps.validation().requestId().getClass().getMethod("getNewRequestIdPublic", RequestIdDTO.class));		
 
 	}
 	

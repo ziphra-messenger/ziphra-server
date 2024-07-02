@@ -16,8 +16,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.privacity.common.enumeration.RandomGeneratorType;
 import com.privacity.common.util.RandomGenerator;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.security.Usuario;
 
 @Service
 public class UtilService {

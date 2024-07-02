@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.privacity.server.common.model.EncryptKeys;
+import com.privacity.server.common.model.UserInvitationCode;
+import com.privacity.server.common.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysRepository;
-import com.privacity.server.model.EncryptKeys;
-import com.privacity.server.model.UserInvitationCode;
-import com.privacity.server.security.Usuario;
 import com.privacity.server.util.UtilService;
 
 import lombok.AllArgsConstructor;

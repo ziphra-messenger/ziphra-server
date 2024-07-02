@@ -14,14 +14,14 @@ import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.server.common.exceptions.PrivacityException;
+import com.privacity.server.common.exceptions.ProcessException;
+import com.privacity.server.common.exceptions.ValidationException;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.UserForGrupo;
+import com.privacity.server.common.model.Usuario;
+import com.privacity.server.common.util.AESToUse;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ProcessException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.main.AESToUse;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.security.Usuario;
 import com.privacity.server.util.LocalDateAdapter;
 
 @Service
@@ -97,17 +97,14 @@ public class WebSocketSenderService {
 		if (comps.webSocket().socketSessionRegistry().getSessionIds(user).size() >0) {
 			
 		AESToUse c;
-		try {
+
 			c = comps.service().usuarioSessionInfo().get(user).getSessionAESToUseWS();
-		
-			String retornoFuncionEncriptado = c.getAES(mensaje);
 
 
-			comps.webSocket().simpMessagingTemplate().convertAndSendToUser(user, urlDestino , retornoFuncionEncriptado);	
-		} catch (ValidationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String retornoFuncionEncriptado = c.getAES(mensaje);
+
+
+		comps.webSocket().simpMessagingTemplate().convertAndSendToUser(user, urlDestino , retornoFuncionEncriptado);
 						
 						
 				
@@ -147,7 +144,7 @@ public class WebSocketSenderService {
 //
 //
 	public void senderPing(String username) throws PrivacityException {
-		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.PING_COMPONENT, ProtocoloActionsEnum.PING_ACTION);
+		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.PING, ProtocoloActionsEnum.PING_ACTION);
 			addMessageCola(p, username);
 	}
 	

@@ -9,10 +9,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoUserConf;
-import com.privacity.server.model.GrupoUserConfId;
-import com.privacity.server.security.Usuario;
+import com.privacity.server.common.model.Grupo;
+import com.privacity.server.common.model.GrupoUserConf;
+import com.privacity.server.common.model.GrupoUserConfId;
+import com.privacity.server.common.model.Usuario;
 
 
 

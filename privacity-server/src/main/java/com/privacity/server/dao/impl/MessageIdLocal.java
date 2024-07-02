@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.util.RandomGenerator;
+import com.privacity.server.common.model.MessageIdSequence;
 import com.privacity.server.component.message.MessageIdSequenceRepository;
 import com.privacity.server.dao.interfaces.MessgeIdInterfaceDAO;
-import com.privacity.server.model.MessageIdSequence;
 
 @Service
 public class MessageIdLocal implements MessgeIdInterfaceDAO {
