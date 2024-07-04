@@ -68,8 +68,8 @@ public class MessageValidationService {
 		
 		
 		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-				ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
-				ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_DELETE_FOR_EVERYONE);
+				ProtocoloComponentsEnum.MESSAGE,
+				ProtocoloActionsEnum.MESSAGE_DELETE_FOR_EVERYONE);
 		
 		IdMessageDTO mRemove = new IdMessageDTO();
 		p.setMessageDTO(new MessageDTO());

@@ -5,8 +5,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.ProtocoloDTO;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.server.common.enumeration.Urls;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
 import com.privacity.server.component.serverconf.ServerConfValidationService;
@@ -30,18 +32,6 @@ public class FreeAccessController extends ControllerBase{
 		this.serverConfValidationService = serverConfValidationService;
 		this.privacityRSAValidation = privacityRSAValidation;
 
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_SERVER_CONF_UNSECURE, serverConfValidationService);
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_SERVER_CONF_UNSECURE_GET_TIME, serverConfValidationService.getClass().getMethod(
-				"getTime"));	
-		
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_PRIVACITY_RSA, privacityRSAValidation);
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_PRIVACITY_RSA_GET_PUBLIC_KEY, privacityRSAValidation.getClass().getMethod(
-				"getPublicKeyToSend"));	
-
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_SERVER_CONF_UNSECURE, serverConfValidationService);
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_SERVER_CONF_UNSECURE_GET_GRAL_CONF, serverConfValidationService.getClass().getMethod(
-				"getSystemGralConf"));
-		
 		
 	
 	}
@@ -94,5 +84,10 @@ public class FreeAccessController extends ControllerBase{
 	@Override
 	public boolean showLog(ProtocoloDTO request) {
 		return false;
+	}	
+	
+	@Override
+	public Urls getUrl() {
+		return Urls.CONSTANT_URL_PATH_FREE;
 	}	
 }

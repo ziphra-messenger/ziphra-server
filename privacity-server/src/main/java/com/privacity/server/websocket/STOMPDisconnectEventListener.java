@@ -91,8 +91,8 @@ public class STOMPDisconnectEventListener  implements ApplicationListener<Sessio
 				
 
 			p = comps.webSocket().sender().buildProtocoloDTO(
-					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
-			        ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_HOW_MANY_MEMBERS_ONLINE,
+					ProtocoloComponentsEnum.GRUPO,
+			        ProtocoloActionsEnum.GRUPO_HOW_MANY_MEMBERS_ONLINE,
 			        newR);
 			
 			comps.webSocket().sender().sender(new WsMessage (destino , p ));

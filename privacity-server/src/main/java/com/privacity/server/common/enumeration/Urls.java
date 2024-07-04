@@ -1,4 +1,5 @@
-package com.privacity.server.security;
+package com.privacity.server.common.enumeration;
+
    public enum Urls {
 		CONSTANT_URL_PATH_PRIVATE_DOWNLOAD_DATA("/private/download/data"),
 		CONSTANT_URL_PATH_PRIVATE ("/private/entry"),

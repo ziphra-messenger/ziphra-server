@@ -147,7 +147,7 @@ public class WebSocketSenderService {
 //
 //
 	public void senderPing(String username) throws PrivacityException {
-		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.PING_COMPONENT, ProtocoloActionsEnum.PING_ACTION);
+		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.PING, ProtocoloActionsEnum.PING_ACTION);
 			addMessageCola(p, username);
 	}
 	

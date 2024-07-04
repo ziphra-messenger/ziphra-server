@@ -286,8 +286,8 @@ public class MessageProcessService {
 						comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(retornoWS);
 					
 					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-							ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
-					        ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_CHANGE_STATE,
+							ProtocoloComponentsEnum.MESSAGE,
+					        ProtocoloActionsEnum.MESSAGE_CHANGE_STATE,
 					        retornoWS);
 			
 					
@@ -295,7 +295,7 @@ public class MessageProcessService {
 					
 					comps.webSocket().sender().sender(new WsMessage (username , p ));
 					
-						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE, ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
+						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.MESSAGE, ProtocoloActionsEnum.MESSAGE_RECIVIED, responseWs);
 					}
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -373,8 +373,8 @@ public class MessageProcessService {
 //						
 //						
 //						ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-//								ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
-//								ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED);
+//								ProtocoloComponentsEnum.MESSAGE,
+//								ProtocoloActionsEnum.MESSAGE_RECIVIED);
 //						
 //						p.setObjectDTO(new Gson().toJson(p));
 //				
@@ -450,8 +450,8 @@ public class MessageProcessService {
 						comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(responseWs);
 					
 					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-							ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
-							ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED);
+							ProtocoloComponentsEnum.MESSAGE,
+							ProtocoloActionsEnum.MESSAGE_RECIVIED);
 					p.setMessageDTO( responseWs);
 					
 					if (objecto != null) {
@@ -472,7 +472,7 @@ public class MessageProcessService {
 					
 					comps.webSocket().sender().sender(new WsMessage (username , p ));
 					
-						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE, ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_RECIVIED, responseWs);
+						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.MESSAGE, ProtocoloActionsEnum.MESSAGE_RECIVIED, responseWs);
 					
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -515,8 +515,8 @@ public class MessageProcessService {
 
 			
 			this.senderToGrupoMinusCreator(
-					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE,
-					ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_DELETE_FOR_EVERYONE,
+					ProtocoloComponentsEnum.MESSAGE,
+					ProtocoloActionsEnum.MESSAGE_DELETE_FOR_EVERYONE,
 					message.getMessageId().getGrupo().getIdGrupo(), mRemoveWS);
 			
 			

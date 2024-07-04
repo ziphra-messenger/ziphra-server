@@ -12,13 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.ProtocoloWrapperDTO;
 import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.dto.request.LoginRequestDTO;
 import com.privacity.common.dto.request.RegisterUserRequestDTO;
 import com.privacity.common.dto.request.ValidateUsernameDTO;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.server.common.enumeration.Urls;
 import com.privacity.server.component.auth.AuthValidationService;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
@@ -43,13 +45,6 @@ public class PublicController extends ControllerBase{
 	public PublicController(FacadeComponent comps) throws Exception {
 		
 		this.comps = comps;
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_AUTH, comps.validation().auth());
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_AUTH_LOGIN, comps.validation().auth().getClass().getMethod(AuthValidationService.METHOD_ACTION_AUTH_LOGIN, LoginRequestDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_AUTH_REGISTER, comps.validation().auth().getClass().getMethod(AuthValidationService.METHOD_ACTION_AUTH_REGISTER, RegisterUserRequestDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_AUTH_VALIDATE_USERNAME, comps.validation().auth().getClass().getMethod(AuthValidationService.METHOD_ACTION_AUTH_VALIDATE_USERNAME, ValidateUsernameDTO.class));
-
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_REQUEST_ID, comps.validation().requestId());
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_REQUEST_ID_PUBLIC_GET, comps.validation().requestId().getClass().getMethod("getNewRequestIdPublic", RequestIdDTO.class));		
 
 	}
 	
@@ -97,5 +92,8 @@ public class PublicController extends ControllerBase{
 		return true;
 	}
 	
-
+	@Override
+	public Urls getUrl() {
+		return Urls.CONSTANT_URL_PATH_PUBLIC;
+	}
 }

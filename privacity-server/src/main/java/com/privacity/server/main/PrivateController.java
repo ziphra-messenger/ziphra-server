@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.EncryptKeysDTO;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.GrupoGralConfDTO;
@@ -38,6 +37,9 @@ import com.privacity.common.dto.request.LoginRequestDTO;
 import com.privacity.common.dto.request.MyAccountNicknameRequestDTO;
 import com.privacity.common.dto.request.PublicKeyByInvitationCodeRequestDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.server.common.enumeration.Urls;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysService;
@@ -88,59 +90,7 @@ public class PrivateController extends ControllerBase{
 		this.encryptKeysValidationService=encryptKeysValidationService;
 		this.requestIdValidationService=requestIdValidationService;
 
-		
-		// getMapaMetodos().put("/grupo/initGrupo", GrupoValidationService.class.getMethod("initGrupo", String.class));
-		// getMapaMetodos().put("/grupo/listar/misGrupos", GrupoValidationService.class.getMethod("listarMisGrupos"));
-		// getMapaMetodos().put(Constant.PROTOCOLO_ACTION_ENCRYPT_KEYS_CREATE, EncryptKeysValidationService.class.getMethod("create", EncryptKeysDTO.class));
-		// getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_HOW_MANY_MEMBERS_ONLINE, GrupoValidationService.class.getMethod("getMembersOnline",IdDTO.class));
-		//getMapaMetodos().put("/grupo/getGrupoUserConf", GrupoValidationService.class.getMethod("getGrupoUserConf", GrupoDTO.class));
-		//getMapaMetodos().put("/message/send", MessageValidationService.class.getMethod("send", MessageDTO.class));
-		//getMapaMetodos().put("/message/sendAnonimo", comps.service.message.getClass().getMethod("sendAnonimo", MessageDTO.class));
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_ENCRYPT_KEYS, encryptKeysValidationService);
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO, grupoValidationService);
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MESSAGE, messageValidationService);
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_MY_ACCOUNT, myAccountValidationService);
-		getMapaController().put(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_REQUEST_ID, requestIdValidationService);
-		getMapaMetodos().put(ProtocoloActionsEnum.GRUPO_ACCEPT_INVITATION, GrupoValidationService.class.getMethod("acceptInvitation", GrupoInvitationAcceptRequestDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.GRUPO_DELETE, GrupoValidationService.class.getMethod("delete", IdDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.GRUPO_GRAL_CONF_SAVE_LOCK, GrupoValidationService.class.getMethod("saveGrupoGralConfLock", GrupoDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.GRUPO_LIST_MEMBERS, GrupoValidationService.class.getMethod("getMembers", GrupoDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.GRUPO_LOGIN, GrupoValidationService.class.getMethod("loginGrupo", GrupoDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.GRUPO_NEW_GRUPO, GrupoValidationService.class.getMethod("newGrupo", GrupoNewRequestDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.GRUPO_REMOVE_ME, GrupoValidationService.class.getMethod("removeMe", GrupoIdLocalDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.GRUPO_SAVE_GRUPO_USER_CONF, GrupoValidationService.class.getMethod("saveGrupoUserConf", GrupoUserConfDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.GRUPO_SENT_INVITATION, GrupoValidationService.class.getMethod("sentInvitation", GrupoAddUserRequestDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.MESSAGE_DELETE_FOR_ME, MessageValidationService.class.getMethod("deleteForMe", IdMessageDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.MESSAGE_EMPTY_LIST, MessageValidationService.class.getMethod("emptyList", GrupoDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.MESSAGE_GET_ID_HISTORIAL, MessageValidationService.class.getMethod("getHistorialId", IdMessageDTO.class)); 
-		getMapaMetodos().put(ProtocoloActionsEnum.MESSAGE_GET_LOAD_MESSAGES, MessageValidationService.class.getMethod("loadMessages", MessageDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.MY_ACCOUNT_INVITATION_CODE_GENERATOR, MyAccountValidationService.class.getMethod("invitationCodeGenerator", EncryptKeysDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.MY_ACCOUNT_IS_INVITATION_CODE_AVAILABLE, MyAccountValidationService.class.getMethod("isInvitationCodeAvailable", String.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.MY_ACCOUNT_SAVE_CODE_AVAILABLE , MyAccountValidationService.class.getMethod("saveCodeAvailable", UserInvitationCodeDTO.class)); 
-		getMapaMetodos().put(ProtocoloActionsEnum.MY_ACCOUNT_SAVE_LOCK, MyAccountValidationService.class.getMethod("saveLock", LockDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.MY_ACCOUNT_SAVE_NICKNAME, MyAccountValidationService.class.getMethod("saveNickname", MyAccountNicknameRequestDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.MY_ACCOUNT_SAVE_PASSWORD, MyAccountValidationService.class.getMethod("savePassword", LoginRequestDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_ENCRYPT_KEYS_GET, EncryptKeysService.class.getMethod("getPublicKeyByCodigoInvitacion", PublicKeyByInvitationCodeRequestDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_BLOCK_REMOTO, GrupoValidationService.class.getMethod("blockGrupoRemoto", GrupoBlockRemotoRequestLocalDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_GET_GRUPO_BY_ID, GrupoValidationService.class.getMethod("getGrupoById",GrupoIdLocalDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_GET_GRUPO_BY_IDS, GrupoValidationService.class.getMethod("getGrupoByIds",GrupoIdLocalDTO[].class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_GET_IDS_MY_GRUPOS, GrupoValidationService.class.getMethod("getIdsMisGrupos"));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_SAVE_GENERAL_CONFIGURATION, GrupoValidationService.class.getMethod("saveGrupoGeneralConfiguration", GrupoGralConfDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_SAVE_GRAL_CONF_PASSWORD, GrupoValidationService.class.getMethod("saveGrupoGralConfPassword", GrupoDTO.class)); 
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_SAVE_NICKNAME, GrupoValidationService.class.getMethod("saveNickname", GrupoInfoNicknameRequestLocalDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_STOP_WRITTING, GrupoValidationService.class.getMethod("stopWritting",WrittingDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_WRITTING, GrupoValidationService.class.getMethod("startWritting",WrittingDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_CHANGE_STATE, MessageValidationService.class.getMethod("changeState", MessageDetailDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_DELETE_FOR_EVERYONE, MessageValidationService.class.getMethod("deleteForEveryone", IdMessageDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_GET_ALL_ID_MESSAGE_UNREAD, MessageValidationService.class.getMethod("getAllidMessageUnreadMessages")); 
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_GET_MESSAGE, MessageValidationService.class.getMethod("get", MessageDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_MY_ACCOUNT_CLOSE_SESSION, MyAccountValidationService.class.getMethod("closeSession"));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_MY_ACCOUNT_SAVE_GENERAL_CONFIGURATION, MyAccountValidationService.class.getMethod("saveMessageConf", MyAccountConfDTO.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_MY_ACCOUNT_SAVE_LOGIN_SKIP, MyAccountValidationService.class.getMethod("saveLoginSkip", boolean.class));
-		getMapaMetodos().put(ProtocoloActionsEnum.PROTOCOLO_ACTION_REQUEST_ID_PRIVATE_GET, RequestIdValidationService.class.getMethod("getNewRequestIdPrivate", RequestIdDTO.class)); 
 
-
-		
 	}
 
 
@@ -243,7 +193,7 @@ public class PrivateController extends ControllerBase{
 			return true;
 		}
 
-		if (  request != null && ProtocoloActionsEnum.PROTOCOLO_ACTION_MESSAGE_GET_MESSAGE.equals(request.getAction()) ) {
+		if (  request != null && ProtocoloActionsEnum.MESSAGE_GET_MESSAGE.equals(request.getAction()) ) {
 			return true;
 		}
 
@@ -253,5 +203,10 @@ public class PrivateController extends ControllerBase{
 		
 		return true;
 	}	
+	
+	@Override
+	public Urls getUrl() {
+		return Urls.CONSTANT_URL_PATH_PRIVATE;
+	}
 
 }

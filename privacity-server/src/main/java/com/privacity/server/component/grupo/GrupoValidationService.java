@@ -85,8 +85,8 @@ public class GrupoValidationService {
 			
 		ProtocoloDTO p;
 			p = comps.webSocket().sender().buildProtocoloDTO(
-					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
-					ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_BLOCK_REMOTO);
+					ProtocoloComponentsEnum.GRUPO,
+					ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO);
 		
 				
 				comps.webSocket().sender().senderToGrupoMinusCreator( comps.util().usuario().getUsuarioSystem().getIdUser(), grupoBlockRemotoRequestLocalDTO.getGrupo().getIdGrupo(), p);
@@ -163,8 +163,8 @@ public class GrupoValidationService {
 			
 			
 			
-			comps.util().grupo().senderSaveGrupoGralConfLockToGrupo(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO
-					,ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK
+			comps.util().grupo().senderSaveGrupoGralConfLockToGrupo(ProtocoloComponentsEnum.GRUPO
+					,ProtocoloActionsEnum.GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK
 					, g.getIdGrupo(),  c);
 			
 		
@@ -335,10 +335,10 @@ public class GrupoValidationService {
 	}
 
 	public void startWritting (WrittingDTO request) throws Exception {
-		generalWritting(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_WRITTING, request);
+		generalWritting(ProtocoloActionsEnum.GRUPO_WRITTING, request);
 	}
 	public void stopWritting (WrittingDTO request) throws Exception {
-		generalWritting(ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_STOP_WRITTING, request);
+		generalWritting(ProtocoloActionsEnum.GRUPO_STOP_WRITTING, request);
 	}
 
 
@@ -368,7 +368,7 @@ public class GrupoValidationService {
 		
 			
 			p = comps.webSocket().sender().buildProtocoloDTO(
-					ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
+					ProtocoloComponentsEnum.GRUPO,
 					protocoloAction,
 			        w);
 			

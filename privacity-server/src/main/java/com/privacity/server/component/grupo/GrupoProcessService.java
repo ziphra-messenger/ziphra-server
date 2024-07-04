@@ -218,8 +218,8 @@ public class GrupoProcessService  {
 		// enviar invitacion
 		
 		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-				ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
-				ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_INVITATION_RECIVED, 
+				ProtocoloComponentsEnum.GRUPO,
+				ProtocoloActionsEnum.GRUPO_INVITATION_RECIVED, 
 				ginfo);
 		
 		
@@ -430,8 +430,8 @@ public class GrupoProcessService  {
 		usuarioRemove.setIdUsuario(usuarioLogged.getIdUser()+"");
 		r.setUsuariosDTO(usuarioRemove);
 		
-		comps.util().grupo().senderToGrupoMinusCreator(ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
-				ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_REMOVE_USER,  grupo.getIdGrupo(), grupoRemove);
+		comps.util().grupo().senderToGrupoMinusCreator(ProtocoloComponentsEnum.GRUPO,
+				ProtocoloActionsEnum.GRUPO_REMOVE_USER,  grupo.getIdGrupo(), grupoRemove);
 	
 
 		//ACA DEBE INFORMAR A TODOS LOS SUSCRIPTORES EL INGRESO DEL NUEVO MIEMBRO
@@ -499,8 +499,8 @@ public class GrupoProcessService  {
 		r.setUsuariosDTO(usuarioRemove);
 		
 		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-				ProtocoloComponentsEnum.PROTOCOLO_COMPONENT_GRUPO,
-				ProtocoloActionsEnum.PROTOCOLO_ACTION_GRUPO_DELETE_GRUPO, 
+				ProtocoloComponentsEnum.GRUPO,
+				ProtocoloActionsEnum.GRUPO_DELETE_GRUPO, 
 				grupoRemove);
 		
 		for (Usuario usuarioToAvisarRemove : usuarios){

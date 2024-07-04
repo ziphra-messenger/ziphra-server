@@ -14,13 +14,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.privacity.common.RolesAllowed;
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.common.interfaces.GrupoRoleInterface;
 import com.privacity.common.interfaces.UserForGrupoRoleInterface;
 import com.privacity.common.interfaces.UsuarioRoleInterface;
+import com.privacity.server.common.enumeration.Urls;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.model.request.GrupoIdLocalDTO;
 import com.privacity.server.component.requestid.RequestIdUtilService;
@@ -28,6 +30,7 @@ import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.Grupo;
 import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.security.Usuario;
+import com.privacity.server.services.protocolomap.ProtocoloValue;
 import com.privacity.server.util.LocalDateAdapter;
 
 public abstract class ControllerBase {
@@ -44,9 +47,6 @@ public abstract class ControllerBase {
 	private FacadeComponent comps;
 
 
-	protected Map<ProtocoloActionsEnum, Method> getMapaMetodos() {
-		return mapaMetodos;
-	}
 
 	protected Map<ProtocoloComponentsEnum, Object> getMapaController() {
 		return mapaController;
@@ -69,7 +69,8 @@ public abstract class ControllerBase {
 	public ProtocoloDTO in(@RequestBody ProtocoloDTO request) throws Exception {
 
 		if (showLog(request)) System.out.println("<<" + request.toString());
-
+		
+		ProtocoloValue value = comps.service().protocoloMap().get(getUrl(),  request.getComponent(),  request.getAction());
 		ProtocoloDTO p = new ProtocoloDTO();
 
 		// tomo el dto a ejecutar
@@ -78,12 +79,12 @@ public abstract class ControllerBase {
 
 
 		try {
-			if (getMapaMetodos().get(request.getAction()) == null) {
+			if (value == null) {
 				throw new ValidationException(ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL);
 			}
-			if ( this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.PROTOCOLO_ACTION_REQUEST_ID_PRIVATE_GET)) {
+			if ( this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.REQUEST_ID_PRIVATE_GET)) {
 				requestIdUtil.existsRequestId(request.getRequestIdDTO(), true) ;
-			}else if ( !this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.PROTOCOLO_ACTION_REQUEST_ID_PUBLIC_GET)) {
+			}else if ( !this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.REQUEST_ID_PUBLIC_GET)) {
 				requestIdUtil.existsRequestId(request.getRequestIdDTO(),false) ;
 			}
 
@@ -92,13 +93,11 @@ public abstract class ControllerBase {
 			//			if (showLog()) System.out.println("MapaMetodos = " + getMapaMetodos());
 			//			if (showLog()) System.out.println("MapaController = " + getMapaController());
 
-			if (   getMapaMetodos().get(request.getAction()).getParameterTypes() != null &&
-					getMapaMetodos().get(request.getAction()).getParameterTypes().length == 0) {
+			if (   value.getParametersType() == null) {
 
-				objetoRetorno = getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()));
-
+				objetoRetorno = value.getMethod().invoke(value.getClazz());
 			}else {
-				dtoObject =  getDTOObject(request, request.getObjectDTO(),getMapaMetodos().get(request.getAction()).getParameterTypes()[0]);
+				dtoObject =  getDTOObject(request, request.getObjectDTO(), value.getParametersType());
 
 				if ( this.isSecure() ) {
 					comps.service().usuarioSessionInfo().get().getPrivacityIdServices().decryptIds(dtoObject);
@@ -131,7 +130,7 @@ public abstract class ControllerBase {
 
 
 				}
-				Annotation[] ann = getMapaMetodos().get(request.getAction()).getAnnotations();
+				Annotation[] ann =value.getAnnotations();
 				for (int i=0; i < ann.length ; i++) {
 					if (ann[i] instanceof RolesAllowed) {
 						invokeUnderTrace(dtoObject, ann[i]);
@@ -148,8 +147,7 @@ public abstract class ControllerBase {
 					}
 
 				}
-				objetoRetorno =getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()),  dtoObject);
-
+				objetoRetorno =value.getMethod().invoke(value.getClazz(),  dtoObject);
 			}
 
 
@@ -324,5 +322,5 @@ public abstract class ControllerBase {
 
 
 	}
-
+	public abstract Urls getUrl();
 }

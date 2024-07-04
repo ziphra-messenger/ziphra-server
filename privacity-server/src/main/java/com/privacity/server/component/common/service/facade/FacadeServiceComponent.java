@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.privacity.server.component.grupouserconf.GrupoUserConfService;
 import com.privacity.server.component.requestid.RequestIdPublicService;
 import com.privacity.server.encrypt.UsuarioSessionInfoService;
+import com.privacity.server.services.protocolomap.ProtocoloMapService;
 
 import lombok.NoArgsConstructor;
 
@@ -23,6 +24,10 @@ public class FacadeServiceComponent {
 	@Autowired @Lazy
 	private RequestIdPublicService requestIdPublic;
 	
+	@Autowired @Lazy
+	private ProtocoloMapService protocoloMap;
+
+	
 	public RequestIdPublicService requestIdPublic() {
 		return requestIdPublic;
 	}
@@ -32,7 +37,9 @@ public class FacadeServiceComponent {
 	public UsuarioSessionInfoService usuarioSessionInfo() {
 		return usuarioSessionInfo;
 	}
+	public ProtocoloMapService protocoloMap() {
+		return protocoloMap;
+	}
 	
-
 	
 }
