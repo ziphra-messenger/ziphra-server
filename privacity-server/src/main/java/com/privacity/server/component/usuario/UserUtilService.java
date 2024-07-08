@@ -4,11 +4,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.privacity.common.dto.UsuarioDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
@@ -27,44 +25,28 @@ public class UserUtilService {
 
 
 
-
-	public UserUtilService() {
+	private Usuario usuarioSystem;
+	private UsuarioDTO usuarioSystemDTO;
+	
+	public UserUtilService() throws Exception {
 		super();
 
 	}
 
-	private Usuario getUsuarioLogged() {
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-		Usuario u = comps.repo().user().findByUsername(userDetail.getUsername()).get();
-		return u;
-	}    
+ 
 	
-	public String getUsernameLogged() {
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-	    return userDetail.getUsername();
-	    
-	}
-	public Usuario getUsuarioLoggedValidate() throws ValidationException {
-	    
-		Usuario u = getUsuarioLogged();
-		
-		if ( u.getIdUser() == null) {
-			ValidationException e = new ValidationException(ExceptionReturnCode.USER_USER_NOT_LOGGER);
-			
-			throw e; 
-		}
-		return u;
-	} 
+//	public String getUsernameLogged() {
+//		Authentication auth = SecurityContextHolder
+//	            .getContext()
+//	            .getAuthentication();
+//	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
+//	    
+//	    return userDetail.getUsername();
+//	    
+//	}
+
 	
-	public Usuario getUsuarioSystem() throws ProcessException {
+	private Usuario getUsuarioSystemPrivate () throws ProcessException {
 		Optional<Usuario> uSystemO = comps.repo().user().findByUsername("SYSTEM");
 		
 		if ( uSystemO == null || uSystemO.get() == null) {
@@ -72,6 +54,24 @@ public class UserUtilService {
 		}
 		return uSystemO.get();
 	}
+	public Usuario getUsuarioSystem() throws ProcessException {
+		
+		if (usuarioSystem == null) {
+			usuarioSystem=getUsuarioSystemPrivate();
+		}
+		return usuarioSystem;
+	}
+
+	public UsuarioDTO getUsuarioSystemDTO() {
+		
+		if (usuarioSystemDTO == null) {
+			usuarioSystemDTO = comps.common().mapper().doit(usuarioSystem);
+		}
+		return usuarioSystemDTO;
+	}
+
+
+	
 	public Usuario getUsuarioById(String idUsuario) throws ValidationException {
 		return getUsuarioById(Long.parseLong(idUsuario));
 	}

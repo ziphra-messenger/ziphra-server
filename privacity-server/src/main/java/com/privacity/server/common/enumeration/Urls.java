@@ -6,7 +6,8 @@ package com.privacity.server.common.enumeration;
 		CONSTANT_URL_PATH_PRIVATE_SEND ("/private/send"),
 		CONSTANT_URL_PATH_PUBLIC ("/public/entry"),
 		CONSTANT_URL_PATH_FREE ("/free/entry"),
-	    CONSTANT_URL_PATH_ERROR ("/doc/en/error/error.html");
+	    CONSTANT_URL_PATH_ERROR ("/doc/en/error/error.html"),
+	   CONSTANT_URL_PATH_PRIVATE_WS ("WebSocket");
 	   
 	    private final String name;       
 

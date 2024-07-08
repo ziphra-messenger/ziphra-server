@@ -35,7 +35,7 @@ public class RequestIdValidationService {
 	private RequestIdDTO getNewRequestIdGeneral(RequestIdDTO halfId, boolean isPrivate) throws ValidationException {
 		Usuario usuarioLogged=null;
 		if (isPrivate) {
-			usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();	
+			usuarioLogged = comps.requestHelper().getUsuarioLogged();	
 		}
 		
 		
@@ -47,10 +47,14 @@ public class RequestIdValidationService {
 		serverRequestIdDTO.setRequestIdClientSide(halfId.getRequestIdClientSide());
 
 		if (isPrivate) {
-			ConcurrentMap<String, RequestIdDTO> map = comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getRequestIds();
+			// RequestIdDTO> map = comps.service().usuarioSessionInfo().getRequestIds(usuarioLogged.getUsername());
 			//isRequestIdDuplicated(halfId, map);
 						
-			map.put(halfId.getRequestIdClientSide(), serverRequestIdDTO);
+			comps.service().usuarioSessionInfo().putRequestId
+			(usuarioLogged.getUsername()
+					,halfId.getRequestIdClientSide(),
+					
+                       serverRequestIdDTO);
 		}else {
 			comps.service().requestIdPublic().isRequestIdDuplicated(halfId);
 			comps.service().requestIdPublic().getRequestIdsPublic().put(halfId.getRequestIdClientSide(), serverRequestIdDTO);

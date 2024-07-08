@@ -1,5 +1,4 @@
 package com.privacity.server.component.message;
-
 import org.springframework.data.repository.CrudRepository;
 
 import com.privacity.server.model.MessageIdSequence;

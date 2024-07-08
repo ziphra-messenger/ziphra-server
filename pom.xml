@@ -42,9 +42,10 @@
     
     
     <module>privacity-common</module>
-          
-    <module>privacity-requestid</module>
-      
+
+
+    <module>privacity-server-message-id-generator</module>
+    <module>privacity-server-session-manager</module>
   </modules>
     
 

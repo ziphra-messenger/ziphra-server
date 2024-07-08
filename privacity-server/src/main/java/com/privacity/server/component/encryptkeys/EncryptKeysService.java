@@ -27,8 +27,8 @@ public class EncryptKeysService {
 	
 	public EncryptKeysDTO getPublicKeyByCodigoInvitacion(PublicKeyByInvitationCodeRequestDTO request) throws ValidationException {
 	
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
-
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
+		
 		Grupo g = comps.util().grupo().getGrupoByIdValidation(request.getIdGrupo());
 
 		GrupoRolesEnum rol = comps.util().usuario().getRoleForGrupo(usuarioLogged, g);

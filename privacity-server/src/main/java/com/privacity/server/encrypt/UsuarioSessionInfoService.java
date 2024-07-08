@@ -1,185 +1,191 @@
 package com.privacity.server.encrypt;
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.time.LocalDateTime;
+import java.util.Map;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
+import org.hibernate.mapping.TableOwner;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
-import com.privacity.common.dto.AESDTO;
-import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.encrypt.pool.ProducerConsumerDemonstrator;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.main.AESToUse;
-import com.privacity.server.model.EncryptKeys;
-import com.privacity.server.security.Usuario;
-import com.privacity.server.security.UsuarioSessionInfo;
+import com.google.gson.GsonBuilder;
+import com.privacity.common.dto.AESAllDTO;
+import com.privacity.common.dto.ProtocoloDTO;
+import com.privacity.common.dto.RequestIdDTO;
+import com.privacity.server.util.LocalDateAdapter;
 
 /**
  * Created by baiguantao on 2017/8/4.
  * User session record class
  */
 @Service
-public class UsuarioSessionInfoService{
-    //this map save every session
-    //This collection stores session
-    private final ConcurrentMap<String, UsuarioSessionInfo> userSessionIds = new ConcurrentHashMap<String, UsuarioSessionInfo>();
-    
-	@Value("${serverconf.sessionAes.bits}")
-	private int bitsEncrypt;
+public class UsuarioSessionInfoService {
 
+	Gson gson = new GsonBuilder()
+			.setPrettyPrinting()
+			.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
+			.create();
 	
-    @Autowired @Lazy
-    private FacadeComponent comps;    
+	// TODO pasar a configuracion 
+	private final static String CONSTANT_URL = "http://localhost:8085/entry";
 
-    /**
-     *
-     * Get session Id
-     * @param user
-     * @return 
-     * @return
-     * @throws ValidationException 
-     * @throws PrivacityException 
-     */
- 
-    public ConcurrentMap<String, UsuarioSessionInfo> getAll(){
-		return this.userSessionIds;
-    }
-    
-    public void remove(String username){
-    		this.userSessionIds.remove(username);
-    }
-    
-    public UsuarioSessionInfo get(String username, boolean create) throws ValidationException {
-    	try {
-    		if (userSessionIds.containsKey(username)) {
-    			return get(userSessionIds.get(username).getUsuarioDB(),create);
-    		}else {
-    			return get(comps.util().usuario().getUsuarioForUsername(username),create);	
-    		}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null; 
-		}
-    	
-    }
+	public Map getRequestIds(String username) {
+		RestTemplate rest = new RestTemplate();
 
-    public UsuarioSessionInfo get() throws ValidationException {
-    	
-    	try {
-    		if (userSessionIds.containsKey(comps.util().usuario().getUsernameLogged())) {
-    			return get(userSessionIds.get(comps.util().usuario().getUsernameLogged()).getUsuarioDB(),false);
-    		}else {
-    			return get(comps.util().usuario().getUsernameLogged(),false);	
-    		}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null; 
-		}
-    	
-    }
-    public UsuarioSessionInfo get(String username) throws ValidationException {
-    	try {
-    		if (userSessionIds.containsKey(username)) {
-    			return get(userSessionIds.get(username).getUsuarioDB(),false);
-    		}else {
-    			return get(comps.util().usuario().getUsuarioForUsername(username),false);	
-    		}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null; 
-		}
-    	
-    }
-    public UsuarioSessionInfo get(Usuario user) throws Exception {
-    	return get(user,false);
-    }
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
 
-    public boolean isOnline(Usuario user) throws Exception {
-    	return this.isOnline(user.getUsername());
-    }
+		Map r = rest.postForObject(CONSTANT_URL +"/requestId/getAll", map, Map.class);
 
-    public boolean isOnline(String username) throws Exception {
-    	return this.userSessionIds.containsKey(username);
-    }
-    
-    public UsuarioSessionInfo get(Usuario user, boolean create) throws Exception {
-    	
-    	if ((this.userSessionIds.get(user.getUsername()) == null) 
-    			|| create) {
-    		
-    		AESToUse aesToUse = ProducerConsumerDemonstrator.dataQueue.poll();
-    	        	
-    		String AES =aesToUse.getSecretKeyAES();
-    		String SaltAES = aesToUse.getSaltAES();
-    		int AESIteration = aesToUse.getInterationCount();
+		return r;
+	}
 
-    		PublicKey publicKey=null;
-    		EncryptKeys ek = user.getEncryptKeys();
-    		
-   		
-    		{
-    			Security.addProvider(new BouncyCastleProvider());
-                KeyFactory kf = KeyFactory.getInstance("RSA","BC");
+	public AESAllDTO getAesDtoAll(String username) {
+		RestTemplate rest = new RestTemplate();
 
-                X509EncodedKeySpec spec2 = new X509EncodedKeySpec(
-                        new Gson().fromJson(
-                        		ek.getPublicKeyNoEncrypt()
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
 
-                                , byte[].class));
-                  publicKey = kf.generatePublic(spec2);
-                ////System.out.println(publicKey.toString());
-                
+		AESAllDTO r = rest.postForObject(CONSTANT_URL +"/get/AesDtoAll", map, AESAllDTO.class);
 
-    		}
-    		
-    		//AESDTO aes = new AESDTO();
-    		{
-    		
-    		//aes.setSecretKeyAES(AES);
-    		}
-    		UsuarioSessionInfo t = new UsuarioSessionInfo();
-    		t.setSessionAES(new AESDTO(AES, SaltAES,AESIteration,128));
-    		t.setPublicKey(publicKey);
-			t.setSessionAESToUseWS(ProducerConsumerDemonstrator.dataQueue.poll());
-			t.setSessionAESToUseServerEncrypt(ProducerConsumerDemonstrator.dataQueue.poll());
-			t.setPrivacityIdServices(new PrivacityIdServices(
-comps.common().serverConf().getSystemGralConf().isPrivacityIdAESOn(),
-					ProducerConsumerDemonstrator.dataQueue.poll().getAESDTO()));
-			
-    		
-    		t.setUsuarioDB(user);
-    		
+		return r;
+	}
+	public void remove(String username) {
+		RestTemplate rest = new RestTemplate();
 
-    		t.getUsuarioDB().setMyAccountConf(user.getMyAccountConf());
-    		
-    		this.userSessionIds.put(user.getUsername(),t);
-    		
-    		try {
-				t.setSessionAESToUse(aesToUse);
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new ValidationException("error de encriptacion");
-			}
-    	}
-        UsuarioSessionInfo set = (UsuarioSessionInfo)this.userSessionIds.get(user.getUsername());
-        
-        return set;
-        
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
 
-    }
-    
+		rest.postForObject(CONSTANT_URL +"/remove/session", map, Object.class);
 
+	}
+
+	public String decryptSessionAESServerIn(String username, String obj, String className) {
+		RestTemplate rest = new RestTemplate();
+
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
+		map.add("obj", obj);
+		map.add("className", className);
+
+		String r = rest.postForObject(CONSTANT_URL +"/encryption/decrypt/sessionAESServerIn", map, String.class);
+
+		return r;
+	}
+
+	public ProtocoloDTO decryptProtocolo(String username, String obj, String url) {
+		RestTemplate rest = new RestTemplate();
+
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
+		map.add("obj", obj);
+		map.add("url", url);
+
+		ProtocoloDTO r = rest.postForObject(CONSTANT_URL +"/encryption/decrypt/protocolo", map, ProtocoloDTO.class);
+
+		return r;
+	}
+	public String encryptProtocolo(String username, String obj, String url) {
+		RestTemplate rest = new RestTemplate();
+
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
+		map.add("obj", obj);
+		map.add("url", url);
+
+		String r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/protocolo", map, String.class);
+
+		return r;
+	}
+	public String encryptProtocoloWS(String username, Object obj, String url) {
+		return encryptProtocoloWS(username, gson.toJson(obj), url);
+	}
+	public String encryptProtocoloWS(String username, String obj, String url) {
+		RestTemplate rest = new RestTemplate();
+
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
+		map.add("obj", obj);
+		map.add("url", url);
+
+		String r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/protocoloWS", map, String.class);
+
+		return r;
+	}
+
+	public String encryptSessionAESServerOut(String username, String obj) {
+		RestTemplate rest = new RestTemplate();
+
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
+		map.add("obj", obj);
+
+		String r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/sessionAESServerOut", map, String.class);
+
+		return r;
+	}
+//	public String encryptSessionAESServerWS(String username, String obj) {
+//		RestTemplate rest = new RestTemplate();
+//
+//		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+//		map.add("username", username);
+//		map.add("obj", obj);
+//
+//		String r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/sessionAESServerWS", map, String.class);
+//
+//		return r;
+//	}
+	public Object privacityIdServiceDecrypt(String username, Object dtoObject, String className) throws Exception, ClassNotFoundException {
+		RestTemplate rest = new RestTemplate();
+
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
+		map.add("obj", gson.toJson(dtoObject));
+		map.add("className", className);
+
+		Object r = rest.postForObject(CONSTANT_URL +"/encryption/decrypt/ids", map, Class.forName(className));
+
+		return r;
+	}
+
+	public String privacityIdServiceEncrypt(String username, Object dtoObject, String className) {
+		RestTemplate rest = new RestTemplate();
+
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
+		map.add("obj", gson.toJson(dtoObject));
+		map.add("className", className);
+
+		String r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/ids", map, String.class);
+
+		return r;
+	}
+	public Object privacityIdServiceEncrypt2(String username, Object dtoObject, String className) throws Exception, ClassNotFoundException {
+		if (className.equals("void")) return null;
+		
+		RestTemplate rest = new RestTemplate();
+
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
+		map.add("obj", gson.toJson(dtoObject));
+		map.add("className", className);
+
+		Object r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/ids", map, Class.forName(className));
+
+		return r;
+	}
+	public void putRequestId(String username, String requestIdClientSide, RequestIdDTO serverRequestIdDTO) {
+		RestTemplate rest = new RestTemplate();
+
+		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
+		map.add("username", username);
+		map.add("username", requestIdClientSide);
+		map.add("serverRequestIdDTO", gson.toJson(serverRequestIdDTO));
+
+		rest.postForObject(CONSTANT_URL +"/requestId/add", map, Object.class);
+
+	}
 
 }

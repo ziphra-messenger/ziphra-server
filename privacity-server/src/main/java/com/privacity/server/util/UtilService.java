@@ -46,15 +46,7 @@ public class UtilService {
 		
 	}
 
-	public Usuario getUser() {
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-		Usuario u = comps.repo().user().findByUsername(userDetail.getUsername()).get();
-		return u;
-	}    
+
  
 	public String mix(String s,boolean mixIterationRandom, int mixIteration, int minIRamdomterationm , int maxIRamdomteration ) {
 		

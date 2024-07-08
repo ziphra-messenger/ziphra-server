@@ -290,7 +290,12 @@ public class MapperService {
 		
 		Message m = new Message();
 		//m.setDateCreation(new Date());
-		m.setUserCreation(usuarioCreacion);
+		
+		if (dto.isSystemMessage()) {
+			m.setUserCreation(comps.util().usuario().getUsuarioSystem());
+		}else {
+			m.setUserCreation(usuarioCreacion);	
+		}
 		m.setText(dto.getText());
 		m.setBlackMessage(dto.isBlackMessage());
 		m.setAnonimo(dto.isAnonimo());
@@ -305,7 +310,7 @@ public class MapperService {
 		idm.setGrupo(g);
 		
 		if (dto.getIdMessage() == null || newId) {
-			idm.setIdMessage(messageIdSequenceFactory.getMessgeIdInterfaceDAO().getNextMessageId(g.getIdGrupo()));
+			idm.setIdMessage(comps.factory().messageIdSequence().get(g.getIdGrupo()));
 		}
 		
 		m.setMessageId(idm);

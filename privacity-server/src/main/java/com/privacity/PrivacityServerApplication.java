@@ -14,6 +14,7 @@ import com.privacity.server.security.CustomAuthenticationFailureHandler;
 //@ComponentScan(basePackages = "com.privacity.server.component.grupo")
 //@ComponentScan(basePackages = "com.privacity.server.security")
 //@ComponentScan(basePackages = "com.privacity.server")
+//@EnableConfigurationProperties(value = MessageIdSequenceFactoryPropertiesEnumConfiguration.class)
 public class PrivacityServerApplication {
 
 	public static void main(String[] args) {

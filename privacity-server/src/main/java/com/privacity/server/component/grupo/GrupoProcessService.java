@@ -222,8 +222,9 @@ public class GrupoProcessService  {
 				ProtocoloActionsEnum.GRUPO_INVITATION_RECIVED, 
 				ginfo);
 		
+		comps.webSocket().sender().senderToUser(p, UserInvitationCode);
 		
-			q.put(new WsMessage(gi.getGrupoInvitationId().getUsuarioInvitado().getUsername() ,p));
+			//q.put(new WsMessage(gi.getGrupoInvitationId().getUsuarioInvitado().getUsername() ,p));
 
 		
 		
@@ -264,6 +265,7 @@ public class GrupoProcessService  {
 		{
 
 			MessageDTO mensajeD = comps.webSocket().sender().buildSystemMessage(gi.getGrupoInvitationId().getGrupo(), "SE HA AGREGADO EL USUARIO : " + gi.getGrupoInvitationId().getUsuarioInvitado().getNickname() + " AL GRUPO " + gi.getGrupoInvitationId().getGrupo().getName() + " POR " + gi.getGrupoInvitationId().getUsuarioInvitante().getNickname());
+			
 			Message mensaje = comps.common().mapper().doit(mensajeD, comps.util().usuario().getUsuarioSystem(), gi.getGrupoInvitationId().getGrupo());
 			comps.process().message().sendNormal(comps.util().usuario().getUsuarioSystem().getIdUser(), mensaje, gi.getGrupoInvitationId().getGrupo().getIdGrupo());
 			//esto debe estar activo
@@ -381,15 +383,7 @@ public class GrupoProcessService  {
 
 	}
 
-	public Usuario getUser() {
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-		Usuario u = comps.repo().user().findByUsername(userDetail.getUsername()).get();
-		return u;
-	}
+
 
 //
 //	private void removeMeAnonimo(Usuario usuarioLogged, Grupo grupo) throws PrivacityException {
@@ -430,8 +424,8 @@ public class GrupoProcessService  {
 		usuarioRemove.setIdUsuario(usuarioLogged.getIdUser()+"");
 		r.setUsuariosDTO(usuarioRemove);
 		
-		comps.util().grupo().senderToGrupoMinusCreator(ProtocoloComponentsEnum.GRUPO,
-				ProtocoloActionsEnum.GRUPO_REMOVE_USER,  grupo.getIdGrupo(), grupoRemove);
+//		comps.util().grupo().senderToGrupoMinusCreator(ProtocoloComponentsEnum.GRUPO,
+//				ProtocoloActionsEnum.GRUPO_REMOVE_USER,  grupo.getIdGrupo(), grupoRemove);
 	
 
 		//ACA DEBE INFORMAR A TODOS LOS SUSCRIPTORES EL INGRESO DEL NUEVO MIEMBRO

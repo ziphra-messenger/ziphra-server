@@ -3,6 +3,7 @@ package com.privacity.server.model;
 import java.io.Serializable;
 
 import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
@@ -23,11 +24,11 @@ public class MessageDetailId  implements Serializable {
 
 	private static final long serialVersionUID = -1657143766873819117L;
 
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "idUser")
     private Usuario userDestino;
 	
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
     @JoinColumns({
         @JoinColumn(
             name = "idGrupo",
@@ -36,7 +37,8 @@ public class MessageDetailId  implements Serializable {
             name = "idMessage",
             referencedColumnName = "idMessage")
     })
-	@ToString.Exclude	
+	@ToString.Exclude
+
     private Message message;
 
 

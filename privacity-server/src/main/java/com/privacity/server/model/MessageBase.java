@@ -91,7 +91,7 @@ public class MessageBase implements Serializable {
 	protected boolean deleted;
 
 	
-	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+	@OneToMany(fetch=FetchType.LAZY,cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
 	public Set<MessageDetail> getMessagesDetail() {
 		return messagesDetail;
 	}

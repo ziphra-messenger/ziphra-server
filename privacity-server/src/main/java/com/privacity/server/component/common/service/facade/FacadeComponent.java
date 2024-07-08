@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import com.privacity.server.component.common.service.RequestHelperService;
+
 import lombok.NoArgsConstructor;
 
 @Component
@@ -23,7 +25,17 @@ public class FacadeComponent {
 	private FacadeProcessServiceComponent process;
 	@Autowired @Lazy
 	private FacadeValidationService validation;
-
+	
+	@Autowired @Lazy
+	private FacadeFactoryService factory;
+	
+	@Autowired @Lazy
+	private RequestHelperService requestHelper;
+	
+	public FacadeFactoryService factory() {
+		return factory;
+	}
+	
 	public FacadeValidationService validation() {
 		return validation;
 	}
@@ -46,7 +58,9 @@ public class FacadeComponent {
 	public FacadeProcessServiceComponent process() {
 		return process;
 	}
-
+	public RequestHelperService requestHelper() {
+		return requestHelper;
+	}
 
 
 }

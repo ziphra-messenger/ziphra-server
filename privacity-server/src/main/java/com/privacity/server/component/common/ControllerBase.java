@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -20,11 +20,11 @@ import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.common.interfaces.GrupoRoleInterface;
+import com.privacity.common.interfaces.IdGrupoInterface;
 import com.privacity.common.interfaces.UserForGrupoRoleInterface;
 import com.privacity.common.interfaces.UsuarioRoleInterface;
 import com.privacity.server.common.enumeration.Urls;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.component.model.request.GrupoIdLocalDTO;
 import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.Grupo;
@@ -34,6 +34,8 @@ import com.privacity.server.services.protocolomap.ProtocoloValue;
 import com.privacity.server.util.LocalDateAdapter;
 
 public abstract class ControllerBase {
+	
+	private static final Logger log = Logger.getLogger(ControllerBase.class.getCanonicalName());
 
 	private Map<ProtocoloActionsEnum,Method> mapaMetodos = new HashMap<ProtocoloActionsEnum,Method>();
 	private Map<ProtocoloComponentsEnum,Object> mapaController = new HashMap<ProtocoloComponentsEnum,Object>();
@@ -60,7 +62,7 @@ public abstract class ControllerBase {
 				.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
 				.create();
 
-		if (showLog(request)) System.out.println("getDTOObject Base :" + objectDTO + "clazz:" + clazz.getName());
+		log.fine("getDTOObject Base :" + objectDTO + "clazz:" + clazz.getName());
 
 		return gson.fromJson(objectDTO, clazz);
 	}
@@ -68,7 +70,7 @@ public abstract class ControllerBase {
 
 	public ProtocoloDTO in(@RequestBody ProtocoloDTO request) throws Exception {
 
-		if (showLog(request)) System.out.println("<<" + request.toString());
+		log.fine("<<" + request.toString());
 		
 		ProtocoloValue value = comps.service().protocoloMap().get(getUrl(),  request.getComponent(),  request.getAction());
 		ProtocoloDTO p = new ProtocoloDTO();
@@ -88,64 +90,78 @@ public abstract class ControllerBase {
 				requestIdUtil.existsRequestId(request.getRequestIdDTO(),false) ;
 			}
 
-			if (showLog(request)) System.out.println("Action Base = " + request.getAction());
-			if (showLog(request)) System.out.println("Component Base = " + request.getComponent());
-			//			if (showLog()) System.out.println("MapaMetodos = " + getMapaMetodos());
-			//			if (showLog()) System.out.println("MapaController = " + getMapaController());
-
+			log.fine("URL Base = " + request.getComponent());
+			log.fine("COMPONENT Base = " + request.getComponent());
+			log.fine("ACTION Base = " + request.getAction());
+			
 			if (   value.getParametersType() == null) {
 
+				log.fine("Invoke 1 = " + value.getMethod().getName() + " " + value.getClazz().toString());
 				objetoRetorno = value.getMethod().invoke(value.getClazz());
 			}else {
 				dtoObject =  getDTOObject(request, request.getObjectDTO(), value.getParametersType());
 
 				if ( this.isSecure() ) {
-					comps.service().usuarioSessionInfo().get().getPrivacityIdServices().decryptIds(dtoObject);
+					
+//					if( getUrl().equals( Urls.CONSTANT_URL_PATH_PRIVATE)) 
+//					{
+						dtoObject =  getDTOObject(request, request.getObjectDTO(), value.getParametersType());						
+//					}else {
+//						
+//					
+//					dtoObject=comps.service().usuarioSessionInfo().privacityIdServiceDecrypt(
+//							comps.requestHelper().getUsuarioUsername()
+//							, dtoObject
+//							,value.getParametersType().getName());
+//					}
 
 				}
-				if (dtoObject instanceof UsuarioRoleInterface) {
-					((UsuarioRoleInterface) dtoObject).setUsuarioLoggued(comps.util().usuario().getUsuarioLoggedValidate());
-				}
-
-				if (dtoObject instanceof GrupoRoleInterface) {
-
-					Optional<Grupo> grupoO = comps.repo().grupo().findById(
-
-							comps.util().grupo().convertIdGrupoStringToLong(((GrupoRoleInterface) dtoObject).getIdGrupo()));
-
-					if (grupoO.isPresent()) {
-
-
-						((GrupoRoleInterface) dtoObject).setGrupo(grupoO.get()
-
-								);	}
-				}
-
-				if (dtoObject instanceof UserForGrupoRoleInterface) {
-					((UserForGrupoRoleInterface) dtoObject).setUserForGrupo(
-							comps.repo().userForGrupo().findByIdPrimitive(
-									comps.util().grupo().convertIdGrupoStringToLong(((GrupoRoleInterface) dtoObject).getIdGrupo())
-									,
-									((UsuarioRoleInterface) dtoObject).getUsuarioLoggued().getIdUser()));
-
-
-				}
-				Annotation[] ann =value.getAnnotations();
-				for (int i=0; i < ann.length ; i++) {
-					if (ann[i] instanceof RolesAllowed) {
-						invokeUnderTrace(dtoObject, ann[i]);
-						break;
-					}
-				}
-
-				System.out.println("dtoObject deserializado = " + dtoObject.toString());
-				if (showLog(request)) {
-					if ( dtoObject instanceof GrupoIdLocalDTO[]) {
-						for (int i = 0 ; i < ((GrupoIdLocalDTO[]) dtoObject).length ; i ++) {
-							System.out.println("dtoObject array deserializado = " +  ((GrupoIdLocalDTO[]) dtoObject)[i].toString());
-						}
-					}
-
+//				if (dtoObject instanceof UsuarioRoleInterface) {
+//					((UsuarioRoleInterface) dtoObject).setUsuarioLoggued(comps.requestHelper().getUsuarioLogged());
+//				}
+//
+//				if (dtoObject instanceof GrupoRoleInterface) {
+//
+//					Optional<Grupo> grupoO = comps.repo().grupo().findById(
+//
+//							comps.util().grupo().convertIdGrupoStringToLong(((GrupoRoleInterface) dtoObject).getIdGrupo()));
+//
+//					if (grupoO.isPresent()) {
+//
+//
+//						((GrupoRoleInterface) dtoObject).setGrupo(grupoO.get()
+//
+//								);	}
+//				}
+//
+//				if (dtoObject instanceof UserForGrupoRoleInterface) {
+//					((UserForGrupoRoleInterface) dtoObject).setUserForGrupo(
+//							comps.repo().userForGrupo().findByIdPrimitive(
+//									comps.util().grupo().convertIdGrupoStringToLong(((GrupoRoleInterface) dtoObject).getIdGrupo())
+//									,
+//									((UsuarioRoleInterface) dtoObject).getUsuarioLoggued().getIdUser()));
+//
+//
+//				}
+//				Annotation[] ann =value.getAnnotations();
+//				for (int i=0; i < ann.length ; i++) {
+//					if (ann[i] instanceof RolesAllowed) {
+//						invokeUnderTrace(dtoObject, ann[i]);
+//						break;
+//					}
+//				}
+//
+//				log.fine("dtoObject deserializado = " + dtoObject.toString());
+//				{
+//
+//
+//				}
+				log.fine("Invoke 2 = " + value.getMethod().getName() + " " + value.getClazz().toString());
+				
+				log.fine("Invoke 2 parameter = " + ((dtoObject==null) ? "null" : dtoObject.toString()));
+				
+				if (dtoObject!= null && dtoObject instanceof IdGrupoInterface) {
+					comps.requestHelper().setGrupoInUse((IdGrupoInterface)dtoObject);
 				}
 				objetoRetorno =value.getMethod().invoke(value.getClazz(),  dtoObject);
 			}
@@ -183,7 +199,12 @@ public abstract class ControllerBase {
 
 		if ( this.isSecure()){
 
-			comps.service().usuarioSessionInfo().get().getPrivacityIdServices().encryptIds(objetoRetorno);
+
+			
+			objetoRetorno= comps.service().usuarioSessionInfo().privacityIdServiceEncrypt2(
+					comps.requestHelper().getUsuarioUsername()
+					, objetoRetorno
+					,value.getReturnType().getName());
 		}
 		//	if(getEncryptIds()) {
 		//		objetoRetorno = getPrivacityIdServices().transformarDesencriptarOut(getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject));
@@ -212,16 +233,16 @@ public abstract class ControllerBase {
 				retornoJson = gson.toJson(objetoRetorno);	
 			}
 
-			//if (showLog()) System.out.println("OBJETO RETORNO Base >>" + retornoJson);
+			//if (showLog()) log.fine("OBJETO RETORNO Base >>" + retornoJson);
 
 
-			if (showLog(request)) System.out.println("ProtocoloDTO Retorno Base prettyJsonString >> " + retornoJson);
+			log.fine("ProtocoloDTO Retorno Base prettyJsonString >> " + retornoJson);
 
 			p.setObjectDTO(retornoJson);	
 		}
 
 		p.setAsyncId(request.getAsyncId());
-		//if (showLog()) System.out.println(">>" + p.toString());
+		//if (showLog()) log.fine(">>" + p.toString());
 		return p;
 
 	}	
@@ -240,7 +261,7 @@ public abstract class ControllerBase {
 				.setLenient()
 				.create();
 		String b =gson.fromJson("wCddwFHXqIgLzTB/6ntQLlfIKO3t92onltnujNtNads=", String.class);
-		////System.out.println(b);
+		////log.fine(b);
 	}
 
 	public abstract boolean isRequestId();
@@ -252,16 +273,16 @@ public abstract class ControllerBase {
 
 	protected void invokeUnderTrace(Object o, Annotation ann2) 
 			throws ValidationException {
-		System.out.println("----->AppConfigurationMethodRolValidationInterceptor");
+		log.fine("----->AppConfigurationMethodRolValidationInterceptor");
 
-		System.out.println("-----> " + o.toString());
+		log.fine("-----> " + o.toString());
 
 		//        Gson gson = new GsonBuilder()
 		//                .setPrettyPrinting()
 		//                .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
 		//                .create();
 		//        String retornoJson = gson.toJson(o);
-		//        System.out.println("-----> " +retornoJson);
+		//        log.fine("-----> " +retornoJson);
 
 
 

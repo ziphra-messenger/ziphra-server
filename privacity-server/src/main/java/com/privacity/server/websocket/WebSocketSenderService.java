@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.server.common.enumeration.Urls;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ProcessException;
@@ -27,9 +29,6 @@ import com.privacity.server.util.LocalDateAdapter;
 @Service
 public class WebSocketSenderService {
 
-	
-	@Value("${serverconf.privacityIdAESOn}")
-	private boolean encryptIds;
 
 	private static final String WEBSOCKET_CHANNEL = "/topic/reply";
 	
@@ -40,6 +39,11 @@ public class WebSocketSenderService {
    @Autowired 
    @Lazy
    private WsQueue q;
+   
+	Gson gson = new GsonBuilder()
+			.setPrettyPrinting()
+			.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
+			.create();
 
 //	public void sender(Usuario usuario, ProtocoloDTO protocoloDTP) throws PrivacityException {
 //		sender(usuario.getUsername(),protocoloDTP);
@@ -93,18 +97,20 @@ public class WebSocketSenderService {
 ////}
 //
 	private void sentToUser(String user, String urlDestino, String mensaje) throws PrivacityException {
-		
+		System.out.println(" sentToUser(String user, String urlDestino, String mensaje)");
+		System.out.println("SERVER CORE - Salida WS");
+		System.out.println("user: " + user);
+		System.out.println("urlDestino: " + urlDestino);
+		System.out.println("mensaje: " + mensaje);
 		if (comps.webSocket().socketSessionRegistry().getSessionIds(user).size() >0) {
 			
-		AESToUse c;
 		try {
-			c = comps.service().usuarioSessionInfo().get(user).getSessionAESToUseWS();
 		
-			String retornoFuncionEncriptado = c.getAES(mensaje);
+			//String retornoFuncionEncriptado =comps.service().usuarioSessionInfo().encryptSessionAESServerWS(user,mensaje);
 
 
-			comps.webSocket().simpMessagingTemplate().convertAndSendToUser(user, urlDestino , retornoFuncionEncriptado);	
-		} catch (ValidationException e) {
+			comps.webSocket().simpMessagingTemplate().convertAndSendToUser(user, urlDestino , mensaje);	
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -114,137 +120,142 @@ public class WebSocketSenderService {
 		}
 		
 	}
-	 
-	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, Object dto) throws ProcessException {
-		return buildProtocoloDTO(component, action, dto, null);
-	}
-	
-	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, MessageDTO messageDTO) throws ProcessException {
-		return buildProtocoloDTO(component, action, null, messageDTO);
-	}
-	
-	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, Object dto, MessageDTO messageDTO) throws ProcessException {
-		ProtocoloDTO p = new ProtocoloDTO();
-		p.setComponent(component);
-		p.setAction(action);
-		
+//	 
+//	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, Object dto) throws ProcessException {
+//		return buildProtocoloDTO(component, action, dto, null);
+//	}
+//	
+//	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, MessageDTO messageDTO) throws ProcessException {
+//		return buildProtocoloDTO(component, action, null, messageDTO);
+//	}
+//	
+//	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, Object dto, MessageDTO messageDTO) throws ProcessException {
+//		ProtocoloDTO p = new ProtocoloDTO();
+//		p.setComponent(component);
+//		p.setAction(action);
+//		
+//
+//		p.setObjectDTO(new Gson().toJson(dto));
+//
+//		return p;
+//	}
 
-		p.setObjectDTO(new Gson().toJson(dto));
-
-		return p;
-	}
-
-	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action) {
-		ProtocoloDTO p = new ProtocoloDTO();
-		p.setComponent(component);
-		p.setAction(action);
-
-		return p;
-	}
+//	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action) {
+//		ProtocoloDTO p = new ProtocoloDTO();
+//		p.setComponent(component);
+//		p.setAction(action);
+//
+//		return p;
+//	}
 //	/*
 //	 * @param U ignora ese usuario
 //	 */
 //
 //
-	public void senderPing(String username) throws PrivacityException {
-		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.PING, ProtocoloActionsEnum.PING_ACTION);
-			addMessageCola(p, username);
-	}
+//	public void senderPing(String username) throws PrivacityException {
+//		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.PING, ProtocoloActionsEnum.PING_ACTION);
+//			addMessageCola(p, username);
+//	}
 	
 
 		
-	public void senderMessageToGrupoMinusCreator(String idUsuario, String idGrupo, ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, MessageDTO messageDTO ) throws PrivacityException {
-
-
-		
-		List<String> lista;
-		
-		if (messageDTO.isSystemMessage() ) {
-			lista = comps.repo().userForGrupo().findByForGrupoAll(Long.parseLong(idGrupo));
-		}else {
-			lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(Long.parseLong(idGrupo), Long.parseLong( idUsuario));	
-		}
-		
-		
-		lista.stream().forEach( username -> 
-		senderMessageToGrupoMinusCreatorThread(username,componente, action, messageDTO)
-	);
-		
-	}
-	private void senderMessageToGrupoMinusCreatorThread (String username, ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, MessageDTO messageDTO ){
-		
-		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-				componente,
-				action);
-		
-		p.setMessageDTO(messageDTO);
-		addMessageCola(p, username);
-	}
+//	public void senderMessageToGrupoMinusCreator(String idUsuario, String idGrupo, ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, MessageDTO messageDTO ) throws PrivacityException {
+//
+//
+//		
+//		List<String> lista;
+//		
+//		if (messageDTO.isSystemMessage() ) {
+//			lista = comps.repo().userForGrupo().findByForGrupoAll(Long.parseLong(idGrupo));
+//		}else {
+//			lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(Long.parseLong(idGrupo), Long.parseLong( idUsuario));	
+//		}
+//		
+//		
+//		lista.stream().forEach( username -> 
+//		senderMessageToGrupoMinusCreatorThread(username,componente, action, messageDTO)
+//	);
+//		
+//	}
+//	private void senderMessageToGrupoMinusCreatorThread (String username, ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, MessageDTO messageDTO ){
+//		
+//		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
+//				componente,
+//				action);
+//		
+//		p.setMessageDTO(messageDTO);
+//		addMessageCola(p, username);
+//	}
 	
-	public void senderToGrupoMinusCreator(Long idUsuario, long idGrupo, ProtocoloDTO p) throws PrivacityException {
+	public void senderToGrupoMinusCreator(String username, long idGrupo, ProtocoloDTO p) throws PrivacityException {
 		
-		List<String> lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, idUsuario);
-		
-		
-		
-		lista.stream().forEach( username -> 
-		
-		
-			addMessageCola(p, username)
-		);
+		senderToGrupo(p,idGrupo, username, true);
 		
 	}
 
-	private void addMessageCola(ProtocoloDTO p, String username) {
+
+	
+	public void senderToUser(ProtocoloDTO p, Usuario usuario) throws PrivacityException {
+		System.out.println("senderToUser(ProtocoloDTO p, Usuario usuario");
+		String protocoloEncr = comps.service().usuarioSessionInfo().encryptProtocoloWS(usuario.getUsername(), p, getUrl().name());
+
 		WsMessage m = new WsMessage();
-		m.setUsername(username);
-		m.setProtocolo(p);
-		q.put(m);
-	}
+		m.setUsername(usuario.getUsername());
+		m.setProtocolo(protocoloEncr);
+		sender( m);
 
-	public void senderToGrupoAllMember(Grupo grupo, ProtocoloDTO p) throws PrivacityException {
-		
-		List<UserForGrupo> lista = comps.repo().userForGrupo().findByForGrupo(grupo.getIdGrupo());
+	}
+	
+	public void senderToGrupo(ProtocoloDTO p, Long idGrupo, String username, boolean minusCreator) throws PrivacityException {
+		System.out.println("senderToGrupo(ProtocoloDTO p, boolean minusCreator, boolean onlyOnline)");
+		List<Usuario> lista = comps.repo().userForGrupo().findByUsuariosForGrupoDeletedFalse(idGrupo);
 		//poner paralel stream
 		
 		for ( int k = 0 ; k < lista.size() ; k++ ) {
 
-			Usuario destino = lista.get(k).getUserForGrupoId().getUser(); 
+			Usuario destino = lista.get(k); 
 			
-			WsMessage m = new WsMessage();
-			m.setUsername(destino.getUsername());
-			m.setProtocolo(p);
-			// esta mal corregir
-			new Runnable() {
-				@Override
-				public void run() {
-					q.put(m);
-				}}.run();
+			if (destino.getUsername().equals(username) && minusCreator) {
+				System.out.println("usuario creador excluido: " + username);
+			}else {
+				senderToUser(p,  destino );	
+			}
+				
+			
+	
 		}
 		
 	}
 	
 	public void sender(WsMessage msg) {
+		
 		String destino;
 		
 		destino = msg.getUsername();
 		try {	
-//		if(encryptIds) {
-//			privacityIdServices.transformarEncriptarOutOrder(msg.getProtocolo().getMessageDTO());
-//			privacityIdServices.transformarEncriptarOut(msg.getProtocolo().getMessageDTO());
-//		}
-
-
-	        Gson gson = new GsonBuilder()
-	                .setPrettyPrinting()
-	                .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
-	                .create();
 	        
-			sentToUser(destino, WEBSOCKET_CHANNEL , gson.toJson(msg.getProtocolo()));
+			sentToUser(destino, WEBSOCKET_CHANNEL , msg.getProtocolo());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public Urls getUrl() {
+		return Urls.CONSTANT_URL_PATH_PRIVATE_WS;
+	}
+	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum comp, ProtocoloActionsEnum action,
+			Object obj) {
+		
+		ProtocoloDTO p = new ProtocoloDTO(comp,action);
+		p.setObjectDTO(gson.toJson(obj));
+		return p;
+	}
+	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum comp, ProtocoloActionsEnum action,
+			MessageDTO m) {
+		ProtocoloDTO p = new ProtocoloDTO(comp,action);
+		p.setMessageDTO(m);
+		return p;
 	}
 }

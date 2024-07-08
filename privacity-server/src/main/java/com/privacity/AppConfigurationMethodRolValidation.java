@@ -11,9 +11,9 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 
-@Configuration
-@EnableAspectJAutoProxy
-@Aspect
+//@Configuration
+//@EnableAspectJAutoProxy
+//@Aspect
 public class AppConfigurationMethodRolValidation {
     
 
@@ -29,9 +29,9 @@ public class AppConfigurationMethodRolValidation {
     public Advisor configurationMethodRolValidationAdvisor(@Autowired  FacadeComponent comps) {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
         pointcut.setExpression(
-        		"within(com.privacity.server.component.grucpo.GrupoValidationService..*) "
+        		"within(com.privacity.server.component.gr2ucpo.GrupoValidationService..*) "
         		
-        		+ " || within(com.privacity.server.componcent.grupo.GrupoValidationService*) " 
+        		+ " || within(com.privacity.server.compo2ncent.grupo.GrupoValidationService*) " 
         		);
 
         return new DefaultPointcutAdvisor(pointcut, new AppConfigurationMethodRolValidationInterceptor(comps));

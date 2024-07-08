@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class UserInvitationCodeDTO {
-
-	   public EncryptKeysDTO encryptKeysDTO;
 	   public String invitationCode;
+	   public EncryptKeysDTO encryptKeysDTO;
+
 }

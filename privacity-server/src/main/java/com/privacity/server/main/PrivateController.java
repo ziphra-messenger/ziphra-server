@@ -45,9 +45,7 @@ import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysService;
 import com.privacity.server.component.grupo.GrupoValidationService;
 import com.privacity.server.component.message.MessageValidationService;
-import com.privacity.server.component.model.request.GrupoBlockRemotoRequestLocalDTO;
-import com.privacity.server.component.model.request.GrupoIdLocalDTO;
-import com.privacity.server.component.model.request.GrupoInfoNicknameRequestLocalDTO;
+
 import com.privacity.server.component.myaccount.MyAccountValidationService;
 import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.component.requestid.RequestIdValidationService;
@@ -109,23 +107,19 @@ public class PrivateController extends ControllerBase{
 		
 		request = requestDTO.getRequest();
 
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-		UserDetailsImpl u = (UserDetailsImpl) auth.getPrincipal();
-	    
-		 AESToUse c = comps.service().usuarioSessionInfo().get(u.getUsername()).getSessionAESToUse();
-		 String requestDesencriptado=null;
-		try {
-			requestDesencriptado = c.getAESDecrypt(request);	
-		}catch(javax.crypto.BadPaddingException e) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("MAL SESSION ENCRYPT");
-		}
+	
+		 //AESToUse c = comps.service().usuarioSessionInfo().get(u.getUsername()).getSessionAESToUse();
+		 //String requestDesencriptado=null;
+//		try {
+//			requestDesencriptado = comps.service().usuarioSessionInfo().decryptSessionAESServerIn(u.getUsername(),request, String.class.getName());	
+//		}catch(Exception e) {
+//			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("MAL SESSION ENCRYPT");
+//		}
 		
 		
-
+		 
         
-		ProtocoloDTO p = gson.fromJson(requestDesencriptado, ProtocoloDTO.class);
+		ProtocoloDTO p = comps.service().usuarioSessionInfo().decryptProtocolo(comps.requestHelper().getUsuarioUsername(), request, getUrl().name());
 		
 		if (showLog(p)) {
 			System.out.println( " ================================================================================");
@@ -138,7 +132,8 @@ public class PrivateController extends ControllerBase{
 			return ResponseEntity.ok().body(gson.toJson(retornoFuncion));
 		}
 		String retornoFuncionJson = gson.toJson(retornoFuncion);
-		String retornoFuncionEncriptado = comps.service().usuarioSessionInfo().get(u.getUsername()).getSessionAESToUseServerEncrypt().getAES(retornoFuncionJson);
+		
+		String retornoFuncionEncriptado = comps.service().usuarioSessionInfo().encryptSessionAESServerOut(comps.requestHelper().getUsuarioUsername(),retornoFuncionJson);
 
 		if (showLog(p)) {
 			

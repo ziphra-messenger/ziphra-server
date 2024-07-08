@@ -1,4 +1,5 @@
 package com.privacity.server.websocket;
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 
@@ -8,12 +9,15 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.ProtocoloDTO;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.model.Grupo;
+import com.privacity.server.util.LocalDateAdapter;
 
 /**
  * Created by baiguantao on 2017/8/4.
@@ -69,34 +73,14 @@ public class STOMPDisconnectEventListener  implements ApplicationListener<Sessio
         t.start();
 } 
 	private void senderToGrupoMinusCreator(String username, long idGrupo, GrupoDTO g) throws Exception {
-		
-		
-		
-		List<String> lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get(username).getUsuarioDB().getIdUser());
-		
-		Iterator<String> i = lista.iterator();
-		
-		while (i.hasNext()){
-			String destino = i.next();
-			ProtocoloDTO p;
 
-
-			GrupoDTO newR =  (GrupoDTO) comps.util().utilService().clon(GrupoDTO.class, g);
-
+		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
+				ProtocoloComponentsEnum.GRUPO,
+		        ProtocoloActionsEnum.GRUPO_HOW_MANY_MEMBERS_ONLINE,
+		        g);
+		comps.webSocket().sender().senderToGrupo(p, idGrupo, username, true);
 		
-					comps.service().usuarioSessionInfo().get(destino).getPrivacityIdServices() 
-					.encryptIds(newR);
-				
-				
-				
-
-			p = comps.webSocket().sender().buildProtocoloDTO(
-					ProtocoloComponentsEnum.GRUPO,
-			        ProtocoloActionsEnum.GRUPO_HOW_MANY_MEMBERS_ONLINE,
-			        newR);
-			
-			comps.webSocket().sender().sender(new WsMessage (destino , p ));
-		}
+	
 		
 		
 	}

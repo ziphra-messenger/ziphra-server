@@ -2,7 +2,6 @@ package com.privacity.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 
@@ -22,30 +21,24 @@ public class ProtocoloDTO {
 		this.action = action;
 	}
 
-    private ProtocoloComponentsEnum component;
-    private ProtocoloActionsEnum action;
+    public ProtocoloComponentsEnum component;
+    public ProtocoloActionsEnum action;
     
     @JsonInclude(Include.NON_NULL)
-    private String asyncId;
+    public String asyncId;
     @JsonInclude(Include.NON_NULL)
-    private String mensajeRespuesta;
+    public String mensajeRespuesta;
     
     @JsonInclude(Include.NON_NULL)
-    private String codigoRespuesta;
+    public String codigoRespuesta;
     
     @JsonInclude(Include.NON_NULL)
-    private RequestIdDTO requestIdDTO;
+    public RequestIdDTO requestIdDTO;
     
     @JsonInclude(Include.NON_NULL)
-    private GrupoDTO grupoDTO;
+    public MessageDTO messageDTO;
     
     @JsonInclude(Include.NON_NULL)
-    private MessageDTO messageDTO;
+    public String objectDTO; 
     
-    @JsonInclude(Include.NON_NULL)
-    private String objectDTO; 
-    
-    @JsonInclude(Include.NON_NULL)
-    public SaveGrupoGralConfLockResponseDTO saveGrupoGralConfLockResponseDTO;
-
 }

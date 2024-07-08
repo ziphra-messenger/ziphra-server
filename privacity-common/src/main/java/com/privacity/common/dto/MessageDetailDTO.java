@@ -3,12 +3,13 @@ package com.privacity.common.dto;
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.enumeration.MessageState;
+import com.privacity.common.interfaces.IdGrupoInterface;
 
 import lombok.Data;
 
 
 @Data
-public class MessageDetailDTO{
+public class MessageDetailDTO implements IdGrupoInterface{
 
 	@PrivacityIdOrder	
 	public String idMessage;
@@ -17,9 +18,9 @@ public class MessageDetailDTO{
 	public String idGrupo;
 	public UsuarioDTO usuarioDestino;
     public MessageState estado;
-    private boolean deleted;
+    public boolean deleted;
     
-    public String getIdMessageDetailToMap() {
+    public String buildIdMessageDetailToMap() {
     	String usuarioid=null;
     	if (usuarioDestino != null) {
     		usuarioid= usuarioDestino.getIdUsuario();
@@ -27,7 +28,7 @@ public class MessageDetailDTO{
     	return idGrupo + "{-}" + idMessage + "{-}" + usuarioid;
     }
 	    
-    public String getIdMessageToMap() {
+    public String buildIdMessageToMap() {
     	return idGrupo + "{-}" + idMessage;
     }
 }

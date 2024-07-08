@@ -9,13 +9,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class AESDTO {
+	public String bitsEncrypt;
+	public String iteration;
 	public String secretKeyAES;
 	public String saltAES;
-	public String iteration;
-	public String bitsEncrypt;
+	
+
 	
 	@Override
 	public String toString() {
@@ -24,7 +25,13 @@ public class AESDTO {
 		check(iteration) + "]";
 	}
 	
-
+	public String toStringComplete() {
+		return "AESDTO [secretKeyAES=" + secretKeyAES
+		+ ", saltAES=" + saltAES + ", iteration=" +
+		iteration + "]";
+	}
+	
+	
 	private String check (String s) {
 		if ( s != null ) {
 			return s.length() + "";

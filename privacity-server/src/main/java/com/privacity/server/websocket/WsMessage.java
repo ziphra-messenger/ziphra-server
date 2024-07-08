@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class WsMessage {
 
 	private String username;
-	private ProtocoloDTO protocolo;
+	private String protocolo;
 
 }

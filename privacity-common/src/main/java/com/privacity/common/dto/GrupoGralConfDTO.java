@@ -5,11 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
+import com.privacity.common.interfaces.IdGrupoInterface;
 
 import lombok.Data;
 
 @Data
-public class GrupoGralConfDTO {
+public class GrupoGralConfDTO implements IdGrupoInterface{
 
 	@PrivacityId
 	@PrivacityIdOrder

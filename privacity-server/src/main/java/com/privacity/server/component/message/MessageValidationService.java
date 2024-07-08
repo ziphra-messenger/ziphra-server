@@ -3,17 +3,10 @@ package com.privacity.server.component.message;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.security.DeclareRoles;
-import javax.annotation.security.RolesAllowed;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.IdMessageDTO;
 import com.privacity.common.dto.MediaDTO;
@@ -23,6 +16,8 @@ import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.common.enumeration.MessageState;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ProcessException;
@@ -52,12 +47,12 @@ public class MessageValidationService {
 	   private WsQueue q;
 	
 	public void deleteForMe(IdMessageDTO request) throws ValidationException, ProcessException {
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		comps.requestHelper().setGrupoInUse(request);
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		
-		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());
 		Long idMessage = comps.util().message().convertIdMessageStringToLong(request.getIdMessage());
 
-		Message message = comps.util().message().getMessage(idGrupo,idMessage);
+		Message message = comps.util().message().getMessage(comps.requestHelper().getGrupoInUse().getIdGrupo(),idMessage);
 
 		MessageDetail detail = comps.util().messageDetail().getMessageDetail(message, usuarioLogged);
 		
@@ -66,26 +61,23 @@ public class MessageValidationService {
 		}
 		//comps.process().message().deleteForMe(detail);
 		
-		
-		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-				ProtocoloComponentsEnum.MESSAGE,
-				ProtocoloActionsEnum.MESSAGE_DELETE_FOR_EVERYONE);
-		
-		IdMessageDTO mRemove = new IdMessageDTO();
-		p.setMessageDTO(new MessageDTO());
-		p.getMessageDTO().setIdGrupo(message.getMessageId().getGrupo().getIdGrupo()+"");
-		p.getMessageDTO().setIdMessage(message.getMessageId().getIdMessage()+"");
-		
-				q.put(new WsMessage(usuarioLogged.getUsername() ,p ));	
-			
-		
+//		IdMessageDTO mRemove = new IdMessageDTO();
+//		p.setMessageDTO(new MessageDTO());
+//		p.getMessageDTO().setIdGrupo(message.getMessageId().getGrupo().getIdGrupo()+"");
+//		p.getMessageDTO().setIdMessage(message.getMessageId().getIdMessage()+"");
+//		
+//		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
+//				ProtocoloComponentsEnum.MESSAGE,
+//				ProtocoloActionsEnum.MESSAGE_DELETE_FOR_EVERYONE,
+//				mRemove);
+//		comps.webSocket().sender().senderToGrupo(p, true, true);
 		
 		//return request;
 		
 	}
 	
 	public void deleteForEveryone(IdMessageDTO request) throws PrivacityException {
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 
 		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());
 		Long idMessage = comps.util().message().convertIdMessageStringToLong(request.getIdMessage());
@@ -110,8 +102,8 @@ public class MessageValidationService {
 	}
 	
 	public MessageDTO get(MessageDTO request) throws Exception {
-		String username = comps.util().usuario().getUsernameLogged();
-		Usuario usuarioLogged = comps.service().usuarioSessionInfo().get(username).getUsuarioDB();
+		String username = comps.requestHelper().getUsuarioUsername();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 
 		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());
 		Long idMessage = comps.util().message().convertIdMessageStringToLong(request.getIdMessage());
@@ -127,18 +119,16 @@ public class MessageValidationService {
 	}
 	
 	public MessageDTO getDataMedia(MessageDTO request) throws Exception {
-		String username = comps.util().usuario().getUsernameLogged();
-		Usuario usuarioLogged = comps.service().usuarioSessionInfo().get(username).getUsuarioDB();
 
-		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());
+		Grupo grupo = comps.requestHelper().setGrupoInUse(request);
 		Long idMessage = comps.util().message().convertIdMessageStringToLong(request.getIdMessage());
 		
-		comps.util().userForGrupo().getValidation(usuarioLogged, idGrupo).getUserForGrupoId().getGrupo();
+		comps.util().userForGrupo().getValidation(comps.requestHelper().getUsuarioLogged(),grupo.getIdGrupo()).getUserForGrupoId().getGrupo(); 
 		
-		Message m = comps.util().message().getMessage(idGrupo,idMessage);
+		Message m = comps.util().message().getMessage(grupo.getIdGrupo(),idMessage);
 
 		
-		comps.util().messageDetail().getMessageDetailValidateTimeMessage(m, usuarioLogged);
+		comps.util().messageDetail().getMessageDetailValidateTimeMessage(m, comps.requestHelper().getUsuarioLogged());
 		
 		MessageDTO r = new MessageDTO();
 		r.setMediaDTO(new MediaDTO());
@@ -164,7 +154,7 @@ public class MessageValidationService {
 	
 	public MessageDetailDTO changeState(MessageDetailDTO request) throws Exception {
 		
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		
 		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());
 		Long idMessage = comps.util().message().convertIdMessageStringToLong(request.getIdMessage());
@@ -202,7 +192,6 @@ public class MessageValidationService {
 		log.info("total:>> " + (total/1000));
 		return r;
 	}
-
 
 
 }

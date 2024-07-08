@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,12 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.privacity.common.dto.AESAllDTO;
+import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
+import com.privacity.server.common.enumeration.Urls;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.message.MessageValidationService;
-import com.privacity.server.security.UserDetailsImpl;
 import com.privacity.server.util.LocalDateAdapter;
 
 
@@ -39,56 +39,43 @@ public class DownloadDataPrivateController {
 	@Autowired @Lazy
 	private FacadeComponent comps;
 
-
-		
-
 	public DownloadDataPrivateController(MessageValidationService messageValidationService) {
 		super();
 	
 		this.messageValidationService = messageValidationService;
 	}
-
-
-
 	@PostMapping("/data")
 	public ResponseEntity<byte[]> getData(@RequestBody String requestO) throws Exception {
 		
-		
-	
         Gson gson = new GsonBuilder()
                 //.setPrettyPrinting()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
                 .create();
         RequestEncryptDTO request = gson.fromJson(requestO, RequestEncryptDTO.class);
 		
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-		UserDetailsImpl u = (UserDetailsImpl) auth.getPrincipal();
-	    
-		 AESToUse c = comps.service().usuarioSessionInfo().get(u.getUsername()).getSessionAESToUse();
-		
 		 String requestDesencriptado=null;
 		try {
-			requestDesencriptado = c.getAESDecrypt(request.getRequest());	
-		}catch(javax.crypto.BadPaddingException e) {
+			requestDesencriptado = comps.service().usuarioSessionInfo().decryptSessionAESServerIn(comps.requestHelper().getUsuarioUsername(),request.getRequest(), String.class.getName());
+		}catch(Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 		
 		ProtocoloDTO p = gson.fromJson(requestDesencriptado, ProtocoloDTO.class);
+		MessageDTO retornoFuncion = this.in(p);
 		
-		 MessageDTO retornoFuncion = this.in(p);
-		
-		byte[] retorno = c.getAESData(retornoFuncion.getMediaDTO().getData());
-		
+		 AESAllDTO aess = comps.service().usuarioSessionInfo().getAesDtoAll(comps.requestHelper().getUsuarioUsername());
+			AESDTO aesdto =aess.getSessionAESDTOServerOut();
+			AESToUse c = new AESToUse(Integer.parseInt(aesdto.getBitsEncrypt()),
+Integer.parseInt(	 aesdto.iteration),
+					aesdto.getSecretKeyAES(),
+					aesdto.getSaltAES());
+		 
+		 byte[] retorno = c.getAESData(retornoFuncion.getMediaDTO().getData());
 
 		return ResponseEntity.status(HttpStatus.OK).body(retorno);
 
 	}
-
-
-
 
 	public boolean getEncryptIds() {
 		return encryptIds;
@@ -108,21 +95,19 @@ public class DownloadDataPrivateController {
 
 
 		MessageDTO objetoRetorno=null;
-
-
-
 			
 				MessageDTO dtoObject =  request.getMessageDTO();
-				
-				comps.service().usuarioSessionInfo().get().getPrivacityIdServices().decryptIds(dtoObject);
+				dtoObject = (MessageDTO) comps.service().usuarioSessionInfo().privacityIdServiceDecrypt(
+						comps.requestHelper().getUsuarioUsername()
+						,dtoObject, MessageDTO.class.getName());
 				
 				objetoRetorno = messageValidationService.getDataMedia(dtoObject);
-					
+
+				objetoRetorno = (MessageDTO) comps.service().usuarioSessionInfo().privacityIdServiceDecrypt(
+						comps.requestHelper().getUsuarioUsername()
+						,objetoRetorno, MessageDTO.class.getName());
 
 
-	
-
-				comps.service().usuarioSessionInfo().get().getPrivacityIdServices().encryptIds(objetoRetorno);
 
 	//	if(getEncryptIds()) {
 	//		objetoRetorno = getPrivacityIdServices().transformarDesencriptarOut(getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject));
@@ -155,6 +140,8 @@ public class DownloadDataPrivateController {
 		return false;
 	}
 
-
-
+	   public Urls getUrl() {
+			return Urls.CONSTANT_URL_PATH_PRIVATE_DOWNLOAD_DATA;
+					 
+		}	 
 }

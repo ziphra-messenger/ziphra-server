@@ -4,17 +4,19 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
+import com.privacity.common.interfaces.IdGrupoInterface;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class GrupoDTO{
+@Data
+public class GrupoDTO implements IdGrupoInterface{
 	@PrivacityId
 	@PrivacityIdOrder
 	public String idGrupo;
@@ -59,5 +61,17 @@ public class GrupoDTO{
 	public LockDTO lock;
 	
 	@JsonInclude(Include.NON_NULL)
-	public GrupoGralConfPasswordDTO password;	
+	public GrupoGralConfPasswordDTO password;
+
+	@Override
+	public String getIdGrupo() {
+		// TODO Auto-generated method stub
+		return idGrupo;
+	}
+
+	@Override
+	public void setIdGrupo(String idGrupo) {
+		this.idGrupo=idGrupo;
+		
+	}	
 }

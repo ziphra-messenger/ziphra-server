@@ -1,7 +1,10 @@
 package com.privacity.common.dto;
 
+import java.util.Arrays;
+
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
+import com.privacity.common.interfaces.IdGrupoInterface;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +14,14 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageDTO implements Cloneable{
+
+public class MessageDTO implements Cloneable , IdGrupoInterface{
+	@Override
+	public String toString() {
+		return "MessageDTO [idMessage=" + idMessage + ", idGrupo=" + idGrupo + ", text=" + text + ", systemMessage="
+				+ systemMessage + ", MessagesDetailDTO=" + Arrays.toString(MessagesDetailDTO) + "]";
+	}
+
 	@PrivacityIdOrder
 	public String idMessage;
 	@PrivacityId
@@ -49,7 +59,7 @@ public class MessageDTO implements Cloneable{
 		return (MessageDTO)super.clone();
 	}
 
-    public String getIdMessageToMap() {
+    public String buildIdMessageToMap() {
     	return idGrupo + "{-}" + idMessage;
     }
     
@@ -57,7 +67,7 @@ public class MessageDTO implements Cloneable{
     	return timeMessage > 0;
     }
     
-    public IdMessageDTO getIdMessageDTO(){
+    public IdMessageDTO buildIdMessageDTO(){
         return new IdMessageDTO(this.getIdGrupo(),this.getIdMessage());    
     }
 

@@ -1,27 +1,19 @@
 package com.privacity.server.component.message;
 
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
-import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.IdMessageDTO;
 import com.privacity.common.dto.MediaDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.MessageDetailDTO;
 import com.privacity.common.dto.ProtocoloDTO;
-import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
-import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.MessageState;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
@@ -32,9 +24,9 @@ import com.privacity.server.model.Grupo;
 import com.privacity.server.model.Media;
 import com.privacity.server.model.Message;
 import com.privacity.server.model.MessageDetail;
+import com.privacity.server.model.MessageId;
 import com.privacity.server.security.Usuario;
 import com.privacity.server.util.PrivacityLogguer;
-import com.privacity.server.websocket.WsMessage;
 import com.privacity.server.websocket.WsQueue;
 
 import lombok.extern.java.Log;
@@ -194,8 +186,8 @@ public class MessageProcessService {
 			id.setIdMessage("9123372036854775807");
 		}
 		
-		Usuario u = getUser();
-		List<MessageDetail> l = comps.repo().messageDetail().getHistorial(u.getIdUser(),id.getIdGrupoLong(),id.getIdMessageLong(), 
+		Usuario u = comps.requestHelper().getUsuarioLogged();
+		List<MessageDetail> l = comps.repo().messageDetail().getHistorial(u.getIdUser(),id.convertIdGrupoToLong(),id.convertIdMessageToLong(), 
 				 PageRequest.of(0, 10));
 		
 		
@@ -212,7 +204,7 @@ public class MessageProcessService {
 	}
 	
 	public MessageDTO[] getAllidMessageUnreadMessages() throws Exception {
-		Usuario u = getUser();
+		Usuario u = comps.requestHelper().getUsuarioLogged();
 		List<MessageDetail> l = comps.repo().messageDetail().getAllidMessageUnreadMessages(u.getIdUser());
 		
 		MessageDTO[] r = new MessageDTO[l.size()];
@@ -228,14 +220,14 @@ public class MessageProcessService {
 	}
 	
 	public void emptyList(String idGrupo) throws Exception {
-		Usuario u = getUser();
+		Usuario u = comps.requestHelper().getUsuarioLogged();
 		
 		comps.repo().messageDetail().deleteAllMessageDetailByGrupoAndUser(Long.parseLong(idGrupo), u.getIdUser());
 		
 	}
 	
 	public void deleteAllMyMessageForEverybodyByGrupo(String idGrupo) throws Exception {
-		Usuario u = getUser();
+		Usuario u = comps.requestHelper().getUsuarioLogged();
 		
 		comps.repo().messageDetail().deleteAllMyMessageDetailForEverybodyByGrupo(Long.parseLong(idGrupo), u.getIdUser());
 		comps.repo().message().deleteAllMyMessageForEverybodyByGrupo(Long.parseLong(idGrupo), u.getIdUser());
@@ -251,75 +243,41 @@ public class MessageProcessService {
 		
 
 		MessageDetailDTO retornoServer = comps.common().mapper().doit(md);
+		MessageDetailDTO retornoWS = comps.common().mapper().doit(md);
 		
-
 				comps.repo().messageDetail().save(md);		
 
 		
 
 
-
-//		Thread allT = new Thread() {
-//
-//			@Override
-//			public void run() {
+				ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
+						ProtocoloComponentsEnum.MESSAGE,
+						ProtocoloActionsEnum.MESSAGE_CHANGE_STATE ,
+						retornoWS);
 				
-
-				
-
-				List<String> lista;
-				
-			      
-					lista = comps.repo().userForGrupo().findByForGrupoAll(m.getMessageId().getGrupo().getIdGrupo());
-
-				
-				Iterator<String> i = lista.iterator();
-				
-				while (i.hasNext()){
-					try {
-						
-					String username = i.next();
-					if (comps.service().usuarioSessionInfo().isOnline(username)){
-					MessageDetailDTO retornoWS = comps.common().mapper().doit(md);
-//					MessageDTO responseWs = comps.common().mapper().doit(m);
-					
-						comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(retornoWS);
-					
-					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-							ProtocoloComponentsEnum.MESSAGE,
-					        ProtocoloActionsEnum.MESSAGE_CHANGE_STATE,
-					        retornoWS);
-			
-					
-
-					
-					comps.webSocket().sender().sender(new WsMessage (username , p ));
-					
-						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.MESSAGE, ProtocoloActionsEnum.MESSAGE_RECIVIED, responseWs);
-					}
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}	
-					
-				}
-
-
-
-
-
-						
-		
-//					
-//
-//			}};
-//			allT.start();
+				comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername(), true);
+	
 		return retornoServer;
+
 		
 	}
 	public MessageDTO[] loadMessages(MessageDTO request) throws Exception {
 		return null;
 	}
+	
+	public Message buildMessage(Message m) throws Exception {
+		Media media = m.getMedia();
+		m.setMedia(media);
+
+		MessageId idm = new MessageId();
+		idm.setGrupo(comps.requestHelper().getGrupoInUse());
+		idm.setIdMessage(comps.factory().messageIdSequence().get());
+		
+		m.setMessageId(idm);
+		
+		return m;
+
+	}	
 	
 	public MessageDTO send(Long idUsuario, Message request, Long idGrupo) throws Exception {
 	
@@ -412,87 +370,22 @@ public class MessageProcessService {
 		
 		MessageDTO responseServer = comps.common().mapper().doit(m);
 		
-		//MessageDTO responseWs = comps.common().mapper().doit(m);
+		MessageDTO responseWs = comps.common().mapper().doit(m);
 		comps.repo().message().save(m);
-		Thread allT = new Thread() {
+	
+		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.MESSAGE,ProtocoloActionsEnum.MESSAGE_RECIVIED,responseWs);
 
-			@Override
-			public void run() {
-
-//				Thread messageSaveT = new Thread() {
-//
-//					@Override
-//					public void run() {
-//
-////						comps.repo().message().save(m);
-//
-//					}};
-//					messageSaveT.start();
-
-				List<String> lista;
-				
-			      
 				if (responseServer.isSystemMessage() ) {
-					lista = comps.repo().userForGrupo().findByForGrupoAll(idGrupo);
+					comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername(), true);
 				}else {
-					lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, idUsuario);	
+					comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername(), true);
 				}
 				
-				Iterator<String> i = lista.iterator();
 				
-				while (i.hasNext()){
-					try {
-					String username = i.next();
-			
-					MessageDTO responseWs = comps.common().mapper().doit(m);
-					
-					
-						comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(responseWs);
-					
-					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-							ProtocoloComponentsEnum.MESSAGE,
-							ProtocoloActionsEnum.MESSAGE_RECIVIED);
-					p.setMessageDTO( responseWs);
-					
-					if (objecto != null) {
-						if (objecto instanceof GrupoDTO) {
-							GrupoDTO gr = new GrupoDTO();
-							gr.setIdGrupo(((GrupoDTO)objecto).getIdGrupo()+"");
-						
-								comps.service().usuarioSessionInfo().get(username).getPrivacityIdServices().encryptIds(gr);
-								((GrupoDTO)objecto).setIdGrupo(gr.getIdGrupo());
-		
-							p.setGrupoDTO((GrupoDTO)objecto);
-						}else if(objecto instanceof SaveGrupoGralConfLockResponseDTO) {
-							p.setSaveGrupoGralConfLockResponseDTO((SaveGrupoGralConfLockResponseDTO) objecto);
-						}
-						
-						
-					}
-					
-					comps.webSocket().sender().sender(new WsMessage (username , p ));
-					
-						//comps.webSocket().sender().sender( idUsuario+"", idGrupo+"",  ProtocoloComponentsEnum.MESSAGE, ProtocoloActionsEnum.MESSAGE_RECIVIED, responseWs);
-					
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}	
-					
-				}
-				{
 				
-				};
 
-
-
-
-						
 		
-					
 
-			}};
-			allT.start();
 
 			return comps.common().mapper().doitWithOutTextAndMedia(responseServer);
 
@@ -513,14 +406,9 @@ public class MessageProcessService {
 			comps.repo().messageDetail().deleteLogicByMessageDetailIdMessage(message.getMessageId().getGrupo().getIdGrupo(), message.getMessageId().getIdMessage());
 			comps.repo().message().deleteLogic(message.getMessageId().getGrupo().getIdGrupo(), message.getMessageId().getIdMessage());
 
+			ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.MESSAGE,ProtocoloActionsEnum.MESSAGE_DELETE_FOR_EVERYONE,mRemoveWS);
+			comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername(), true);
 			
-			this.senderToGrupoMinusCreator(
-					ProtocoloComponentsEnum.MESSAGE,
-					ProtocoloActionsEnum.MESSAGE_DELETE_FOR_EVERYONE,
-					message.getMessageId().getGrupo().getIdGrupo(), mRemoveWS);
-			
-			
-		
 		mRemoveReturn.setIdGrupo(message.getMessageId().getGrupo().getIdGrupo()+"");
 		mRemoveReturn.setIdMessage(message.getMessageId().getIdMessage()+"");
 		
@@ -528,70 +416,7 @@ public class MessageProcessService {
 
 	}    	
 
-
-	private Usuario getUser() {
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-		Usuario u = comps.repo().user().findByUsername(userDetail.getUsername()).get();
-		return u;
-	}    
-	public void senderToGrupo(
-			ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  MessageDTO g
-			) throws PrivacityException {
-		sendTo(true, componente, action, idGrupo, g);
-	}
 	
-	public void senderToGrupoMinusCreator(ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  MessageDTO g
-			) throws PrivacityException {
-		sendTo(false, componente, action, idGrupo, g);
-					
-	}
-	
-
-	private void sendTo(boolean toAll , 
-			ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, long idGrupo,  MessageDTO g
-			) throws PrivacityException {
-					
-					List<String> lista;
-					if (toAll) {
-						lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(idGrupo, comps.service().usuarioSessionInfo().get().getUsuarioDB().getIdUser());
-					}else {
-						lista = comps.repo().userForGrupo().findByForGrupoAll(idGrupo);	
-					}
-					
-					
-					Iterator<String> i = lista.iterator();
-					
-					while (i.hasNext()){
-						String destino = i.next();
-						ProtocoloDTO p;
-
-
-						MessageDTO newR =  (MessageDTO) comps.util().utilService().clon(MessageDTO.class, g);
-			
-						try {
-					
-								comps.service().usuarioSessionInfo().get(destino).getPrivacityIdServices().encryptIds(newR);
-							
-							
-							
-						} catch (Exception e) {
-							throw new PrivacityException(ExceptionReturnCode.ENCRYPT_PROCESS);
-						}
-						
-						p = comps.webSocket().sender().buildProtocoloDTO(
-								componente,
-								action);
-						p.setMessageDTO(newR);
-						
-						comps.webSocket().sender().sender(new WsMessage (destino , p ));
-					
-					
-					
-				}}
 
 	
 }

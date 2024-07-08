@@ -15,11 +15,9 @@ import com.privacity.common.dto.response.MyAccountGenerateInvitationCodeResponse
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysValidation;
-import com.privacity.server.component.usuario.UserUtilService;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.EncryptKeys;
 import com.privacity.server.security.Usuario;
-import com.privacity.server.security.UsuarioSessionInfo;
 import com.privacity.server.util.UtilService;
 
 import lombok.AllArgsConstructor;
@@ -40,24 +38,23 @@ public class MyAccountValidationService {
 	
 	
 	
-	public void closeSession(){
+	public void closeSession() throws Exception{
 	
-		Usuario u = utilService.getUser();
 		
-		comps.service().usuarioSessionInfo().remove(u.getUsername());
+		comps.service().usuarioSessionInfo().remove(comps.requestHelper().getUsuarioUsername());
 	}
 	
 	public void saveLoginSkip(boolean request) throws ValidationException{
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		usuarioLogged.getMyAccountConf().setLoginSkip(request);
-		comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getMyAccountConf().setLoginSkip(request);
+		//comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getMyAccountConf().setLoginSkip(request);
 		
 		myAccountService.saveMyAccountGeneralConfiguration(usuarioLogged);
 		
 	}
 	public void saveLock(LockDTO request) throws ValidationException{
 	
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		
 		if (request.getSeconds() == null ||
 				request.getSeconds().intValue() < comps.common().serverConf().getSystemGralConf().getMyAccountConf().getLock().getMinSecondsValidation().intValue()) {
@@ -74,7 +71,7 @@ public class MyAccountValidationService {
 	
 	public void saveNickname(MyAccountNicknameRequestDTO request) throws ValidationException{
 		boolean update = false;
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		if (request.getNickname() != null) {
 			if (request.getNickname().length() > ConstantValidation.USER_NICKNAME_MAX_LENGTH) {
 				throw new ValidationException(ExceptionReturnCode.USER_NICKNAME_TOO_LONG);
@@ -90,7 +87,7 @@ public class MyAccountValidationService {
 	
 	public void savePassword(LoginRequestDTO request) throws ValidationException{
 		
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		
 		String newPassword = comps.util().passwordEncoder().encode(request.getPassword());
 		
@@ -102,7 +99,7 @@ public class MyAccountValidationService {
 	}
 	
 	public void saveMessageConf(MyAccountConfDTO request) throws ValidationException {
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		
 		comps.common().mapper().doit(usuarioLogged, request);
 		myAccountService.saveMyAccountGeneralConfiguration(usuarioLogged);
@@ -111,7 +108,7 @@ public class MyAccountValidationService {
 	public MyAccountGenerateInvitationCodeResponseDTO invitationCodeGenerator(EncryptKeysDTO request) throws ValidationException{
 		
 		encryptKeysValidation.encryptKeysInvitationCodeDTO(request);
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		
 		EncryptKeys encryptKeys = comps.common().mapper().doit(request);
 		
@@ -120,7 +117,7 @@ public class MyAccountValidationService {
 	
 	public Boolean isInvitationCodeAvailable(String invitationCode) throws ValidationException{
 		
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 
 		Usuario UserInvitationCode = comps.repo().user().findByUserInvitationCode(invitationCode);
 		
@@ -137,7 +134,7 @@ public class MyAccountValidationService {
 		if (request.getInvitationCode() == null || request.getInvitationCode().equals("")) {
 			throw new ValidationException(ExceptionReturnCode.MYACCOUNT_INVITATION_CODE_CANT_BE_EMPTY);
 		}
-		Usuario usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 
 		Usuario UserInvitationCode = comps.repo().user().findByUserInvitationCode(request.getInvitationCode());
 		

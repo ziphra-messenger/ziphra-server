@@ -82,7 +82,6 @@ public class MessageDetailUtil {
 
 	private static void extracted(Message message, Set<MessageDetail> r, Usuario destino) {
 		MessageDetail md = new MessageDetail();
-
 		if ( destino.getUsername().equals(message.getUserCreation().getUsername())){
 			md.setState(MessageState.MY_MESSAGE_SENT);
 		}else {

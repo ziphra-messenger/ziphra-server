@@ -20,8 +20,13 @@ public class IdDTO{
 		
 	}
 	
-	public Long getIdLong() {
+	public Long convertIdToLong() {
 		return Long.parseLong(id);
+	}
+
+	@Override
+	public String toString() {
+		return "IdDTO [id=" + id + "]";
 	}
 
 }

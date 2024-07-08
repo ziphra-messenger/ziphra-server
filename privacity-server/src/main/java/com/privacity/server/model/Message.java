@@ -56,7 +56,7 @@ public class Message extends MessageBase implements Serializable {
     private Set<Message> childrenReply;	
     
 
-	@ManyToOne(cascade = {CascadeType.ALL})
+	@ManyToOne(fetch=FetchType.LAZY,cascade = {CascadeType.ALL})
 	@JoinColumn(name = "idUser")
     private Usuario userCreation;
 
@@ -84,7 +84,7 @@ public class Message extends MessageBase implements Serializable {
 	private boolean hideMessageState;
 	
 	
-	@OneToMany(cascade = {CascadeType.ALL})
+	@OneToMany(fetch=FetchType.LAZY, cascade = {CascadeType.ALL})
 	public Set<MessageDetail> getMessagesDetail() {
 		return messagesDetail;
 	}

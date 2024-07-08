@@ -20,6 +20,7 @@ import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.dto.UserInvitationCodeDTO;
 import com.privacity.common.dto.WrittingDTO;
 import com.privacity.common.dto.request.GrupoAddUserRequestDTO;
+import com.privacity.common.dto.request.GrupoInfoNicknameRequestDTO;
 import com.privacity.common.dto.request.GrupoInvitationAcceptRequestDTO;
 import com.privacity.common.dto.request.GrupoNewRequestDTO;
 import com.privacity.common.dto.request.LoginRequestDTO;
@@ -35,9 +36,6 @@ import com.privacity.server.component.encryptkeys.EncryptKeysService;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
 import com.privacity.server.component.grupo.GrupoValidationService;
 import com.privacity.server.component.message.MessageValidationService;
-import com.privacity.server.component.model.request.GrupoBlockRemotoRequestLocalDTO;
-import com.privacity.server.component.model.request.GrupoIdLocalDTO;
-import com.privacity.server.component.model.request.GrupoInfoNicknameRequestLocalDTO;
 import com.privacity.server.component.myaccount.MyAccountValidationService;
 import com.privacity.server.component.requestid.RequestIdValidationService;
 import com.privacity.server.component.serverconf.ServerConfValidationService;
@@ -71,26 +69,12 @@ public class ProtocoloMapService {
 	
 
 	private EncryptKeysService encryptKeysService;
-	
-
-
 	private GrupoValidationService grupoValidationService;
-	
-
 	private MessageValidationService messageValidationService;
-	
-
 	private MyAccountValidationService myAccountValidationService;
-	
-
 	private RequestIdValidationService requestIdValidationService;
-
 	private ServerConfValidationService serverConfValidationService;
-	
-
 	private PrivacityRSAValidation privacityRSAValidation;
-	
-
 	private AuthValidationService authValidationService;
 
 		private synchronized void buildItem(Urls url, ProtocoloComponentsEnum component, ProtocoloActionsEnum action,Object clazz, String methodString, Class<?> parameterType) throws Exception {
@@ -120,20 +104,20 @@ public class ProtocoloMapService {
 
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.ENCRYPT_KEYS,ProtocoloActionsEnum.ENCRYPT_KEYS_GET,encryptKeysService,"getPublicKeyByCodigoInvitacion",PublicKeyByInvitationCodeRequestDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_ACCEPT_INVITATION,grupoValidationService,"acceptInvitation",GrupoInvitationAcceptRequestDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO,grupoValidationService,"blockGrupoRemoto",GrupoBlockRemotoRequestLocalDTO.class);
+//		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO,grupoValidationService,"blockGrupoRemoto",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_DELETE,grupoValidationService,"delete",IdDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_ID,grupoValidationService,"getGrupoById",GrupoIdLocalDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_IDS,grupoValidationService,"getGrupoByIds",GrupoIdLocalDTO[].class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_ID,grupoValidationService,"getGrupoById",IdDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_IDS,grupoValidationService,"getGrupoByIds",IdDTO[].class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_IDS_MY_GRUPOS,grupoValidationService,"getIdsMisGrupos");
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GRAL_CONF_SAVE_LOCK,grupoValidationService,"saveGrupoGralConfLock",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_LIST_MEMBERS,grupoValidationService,"getMembers",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_LOGIN,grupoValidationService,"loginGrupo",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_NEW_GRUPO,grupoValidationService,"newGrupo",GrupoNewRequestDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_REMOVE_ME,grupoValidationService,"removeMe",GrupoIdLocalDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_REMOVE_ME,grupoValidationService,"removeMe",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_SAVE_GENERAL_CONFIGURATION,grupoValidationService,"saveGrupoGeneralConfiguration",GrupoGralConfDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_SAVE_GRAL_CONF_PASSWORD,grupoValidationService,"saveGrupoGralConfPassword",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_SAVE_GRUPO_USER_CONF,grupoValidationService,"saveGrupoUserConf",GrupoUserConfDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_SAVE_NICKNAME,grupoValidationService,"saveNickname",GrupoInfoNicknameRequestLocalDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_SAVE_NICKNAME,grupoValidationService,"saveNickname",GrupoInfoNicknameRequestDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_SENT_INVITATION,grupoValidationService,"sentInvitation",GrupoAddUserRequestDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_STOP_WRITTING,grupoValidationService,"stopWritting",WrittingDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_WRITTING,grupoValidationService,"startWritting",WrittingDTO.class);

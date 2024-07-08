@@ -1,6 +1,7 @@
 package com.privacity.server.component.requestid;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,6 @@ import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.security.Usuario;
-
-import lombok.AllArgsConstructor;
 
 @Service
 public class RequestIdUtilService {
@@ -29,7 +28,7 @@ public class RequestIdUtilService {
 	public boolean existsRequestId(RequestIdDTO requestId, boolean isPrivate) throws ValidationException {
 		Usuario usuarioLogged = null;
 		if (isPrivate) {
-			usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+			usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		}
 		
 		
@@ -51,7 +50,8 @@ public class RequestIdUtilService {
 			
 			if (isPrivate) {
 				requestId.setDate(LocalDateTime.now());
-				ConcurrentMap<String, RequestIdDTO> map = comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getRequestIds();
+				Map map = comps.service().usuarioSessionInfo().getRequestIds(usuarioLogged.getUsername());
+
 				
 				if ( map.containsKey(requestId.getRequestIdClientSide())){
 					throw new ValidationException(ExceptionReturnCode.REQUEST_ID_CANT_BE_USED_MULTI_TIMES);	

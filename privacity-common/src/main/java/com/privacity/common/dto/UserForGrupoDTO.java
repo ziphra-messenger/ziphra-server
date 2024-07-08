@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.interfaces.IdGrupoInterface;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +17,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserForGrupoDTO {
+public class UserForGrupoDTO implements IdGrupoInterface{
 	@PrivacityId
 	@PrivacityIdOrder
 	@JsonInclude(Include.NON_NULL)

@@ -27,9 +27,9 @@ public class AopConfiguration {
     public Advisor performanceMonitorAdvisor() {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
         pointcut.setExpression(
-        		"within(com.privacity.server.component.grupouserconf..*) "
+        		"within(com.privacity.server.component.grupous2erconf..*) "
         		
-        		+ " || within(com.privacity.server.component.grupo..*) " 
+        		+ " || within(com.privacity.server.component.g2rupo..*) " 
         		);
 
         return new DefaultPointcutAdvisor(pointcut, new MyPerformanceMonitorInterceptor());
