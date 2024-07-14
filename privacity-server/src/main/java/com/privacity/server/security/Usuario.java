@@ -20,6 +20,7 @@ import javax.persistence.UniqueConstraint;
 
 import com.privacity.server.model.EncryptKeys;
 import com.privacity.server.model.MyAccountConf;
+import com.privacity.server.model.Role;
 import com.privacity.server.model.UserInvitationCode;
 
 import lombok.Data;

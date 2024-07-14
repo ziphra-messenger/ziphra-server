@@ -2,11 +2,10 @@ package com.privacity.server.encrypt;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import org.hibernate.mapping.TableOwner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
@@ -14,7 +13,7 @@ import com.google.gson.GsonBuilder;
 import com.privacity.common.dto.AESAllDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.RequestIdDTO;
-import com.privacity.server.util.LocalDateAdapter;
+import com.privacity.server.common.adapters.LocalDateAdapter;
 
 /**
  * Created by baiguantao on 2017/8/4.
@@ -22,14 +21,17 @@ import com.privacity.server.util.LocalDateAdapter;
  */
 @Service
 public class UsuarioSessionInfoService {
-
+    
+	@Value("${com.privacity.server.sessionmanager.url}")
+    private String urlService;
+    
 	Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
 			.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
 			.create();
 	
 	// TODO pasar a configuracion 
-	private final static String CONSTANT_URL = "http://localhost:8085/entry";
+	private final static String CONSTANT_URL = "/entry";
 
 	public Map getRequestIds(String username) {
 		RestTemplate rest = new RestTemplate();
@@ -37,7 +39,7 @@ public class UsuarioSessionInfoService {
 		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
 		map.add("username", username);
 
-		Map r = rest.postForObject(CONSTANT_URL +"/requestId/getAll", map, Map.class);
+		Map r = rest.postForObject(urlService + CONSTANT_URL   + "/request/private/request/id/getAll", map, Map.class);
 
 		return r;
 	}
@@ -48,7 +50,7 @@ public class UsuarioSessionInfoService {
 		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
 		map.add("username", username);
 
-		AESAllDTO r = rest.postForObject(CONSTANT_URL +"/get/AesDtoAll", map, AESAllDTO.class);
+		AESAllDTO r = rest.postForObject(urlService + CONSTANT_URL+"/session/get/AesDtoAll", map, AESAllDTO.class);
 
 		return r;
 	}
@@ -58,7 +60,7 @@ public class UsuarioSessionInfoService {
 		MultiValueMap < String, String > map = new LinkedMultiValueMap < String, String > ();
 		map.add("username", username);
 
-		rest.postForObject(CONSTANT_URL +"/remove/session", map, Object.class);
+		rest.postForObject(urlService + CONSTANT_URL+"/session/remove/session", map, Object.class);
 
 	}
 
@@ -70,7 +72,7 @@ public class UsuarioSessionInfoService {
 		map.add("obj", obj);
 		map.add("className", className);
 
-		String r = rest.postForObject(CONSTANT_URL +"/encryption/decrypt/sessionAESServerIn", map, String.class);
+		String r = rest.postForObject(urlService + CONSTANT_URL+"/session/encryption/decrypt/sessionAESServerIn", map, String.class);
 
 		return r;
 	}
@@ -83,7 +85,7 @@ public class UsuarioSessionInfoService {
 		map.add("obj", obj);
 		map.add("url", url);
 
-		ProtocoloDTO r = rest.postForObject(CONSTANT_URL +"/encryption/decrypt/protocolo", map, ProtocoloDTO.class);
+		ProtocoloDTO r = rest.postForObject(urlService + CONSTANT_URL+"/session/encryption/decrypt/protocolo", map, ProtocoloDTO.class);
 
 		return r;
 	}
@@ -95,7 +97,7 @@ public class UsuarioSessionInfoService {
 		map.add("obj", obj);
 		map.add("url", url);
 
-		String r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/protocolo", map, String.class);
+		String r = rest.postForObject(urlService + CONSTANT_URL+"/session/encryption/encrypt/protocolo", map, String.class);
 
 		return r;
 	}
@@ -110,7 +112,7 @@ public class UsuarioSessionInfoService {
 		map.add("obj", obj);
 		map.add("url", url);
 
-		String r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/protocoloWS", map, String.class);
+		String r = rest.postForObject(urlService + CONSTANT_URL+"/session/encryption/encrypt/protocoloWS", map, String.class);
 
 		return r;
 	}
@@ -122,7 +124,7 @@ public class UsuarioSessionInfoService {
 		map.add("username", username);
 		map.add("obj", obj);
 
-		String r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/sessionAESServerOut", map, String.class);
+		String r = rest.postForObject(urlService + CONSTANT_URL+"/session/encryption/encrypt/sessionAESServerOut", map, String.class);
 
 		return r;
 	}
@@ -145,7 +147,7 @@ public class UsuarioSessionInfoService {
 		map.add("obj", gson.toJson(dtoObject));
 		map.add("className", className);
 
-		Object r = rest.postForObject(CONSTANT_URL +"/encryption/decrypt/ids", map, Class.forName(className));
+		Object r = rest.postForObject(urlService + CONSTANT_URL+"/session/encryption/decrypt/ids", map, Class.forName(className));
 
 		return r;
 	}
@@ -158,7 +160,7 @@ public class UsuarioSessionInfoService {
 		map.add("obj", gson.toJson(dtoObject));
 		map.add("className", className);
 
-		String r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/ids", map, String.class);
+		String r = rest.postForObject(urlService + CONSTANT_URL+"/session/encryption/encrypt/ids", map, String.class);
 
 		return r;
 	}
@@ -172,7 +174,7 @@ public class UsuarioSessionInfoService {
 		map.add("obj", gson.toJson(dtoObject));
 		map.add("className", className);
 
-		Object r = rest.postForObject(CONSTANT_URL +"/encryption/encrypt/ids", map, Class.forName(className));
+		Object r = rest.postForObject(urlService + CONSTANT_URL+"/session/encryption/encrypt/ids", map, Class.forName(className));
 
 		return r;
 	}
@@ -184,7 +186,7 @@ public class UsuarioSessionInfoService {
 		map.add("username", requestIdClientSide);
 		map.add("serverRequestIdDTO", gson.toJson(serverRequestIdDTO));
 
-		rest.postForObject(CONSTANT_URL +"/requestId/add", map, Object.class);
+		rest.postForObject(urlService + CONSTANT_URL+"/request/private/request/id/getAll", map, Object.class);
 
 	}
 

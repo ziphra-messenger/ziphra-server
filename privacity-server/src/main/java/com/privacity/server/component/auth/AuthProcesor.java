@@ -29,17 +29,17 @@ import com.privacity.common.dto.AESAllDTO;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.LoginDataDTO;
 import com.privacity.common.dto.response.LoginDTOResponse;
+import com.privacity.server.common.adapters.LocalDateAdapter;
+import com.privacity.server.common.enumeration.ERole;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.encrypt.RSA;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.EncryptKeys;
 import com.privacity.server.model.MyAccountConf;
-import com.privacity.server.security.ERole;
+import com.privacity.server.model.Role;
 import com.privacity.server.security.JwtUtils;
-import com.privacity.server.security.Role;
 import com.privacity.server.security.UserDetailsImpl;
 import com.privacity.server.security.Usuario;
-import com.privacity.server.util.LocalDateAdapter;
 import com.privacity.server.util.PrivacityLogguer;
 
 
@@ -73,7 +73,8 @@ public class AuthProcesor {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String jwt = jwtUtils.generateJwtToken(authentication);
 		
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
+		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+		userDetails.setJwt(jwt);
 		List<String> roles = userDetails.getAuthorities().stream()
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());

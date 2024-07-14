@@ -1,7 +1,6 @@
 package com.privacity.server.component.requestid;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.dto.servergralconf.MinMaxLenghtDTO;
-import com.privacity.common.dto.servergralconf.SystemGralConf;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.exceptions.ValidationException;
@@ -57,7 +55,7 @@ public class RequestIdValidationService {
                        serverRequestIdDTO);
 		}else {
 			comps.service().requestIdPublic().isRequestIdDuplicated(halfId);
-			comps.service().requestIdPublic().getRequestIdsPublic().put(halfId.getRequestIdClientSide(), serverRequestIdDTO);
+			comps.service().requestIdPublic().put(halfId.getRequestIdClientSide(), serverRequestIdDTO);
 			
 
 		}

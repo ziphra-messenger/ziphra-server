@@ -19,10 +19,10 @@ import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
+import com.privacity.server.common.adapters.LocalDateAdapter;
 import com.privacity.server.common.enumeration.Urls;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.message.MessageValidationService;
-import com.privacity.server.util.LocalDateAdapter;
 
 
 @RestController
@@ -30,8 +30,6 @@ import com.privacity.server.util.LocalDateAdapter;
 
 public class DownloadDataPrivateController {
 
-	@Value("${serverconf.privacityIdAESOn}")
-	private boolean encryptIds;
 
 	private MessageValidationService messageValidationService;
 	
@@ -77,9 +75,6 @@ Integer.parseInt(	 aesdto.iteration),
 
 	}
 
-	public boolean getEncryptIds() {
-		return encryptIds;
-	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Object getDTOObject(String objectDTO, Class clazz) {

@@ -1,6 +1,5 @@
 package com.privacity.server.messageidgenerator.services;
 
-import java.util.Random;
 import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;

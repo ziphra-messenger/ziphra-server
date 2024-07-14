@@ -5,18 +5,13 @@ import java.util.Date;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.servergralconf.MinMaxLenghtDTO;
 import com.privacity.common.dto.servergralconf.SGCAESDTO;
 import com.privacity.common.dto.servergralconf.SGCInvitationCode;
-import com.privacity.common.dto.servergralconf.SystemGralConf;
 import com.privacity.common.enumeration.RandomGeneratorType;
 import com.privacity.common.util.RandomGenerator;
-import com.privacity.server.component.common.service.facade.FacadeComponent;
-
-import lombok.NoArgsConstructor;
 
 @Service
 public class RandomGeneratorService {

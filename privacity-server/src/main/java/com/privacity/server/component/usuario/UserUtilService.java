@@ -26,7 +26,7 @@ public class UserUtilService {
 
 
 	private Usuario usuarioSystem;
-	private UsuarioDTO usuarioSystemDTO;
+
 	
 	public UserUtilService() throws Exception {
 		super();
@@ -62,12 +62,12 @@ public class UserUtilService {
 		return usuarioSystem;
 	}
 
-	public UsuarioDTO getUsuarioSystemDTO() {
+	public UsuarioDTO getUsuarioSystemDTO() throws ProcessException {
 		
-		if (usuarioSystemDTO == null) {
-			usuarioSystemDTO = comps.common().mapper().doit(usuarioSystem);
-		}
-		return usuarioSystemDTO;
+
+		return comps.common().mapper().doit(getUsuarioSystemPrivate ());
+	
+	
 	}
 
 

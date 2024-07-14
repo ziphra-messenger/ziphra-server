@@ -1,17 +1,23 @@
 package com.privacity.server.sessionmanager.services;
 import java.security.PublicKey;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
-import javax.xml.bind.ValidationException;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.privacity.server.common.adapters.LocalDateAdapter;
 import com.privacity.server.sessionmanager.model.AESToUse;
+import com.privacity.server.sessionmanager.model.Session;
 import com.privacity.server.sessionmanager.model.UsuarioSessionInfo;
+import com.privacity.server.sessionmanager.repositories.SessionRepository;
 import com.privacity.server.sessionmanager.util.pool.ProducersGenerator;
 
 /**
@@ -25,8 +31,20 @@ public class UsuarioSessionInfoService{
     private final ConcurrentMap<String, UsuarioSessionInfo> userSessionIds = new ConcurrentHashMap<String, UsuarioSessionInfo>();
     @Value("${com.privacity.server.sessionmanager.services.UsuarioSessionInfoService.encryptIds}")
     private boolean encryptIds;
+    
+    @Value("${com.privacity.server.sessionmanager.services.UsuarioSessionInfoService.saveSession.database}")
+    private boolean databaseSave;
+    
+    
     private static final Logger log = Logger.getLogger(UsuarioSessionInfoService.class.getCanonicalName());
     
+    @Autowired
+    SessionRepository sessionRepository;
+	Gson gson = new GsonBuilder()
+			.setPrettyPrinting()
+			.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
+			.create();
+	
 	public UsuarioSessionInfoService() {
 		super();
 		log.info("Encrypt Ids Enabled: " + encryptIds );
@@ -36,6 +54,7 @@ public class UsuarioSessionInfoService{
     }
     
     public void remove(String username){
+    		if (databaseSave) sessionRepository.deleteById(username);
     		this.userSessionIds.remove(username);
     }
     
@@ -85,6 +104,34 @@ public class UsuarioSessionInfoService{
     		//aes.setSecretKeyAES(AES);
     		}
     		UsuarioSessionInfo t = new UsuarioSessionInfo();
+    		
+    		
+    		Optional<Session> sessionDBO=null;
+    		
+    		if ( databaseSave) sessionDBO = sessionRepository.findById(username);
+    		
+    		if (databaseSave && sessionDBO.isPresent()) {
+    			
+    			System.out.println("lo recupera de la base");
+    			Session sDB= sessionDBO.get();
+    			
+        		
+        		t.setSessionAESWS(new AESToUse(sDB.getAESDTOWS() ));
+           		t.setSessionAESServerIn(new AESToUse(sDB.getAESDTOServerIn() ));
+           		t.setSessionAESServerOut(new AESToUse(sDB.getAESDTOServerOut() ));
+          		
+           		
+           		t.setPrivacityIdServices(new PrivacityIdServices
+           				(encryptIds, sDB.getAESDTOPrivacityId(), 
+           						Long.parseLong( sDB.privacityIdOrderSeed), 
+           			Long.parseLong(	sDB.orderRamdomNumber),
+           			Integer.parseInt(	sDB.base),
+           				gson.fromJson(sDB.mutateDigitPorLetra, (new HashMap<String, String>()).getClass()),
+           				gson.fromJson(sDB.mutateDigitPorNro, (new HashMap<String, String>()).getClass())));
+           				
+         		
+    		}else {
+    			System.out.println("lo crea desde cero");
     		t.setSessionAESWS(ProducersGenerator.dataQueue.poll());
     		//t.setPublicKey(publicKey);
 			t.setSessionAESServerIn(ProducersGenerator.dataQueue.poll());
@@ -92,10 +139,20 @@ public class UsuarioSessionInfoService{
 			t.setPrivacityIdServices(new PrivacityIdServices(encryptIds,
 					ProducersGenerator.dataQueue.poll().getAESDTO()));
 			
-    		
+			Session s = new Session(username, t.getSessionAESServerIn().getAESDTO(), 
+					t.getSessionAESServerOut().getAESDTO(),
+					t.getSessionAESWS().getAESDTO(),
+					t.getPrivacityIdServices().getAESDTO(),
+					t.getPrivacityIdServices().getPrivacityIdOrderSeed()+"",
+					t.getPrivacityIdServices().getOrderRamdomNumber()+"",
+					t.getPrivacityIdServices().getMutateDigitUtil().getBase()+"",
+					gson.toJson( t.getPrivacityIdServices().getMutateDigitUtil().getPorLetra()),
+					gson.toJson( t.getPrivacityIdServices().getMutateDigitUtil().getPorNro())
+					);
+			sessionRepository.save(s);
     		t.setUsername(username);
     		
-
+    		}
     		//t.getUsuarioDB().setMyAccountConf(user.getMyAccountConf());
     		
     		this.userSessionIds.put(username,t);

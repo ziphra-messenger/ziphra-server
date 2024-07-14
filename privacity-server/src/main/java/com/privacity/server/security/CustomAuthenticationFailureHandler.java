@@ -13,6 +13,6 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) 
       throws IOException {
-    	 response.sendRedirect("/doc/en/error/error.html");
+    //	 response.sendRedirect("/doc/en/error/error.html");
     }
 }

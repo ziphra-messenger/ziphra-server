@@ -7,7 +7,6 @@ import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.interfaces.IdGrupoInterface;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 

@@ -10,7 +10,6 @@ com\privacity\common\dto\servergralconf\SGCGrupoGralConfDTO.class
 com\privacity\common\dto\request\RegisterUserRequestDTO.class
 com\privacity\common\dto\request\GrupoInvitationAcceptRequestDTO.class
 com\privacity\common\dto\MyAccountConfDTO.class
-com\privacity\common\App.class
 com\privacity\common\interfaces\IdGrupoInterface.class
 com\privacity\common\config\SystemGralConfURLs.class
 com\privacity\common\dto\AESDTO.class
@@ -41,7 +40,6 @@ com\privacity\common\dto\GrupoUserConfDTO.class
 com\privacity\common\dto\MediaDTO.class
 com\privacity\common\enumeration\GrupoRolesEnum.class
 com\privacity\common\util\RandomGenerator.class
-com\privacity\common\dto\IdDTO.class
 com\privacity\common\dto\UsuarioDTO.class
 com\privacity\common\dto\servergralconf\SGCAESSimple.class
 com\privacity\common\dto\request\GrupoNewRequestDTO.class

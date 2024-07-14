@@ -1,0 +1,35 @@
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.privacity</groupId>
+		<artifactId>privacity</artifactId>
+		<version>2.2.0</version>
+	</parent>
+	<artifactId>privacity-server-common</artifactId>
+	<name>com-privacity-server-common</name>
+	<!-- https://mvnrepository.com/artifact/javax.persistence/com.springsource.javax.persistence -->
+	<dependencies>
+		<dependency>
+			<groupId>com.privacity</groupId>
+			<artifactId>privacity-common</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>javax.persistence-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-annotations -->
+	</dependencies>
+</project>

@@ -1,6 +1,5 @@
 package com.privacity.server.sessionmanager.controller;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -20,60 +19,41 @@ import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.server.common.utils.UtilsString;
 import com.privacity.server.sessionmanager.enumeration.Urls;
-import com.privacity.server.sessionmanager.services.PrivacityIdServices;
+import com.privacity.server.sessionmanager.services.RequestIdPublicService;
 import com.privacity.server.sessionmanager.services.UsuarioSessionInfoService;
-import com.privacity.server.sessionmanager.util.LocalDateAdapter;
 import com.privacity.server.sessionmanager.util.protocolomap.ProtocoloMapService;
 import com.privacity.server.sessionmanager.util.protocolomap.ProtocoloValue;
 
 @RestController
-@RequestMapping(path = "/entry")
+@RequestMapping(path = "/entry/session")
 public class MainController {
-	private static final int MAX_LOG = 2000;
+
 	private static final Logger log = Logger.getLogger(MainController.class.getCanonicalName());
 	@Autowired
 	UsuarioSessionInfoService usuarioSessionInfoService;
-	Gson gson = new GsonBuilder()
-			.setPrettyPrinting()
-			.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
-			.create();
+
+
 	@Autowired
 	private ProtocoloMapService map;
-	
-//	@PostMapping("/encryption/encrypt/protocolo/Server")
-//	public String encryptProtocolo(@RequestParam String username, @RequestParam String obj, @RequestParam String url) throws Throwable, Exception {
-//		
-//		//String protS = usuarioSessionInfoService.get(username).getSessionAESServerOut().getAES(obj);
-//		ProtocoloDTO p =  gson.fromJson(obj, ProtocoloDTO.class);
-//		
-//		ProtocoloValue value = map.get(Urls.valueOf(url),  p.getComponent(),  p.getAction());
-//
-//		
-//		Object o = gson.fromJson(p.getObjectDTO(),value.getParametersType());
-//		
-//		o = usuarioSessionInfoService.get(username).getPrivacityIdServices().encryptIds(o);
-//		
-//		p.setObjectDTO( gson.toJson(o)) ;
-//		
-//		
-//		return usuarioSessionInfoService.get(username).getSessionAESServerOut().getAES(gson.toJson(p));
-//	}
+
+
 	
 	@PostMapping("/encryption/encrypt/protocolo")
 	public String encryptProtocoloServerOut(@RequestParam String username, @RequestParam String obj, @RequestParam String url) throws Throwable, Exception {
 		
 		//String protS = usuarioSessionInfoService.get(username).getSessionAESServerOut().getAES(obj);
-		ProtocoloDTO p =  gson.fromJson(obj, ProtocoloDTO.class);
+		ProtocoloDTO p =  UtilsString.gson().fromJson(obj, ProtocoloDTO.class);
 		
 		ProtocoloValue value = map.get(Urls.valueOf(url),  p.getComponent(),  p.getAction());
 
 		if (p.getObjectDTO() != null) {
-			Object o = gson.fromJson(p.getObjectDTO(),value.getParametersType());
+			Object o = UtilsString.gson().fromJson(p.getObjectDTO(),value.getParametersType());
 			
 			o = usuarioSessionInfoService.get(username).getPrivacityIdServices().encryptIds(o);
 			
-			p.setObjectDTO( gson.toJson(o));
+			p.setObjectDTO( UtilsString.gsonToSend(o));
 		};
 		
 		if (p.getMessageDTO()!= null) {
@@ -84,7 +64,9 @@ public class MainController {
 
 			
 		}
-		return usuarioSessionInfoService.get(username).getSessionAESServerOut().getAES(gson.toJson(p));
+		return usuarioSessionInfoService.get(username).getSessionAESServerOut().getAES(
+				
+				UtilsString.gsonToSend(p));
 	}
 	
 	@PostMapping("/encryption/encrypt/protocoloWS")
@@ -92,18 +74,18 @@ public class MainController {
 		log.info("Session manager Entrada WS");
 		log.info("username: " + username);
 		log.info("url: " + url);
-		log.info("Object: " + shrinkString(obj));
+		log.info("Object: " + UtilsString.shrinkString(obj));
 		//String protS = usuarioSessionInfoService.get(username).getSessionAESServerOut().getAES(obj);
-		ProtocoloDTO p =  gson.fromJson(obj, ProtocoloDTO.class);
+		ProtocoloDTO p =  UtilsString.gson().fromJson(obj, ProtocoloDTO.class);
 		
 		ProtocoloValue value = map.get(Urls.valueOf(url),  p.getComponent(),  p.getAction());
 
 		if (p.getObjectDTO() != null) {
-			Object o = gson.fromJson(p.getObjectDTO(),value.getParametersType());
+			Object o = UtilsString.gson().fromJson(p.getObjectDTO(),value.getParametersType());
 			
 			o = usuarioSessionInfoService.get(username).getPrivacityIdServices().encryptIds(o);
 			
-			p.setObjectDTO( gson.toJson(o));
+			p.setObjectDTO( UtilsString.gsonToSend(o));
 		};
 		
 		if (p.getMessageDTO()!= null) {
@@ -115,9 +97,9 @@ public class MainController {
 			
 		}
 		
-		String r = usuarioSessionInfoService.get(username).getSessionAESWS().getAES(gson.toJson(p));
+		String r = usuarioSessionInfoService.get(username).getSessionAESWS().getAES(UtilsString.gsonToSend(p));
 		
-		log.info(shrinkString(r.toString()));
+		log.info(UtilsString.shrinkString(r.toString()));
 		
 		return r;
 	}
@@ -131,18 +113,18 @@ public class MainController {
 		
 		String pS = usuarioSessionInfoService.get(username).getSessionAESServerOut().getAESDecrypt(obj);
 		//String protS = usuarioSessionInfoService.get(username).getSessionAESServerOut().getAES(obj);
-		ProtocoloDTO p =  gson.fromJson(pS, ProtocoloDTO.class);
+		ProtocoloDTO p =  UtilsString.gson().fromJson(pS, ProtocoloDTO.class);
 		
 		ProtocoloValue value = map.get(Urls.valueOf(url),  p.getComponent(),  p.getAction());
 
 		
 		if ( p.getObjectDTO() != null ) {
 			log.fine("entrada 1");
-			Object o = gson.fromJson(p.getObjectDTO(),value.getParametersType());
+			Object o = UtilsString.gson().fromJson(p.getObjectDTO(),value.getParametersType());
 			
 			o = usuarioSessionInfoService.get(username).getPrivacityIdServices().decryptIds(o);
 			
-			p.setObjectDTO( gson.toJson(o)) ;
+			p.setObjectDTO( UtilsString.gsonToSend(o)) ;
 		}
 		
 		if (p.getMessageDTO()!= null) {
@@ -162,7 +144,7 @@ public class MainController {
 			p.getMessageDTO().getMediaDTO().setData(dataDescr);
 			
 		}
-		log.fine("salida " + gson.toJson(p));
+		log.fine("salida " + UtilsString.shrinkString(UtilsString.gsonToSend(p)));
 		return p;
 	}
 	
@@ -170,24 +152,24 @@ public class MainController {
 	public ProtocoloDTO decryptProtocolo(@RequestParam String username, @RequestParam String obj, @RequestParam String url) throws Throwable, Exception {
 		log.fine("entrada");
 		log.fine(username);
-		log.fine(obj);
+		log.fine(UtilsString.shrinkString(obj));
 	
 		
 		String pS = usuarioSessionInfoService.get(username).getSessionAESServerIn().getAESDecrypt(obj);
 		//String protS = usuarioSessionInfoService.get(username).getSessionAESServerOut().getAES(obj);
-		ProtocoloDTO p =  gson.fromJson(pS, ProtocoloDTO.class);
+		ProtocoloDTO p =  UtilsString.gson().fromJson(pS, ProtocoloDTO.class);
 		log.fine("protocolo");
-		log.fine(shrinkString(p.toString()));
+		log.fine(UtilsString.shrinkString(p.toString()));
 		ProtocoloValue value = map.get(Urls.valueOf(url),  p.getComponent(),  p.getAction());
 
 		
 		if ( p.getObjectDTO() != null ) {
 			log.fine("entrada 1");
-			Object o = gson.fromJson(p.getObjectDTO(),value.getParametersType());
+			Object o = UtilsString.gson().fromJson(p.getObjectDTO(),value.getParametersType());
 			
 			o = usuarioSessionInfoService.get(username).getPrivacityIdServices().decryptIds(o);
 			
-			p.setObjectDTO( gson.toJson(o)) ;
+			p.setObjectDTO( UtilsString.gsonToSend(o)) ;
 		}
 		
 		if (p.getMessageDTO()!= null) {
@@ -213,7 +195,7 @@ public class MainController {
 			p.getMessageDTO().getMediaDTO().setData(dataDescr);
 			
 		}
-		log.fine("salida " + gson.toJson(p));
+		log.fine("salida " + UtilsString.shrinkString(UtilsString.gsonToSend(p)));
 		return p;
 	}
 
@@ -223,7 +205,7 @@ public class MainController {
 		
 		if ("void".equals(className)) return null;
 		
-		Object o = gson.fromJson(obj, Class.forName(className));
+		Object o = UtilsString.gson().fromJson(obj, Class.forName(className));
 		return  usuarioSessionInfoService.get(username).getPrivacityIdServices().encryptIds(o);
 	}
 	
@@ -231,15 +213,15 @@ public class MainController {
 	public String decryptSessionAESServerIn(@RequestParam String username, @RequestParam String obj, @RequestParam String className) throws Throwable, Exception {
 		log.fine("entrada");
 		log.fine(username);
-		log.fine(obj);
+		//log.fine(obj);
 		log.fine(className);
 		
 		String r = usuarioSessionInfoService.get(username).getSessionAESServerIn().getAESDecrypt(obj);
 		log.fine(r);
-		//Object objDR = gson.fromJson(objD, Class.forName(className));
+		//Object objDR = UtilsString.gson().fromJson(objD, Class.forName(className));
 		
 		log.fine("retorno");
-		log.fine(r);
+		log.fine(UtilsString.shrinkString(r));
 		return r;
 		
 	}
@@ -263,26 +245,21 @@ public class MainController {
 		log.info("Entrada");
 		log.info("username: " + username);
 		log.info("className: " + className);
-		log.info("Object: " + shrinkString(obj));
+		log.info("Object: " + UtilsString.shrinkString(obj));
 
-		Object o = gson.fromJson(obj, Class.forName(className));
+		Object o = UtilsString.gson().fromJson(obj, Class.forName(className));
 		
 		
 		Object r = usuarioSessionInfoService.get(username).getPrivacityIdServices().decryptIds(o);
 		log.info("Salida");
 		
-		log.info(shrinkString(r.toString()));
+		log.info(UtilsString.shrinkString(r.toString()));
 		return r;
 
 		
 	}
 
-	private String shrinkString(String s) {
-		String r = s.toString().replace("\n", "").replace("\t", "").replace("\r", "").replace("\b", "").replace("\f", "")
-				.replace("  ", " ").replace("  ", " ").replace("  ", " ").replace(", -" , "").replace(", " , "");
-						
-		return r.substring(0, (r.length()> MAX_LOG)? MAX_LOG : r.length()-1);
-	}
+
 	
 	@PostMapping("/get/sessionAESServerIn")
 	public AESDTO getAesDtoSessionIn(String username) throws Exception {
@@ -313,31 +290,21 @@ public class MainController {
 		usuarioSessionInfoService.remove(username);	
 	}
 	
-	@PostMapping("/requestId/add")
-	public void requestIdAdd(String username, String requestIdClientSide, String serverRequestIdDTO) throws Exception {
-		usuarioSessionInfoService.get(username).getRequestIds().put(requestIdClientSide,
-				gson.fromJson(requestIdClientSide, RequestIdDTO.class));	
-	}
-	@PostMapping("/requestId/getAll")
-	public Map requestIdGetAll(String username) throws Exception {
-		return usuarioSessionInfoService.get(username).getRequestIds();	
-	}
-	
-	public static void main(String[] args) {
-		
-		ProtocoloDTO p = new ProtocoloDTO();
-		p.setComponent(ProtocoloComponentsEnum.GRUPO);
-		p.setAction(ProtocoloActionsEnum.GRUPO_GRAL_CONF_SAVE_LOCK);
-		GrupoDTO g = new GrupoDTO();
-		g.setIdGrupo("123");
-
-		Gson gson = new GsonBuilder()
-				.setPrettyPrinting()
-				
-				.create();
-		String j = gson.toJson(g);
-		p.setObjectDTO(j);
-		
-		log.fine(gson.toJson(p));
-	}
+//	public static void main(String[] args) {
+//		
+//		ProtocoloDTO p = new ProtocoloDTO();
+//		p.setComponent(ProtocoloComponentsEnum.GRUPO);
+//		p.setAction(ProtocoloActionsEnum.GRUPO_GRAL_CONF_SAVE_LOCK);
+//		GrupoDTO g = new GrupoDTO();
+//		g.setIdGrupo("123");
+//
+//		Gson gson = new GsonBuilder()
+//				.setPrettyPrinting()
+//				
+//				.create();
+//		String j = UtilsString.gsonToSend(g);
+//		p.setObjectDTO(j);
+//		
+//		log.fine(UtilsString.gsonToSend(p));
+//	}
 }

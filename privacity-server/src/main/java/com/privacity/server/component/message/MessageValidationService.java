@@ -12,12 +12,9 @@ import com.privacity.common.dto.IdMessageDTO;
 import com.privacity.common.dto.MediaDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.MessageDetailDTO;
-import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.common.enumeration.MessageState;
-import com.privacity.common.enumeration.ProtocoloActionsEnum;
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ProcessException;
@@ -27,8 +24,6 @@ import com.privacity.server.model.Message;
 import com.privacity.server.model.MessageDetail;
 import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.security.Usuario;
-import com.privacity.server.websocket.WsMessage;
-import com.privacity.server.websocket.WsQueue;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -42,9 +37,7 @@ public class MessageValidationService {
 	@Autowired @Lazy
 	private FacadeComponent comps;
 	
-	   @Autowired 
-	   @Lazy
-	   private WsQueue q;
+
 	
 	public void deleteForMe(IdMessageDTO request) throws ValidationException, ProcessException {
 		comps.requestHelper().setGrupoInUse(request);
@@ -102,6 +95,9 @@ public class MessageValidationService {
 	}
 	
 	public MessageDTO get(MessageDTO request) throws Exception {
+		
+		log.fine("Get Message Reply idParentReply: grupo -> "  + request.getIdGrupo() + " message: -> " + request.getIdMessage() );
+		
 		String username = comps.requestHelper().getUsuarioUsername();
 		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 
@@ -149,20 +145,22 @@ public class MessageValidationService {
 	}
 	
 	public void deleteAllMyMessageForEverybodyByGrupo(String idGrupo) throws Exception {
+		log.fine("Procesando deleteAllMyMessageForEverybodyByGrupo: grupo -> "  + idGrupo);
 		comps.process().message().emptyList(idGrupo);
 	}
 	
 	public MessageDetailDTO changeState(MessageDetailDTO request) throws Exception {
-		
+		log.fine("Procesando changeState (" + request.getEstado().name() +   " ): grupo -> "  + request.getIdGrupo() + " message: -> " + request.getIdMessage() );
+		Grupo g = comps.requestHelper().setGrupoInUse(request);
 		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
-		
-		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());
+
 		Long idMessage = comps.util().message().convertIdMessageStringToLong(request.getIdMessage());
 		
 		//Grupo grupo = comps.util().grupo().getGrupoByIdValidation(request.getIdGrupo());
 //		comps.util().userForGrupo().getValidation(usuarioLogged, grupo.getIdGrupo());
 		
-		Message m = comps.util().message().getMessage(idGrupo, idMessage);
+		Message m = comps.util().message().getMessage(g.getIdGrupo(), idMessage);
+		
 		MessageDetail md = comps.util().messageDetail().getMessageDetail(m, usuarioLogged);
 		
 		MessageState state =request.getEstado();

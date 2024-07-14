@@ -43,7 +43,10 @@ public class GrupoDTO implements IdGrupoInterface{
 		super();
 		this.name = name;
 	}
-	
+	public GrupoDTO(Long id) {
+		super();
+		this.idGrupo = id+"";
+	}	
 	public boolean isGrupoInvitation() {
 		if (grupoInvitationDTO == null) {
 			return false;
@@ -52,7 +55,9 @@ public class GrupoDTO implements IdGrupoInterface{
 	}
 	
 	//olds
-	
+    public Long convertIdGrupoToLong() {
+		return Long.parseLong(idGrupo);
+	}
 	//public String nicknameForGrupo;
 	@JsonInclude(Include.NON_NULL)
 	public String alias;

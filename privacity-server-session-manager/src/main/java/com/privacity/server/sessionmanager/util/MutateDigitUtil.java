@@ -8,15 +8,22 @@ import java.util.Random;
 import com.privacity.common.util.RandomGenerator;
 
 import lombok.Getter;
-
+import lombok.Setter;
+import lombok.extern.java.Log;
+@Log
 public class MutateDigitUtil {
 
-	private static final String CONSTANT_DIGITS = "!#%-`abcdefghijklmnopqrstuvwxyz~´¿ÉÑÓÚáéíñýŒšƒ";
-	//private static final String CONSTANT_DIGITS = "!#%-abcdefghijklmnopqrstuvwxyz~¿@>._<:;";
+	//private static final String CONSTANT_DIGITS = "!#%-`abcdefghijklmnopqrstuvwxyz~´¿ÉÑÓÚáéíñýŒšƒ";
+	private static final String CONSTANT_DIGITS = "!#%-_}abcdefghijklmnopqrstuvwxyz~¿@<>:;ÉÑÓÚáéíñýŒšƒ]";
 	@Getter
-	private final int base;
+	@Setter
+	private int base;
 	
+	@Getter
+	@Setter
 	private Map<String, String> porNro = new HashMap<String, String>();
+	@Getter
+	@Setter
 	private Map<String, String> porLetra = new HashMap<String, String>();
 
 	public MutateDigitUtil(){
@@ -61,23 +68,24 @@ public class MutateDigitUtil {
 			porNro.put(baseValue, lista.get(i));
 			porLetra.put( lista.get(i), baseValue);
 			
-			//System.out.println( lista.get(i) + " "  + baseValue  + " count " + porLetra.size());
-			//System.out.println();
-			//System.out.println(porNro);
-			//System.out.println(porLetra);
+//			System.out.println( lista.get(i) + " "  + baseValue  + " count " + porLetra.size());
+			
+//			System.out.println(porNro);
+//			System.out.println(porLetra);
 
 		}
 		
-		//System.out.println(porNro);
-		//System.out.println(porLetra);
+		System.out.println(porNro);
+		System.out.println(porLetra);
 	}
 	
 	public String mutate(String cadena ) {
 
-		for ( int i = 0 ; i < cadena.length()-1 ; i++) {
+		for ( int i = 0 ; i < cadena.length() ; i++) {
 			try {
 				cadena = cadena.replaceAll(cadena.substring(i,i+1), porNro.get(cadena.substring(i, i+1)));
 			} catch (Exception e) {
+				//System.out.println("ERROR 2 " + cadena);
 			}
 		}
 		return cadena;
@@ -85,17 +93,26 @@ public class MutateDigitUtil {
 
 	public String unmutate(String cadena )  {
 
-		for ( int i = 0 ; i < cadena.length()-1 ; i++) {
+		for ( int i = 0 ; i < cadena.length() ;++ i) {
 			try {
 				cadena = cadena.replaceAll(cadena.substring(i,i+1), porLetra.get(cadena.substring(i, i+1)));
 			} catch (Exception e) {
+				//System.out.println("ERROR 1 " + cadena);
 			}
 		}
 		return cadena;
 	}
 	
-	public static void main(String[] a ) {
-		MutateDigitUtil m = new MutateDigitUtil();
-		
-	}
+//	public static void main(String[] a ) {
+//		MutateDigitUtil m = new MutateDigitUtil();
+//		String mut = "12300ZR";
+//		String mutado = m.mutate(mut);
+//		
+//		System.out.println("mutado --> " + mutado);
+//
+//		String un = m.mutate(mutado);
+//		System.out.println("unmutado --> " + un);
+//		
+//
+//	}
 }

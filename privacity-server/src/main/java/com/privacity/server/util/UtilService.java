@@ -7,17 +7,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.privacity.common.enumeration.RandomGeneratorType;
 import com.privacity.common.util.RandomGenerator;
+import com.privacity.server.common.adapters.LocalDateAdapter;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.security.Usuario;
 
 @Service
 public class UtilService {

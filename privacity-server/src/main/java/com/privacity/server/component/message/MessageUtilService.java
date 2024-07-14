@@ -1,8 +1,5 @@
 package com.privacity.server.component.message;
 
-import java.util.Date;
-
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -10,9 +7,7 @@ import org.springframework.stereotype.Service;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
 import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageId;
 
 @Service
 public class MessageUtilService {

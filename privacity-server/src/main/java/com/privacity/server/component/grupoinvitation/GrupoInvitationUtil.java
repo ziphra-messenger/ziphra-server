@@ -5,9 +5,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.model.Grupo;
 import com.privacity.server.model.GrupoInvitation;
-import com.privacity.server.security.Usuario;
 
 @Service
 public class GrupoInvitationUtil {

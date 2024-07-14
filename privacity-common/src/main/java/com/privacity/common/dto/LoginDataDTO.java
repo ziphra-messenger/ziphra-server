@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.annotations.PrivacityIdOrder;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 @Data
 public class LoginDataDTO {

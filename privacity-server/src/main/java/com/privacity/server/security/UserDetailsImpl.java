@@ -10,9 +10,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.privacity.common.dto.AESDTO;
-import com.privacity.server.encrypt.UsuarioSessionInfoService;
-import com.privacity.server.model.EncryptKeys;
 
 public class UserDetailsImpl implements UserDetails {
 	private static final long serialVersionUID = 1L;
@@ -22,10 +19,25 @@ public class UserDetailsImpl implements UserDetails {
 	private String username;
 
 	@JsonIgnore
-	private String password;
+	private String password; 
 
+	@JsonIgnore
+	private String jwt;
+
+	
 	private Collection<? extends GrantedAuthority> authorities;
 
+	public UserDetailsImpl(Long idUser, String username, String password,String jwt,
+			Collection<? extends GrantedAuthority> authorities 
+			) {
+		this.idUser = idUser;
+		this.username = username;
+		this.password = password;
+		this.authorities = authorities;
+		this.jwt=jwt;
+		
+
+	}
 	public UserDetailsImpl(Long idUser, String username, String password,
 			Collection<? extends GrantedAuthority> authorities 
 			) {
@@ -33,9 +45,10 @@ public class UserDetailsImpl implements UserDetails {
 		this.username = username;
 		this.password = password;
 		this.authorities = authorities;
+	
+		
 
 	}
-
 	public static UserDetailsImpl build(Usuario user) {
 		List<GrantedAuthority> authorities = user.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority(role.getName().name()))
@@ -51,6 +64,7 @@ public class UserDetailsImpl implements UserDetails {
 					user.getIdUser(), 
 					user.getUsername(), 
 					user.getUsuarioPassword().getPassword(), 
+
 					authorities
 //					user.getNickname(),
 //					CryptSessionRegistry.getInstance().getSessionIds(user).getSessionAESDTOToSend(),
@@ -114,6 +128,14 @@ public class UserDetailsImpl implements UserDetails {
 			return false;
 		UserDetailsImpl user = (UserDetailsImpl) o;
 		return Objects.equals(idUser, user.idUser);
+	}
+
+	public String getJwt() {
+		return jwt;
+	}
+
+	public void setJwt(String jwt) {
+		this.jwt = jwt;
 	}
 
 

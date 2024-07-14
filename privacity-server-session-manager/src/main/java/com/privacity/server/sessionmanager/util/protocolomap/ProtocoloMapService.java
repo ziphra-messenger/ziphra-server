@@ -2,7 +2,6 @@ package com.privacity.server.sessionmanager.util.protocolomap;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.springframework.stereotype.Component;
 
@@ -10,7 +9,6 @@ import com.privacity.common.dto.EncryptKeysDTO;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.GrupoGralConfDTO;
 import com.privacity.common.dto.GrupoUserConfDTO;
-import com.privacity.common.dto.IdDTO;
 import com.privacity.common.dto.IdMessageDTO;
 import com.privacity.common.dto.LockDTO;
 import com.privacity.common.dto.MessageDTO;
@@ -33,11 +31,13 @@ import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.server.sessionmanager.enumeration.Urls;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @Component
+@Slf4j
 public class ProtocoloMapService {
 
-	private static final Logger log = Logger.getLogger(ProtocoloMapService.class.getCanonicalName());
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private final Map<ProtocoloKey, ProtocoloValue> map = new HashMap();
@@ -62,7 +62,7 @@ public class ProtocoloMapService {
 		ProtocoloValue v = ProtocoloValue.build(parameterType);
 		map.put(k, v);
 		
-		log.fine(k.toString() + " - " + v.toString());
+		log.trace( "buildItem-> key: " + k.toString() + " value: " + v.toString());
 	}
 
 	private synchronized void build() throws Exception {
@@ -72,10 +72,10 @@ public class ProtocoloMapService {
 
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.ENCRYPT_KEYS,ProtocoloActionsEnum.ENCRYPT_KEYS_GET,PublicKeyByInvitationCodeRequestDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_ACCEPT_INVITATION,GrupoInvitationAcceptRequestDTO.class);
-//		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO,GrupoBlockRemotoRequestDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_DELETE,IdDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_ID,IdDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_IDS,IdDTO[].class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO,GrupoDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_DELETE,GrupoDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_ID,GrupoDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_IDS,GrupoDTO[].class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_IDS_MY_GRUPOS);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GRAL_CONF_SAVE_LOCK,GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_LIST_MEMBERS,GrupoDTO.class);
@@ -128,7 +128,7 @@ public class ProtocoloMapService {
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE_WS,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK,SaveGrupoGralConfLockResponseDTO.class);
 		
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE_WS,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_INVITATION_RECIVED,GrupoDTO.class);
-//		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO,GrupoBlockRemotoRequestDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE_WS,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO,GrupoDTO.class);
 
 		
 		//log.finest(this.toString());
@@ -153,7 +153,7 @@ public class ProtocoloMapService {
 
 
 	public ProtocoloValue get (Urls url, ProtocoloComponentsEnum comp, ProtocoloActionsEnum act ) {
-		log.fine("protocolo pedido " +  ProtocoloKey.build(url, comp, act).toString()) ;
+		log.debug("protocolo pedido " +  ProtocoloKey.build(url, comp, act).toString()) ;
 		return map.get( ProtocoloKey.build(url, comp, act));
 	}
 

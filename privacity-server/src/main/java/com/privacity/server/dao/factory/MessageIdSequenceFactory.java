@@ -28,7 +28,7 @@ public class MessageIdSequenceFactory {
 	}
 	
 	public Long get(Long idGrupo) {
-		return messageIdRest.getNextMessageId(idGrupo);
+		return messageIdLocal.getNextMessageId(idGrupo);
 	}
 
 	public Long get(String idGrupo) {

@@ -1,7 +1,5 @@
 package com.privacity.common.dto.servergralconf;
 
-import com.privacity.common.dto.LockDTO;
-
 import lombok.Data;
 
 @Data

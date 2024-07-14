@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.privacity.server.component.grupo.GrupoProcessService;
 import com.privacity.server.component.message.MessageProcessService;
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Service

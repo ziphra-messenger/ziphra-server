@@ -3,19 +3,14 @@ package com.privacity.server.component.grupo;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.GrupoInvitationDTO;
 import com.privacity.common.dto.GrupoUserConfDTO;
-import com.privacity.common.dto.IdDTO;
+
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.MessageDetailDTO;
 import com.privacity.common.dto.ProtocoloDTO;
@@ -23,8 +18,9 @@ import com.privacity.common.dto.UserForGrupoDTO;
 import com.privacity.common.dto.UsuarioDTO;
 import com.privacity.common.dto.response.GrupoRemoveMeResponseDTO;
 import com.privacity.common.dto.response.InitGrupoResponse;
-import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ValidationException;
@@ -42,8 +38,6 @@ import com.privacity.server.model.MessageDetail;
 import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.model.UserForGrupoId;
 import com.privacity.server.security.Usuario;
-import com.privacity.server.websocket.WsMessage;
-import com.privacity.server.websocket.WsQueue;
 
 import lombok.NoArgsConstructor;
 
@@ -54,26 +48,24 @@ public class GrupoProcessService  {
 	@Autowired @Lazy
 	private FacadeComponent comps;
 	
-	   @Autowired 
-	   @Lazy
-	   private WsQueue q;	
+
 	
-	public IdDTO[] getIdsMisGrupos(Usuario u) {
+	public GrupoDTO[] getIdsMisGrupos(Usuario u) {
 		List<Long> l = comps.repo().userForGrupo().findIdGrupoByUserForGrupoIdUser(u.getIdUser());
 		List<Long> gi = comps.repo().grupoInvitation().findIdGrupoByGrupoInvitationUsuarioGrupo(u);
 
 	
 		
 		
-		IdDTO[] r = new IdDTO[l.size() + gi.size()];
+		GrupoDTO[] r = new GrupoDTO[l.size() + gi.size()];
 		
 		int i = 0;
 		for ( ; i < l.size() ; i++) {
-			r[i] = new IdDTO(l.get(i));
+			r[i] = new GrupoDTO(l.get(i));
 		}
 
 		for ( int j = 0 ; j < gi.size() ; j++) {
-			r[j+i] = new IdDTO(gi.get(j));
+			r[j+i] = new GrupoDTO(gi.get(j));
 		}
 
 		return r;

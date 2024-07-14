@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,6 +21,7 @@ import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.Grupo;
 import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.security.SocketSessionRegistry;
+import com.privacity.server.security.UserDetailsImpl;
 import com.privacity.server.security.Usuario;
 import com.privacity.server.security.UsuarioRepository;
 
@@ -45,7 +45,7 @@ public class RequestHelperService {
 	
 	private Map<Long, Usuario> mapUsuarioByIdUsuario = new HashMap<Long, Usuario>();
 	private Map<String, Usuario> mapUsuarioByUsername = new HashMap<String, Usuario>();
-	
+
 	public Grupo setGrupoInUse( IdGrupoInterface grupoI) throws ValidationException {
 		if (grupoI.getIdGrupo() == null) return null;
 		return setGrupoInUse(Long.parseLong(grupoI.getIdGrupo()));
@@ -188,13 +188,41 @@ public class RequestHelperService {
 	return u;
 	}
 	
-	private Usuario getUsuarioLoggedRequest() {
+//	public Usuario setUsuarioLoggedRequest(String username) {
+////		Authentication auth = SecurityContextHolder
+////	            .getContext()
+////	            .getAuthentication();
+////	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
+//	    
+//		Usuario u = this.usuarioRepository.findByUsername(username).get();
+//		usuario=u;
+//		return usuario;
+//	}    
+	
+	public String getUsuarioLoggedToken() {
+
+
 		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-		Usuario u = this.usuarioRepository.findByUsername(userDetail.getUsername()).get();
-		return u;
+		        .getContext()
+		        .getAuthentication();
+		UserDetailsImpl userDetail = (UserDetailsImpl) auth.getPrincipal();
+		
+		return userDetail.getJwt();
+
+	
+}    
+	
+	private Usuario getUsuarioLoggedRequest() {
+
+
+			Authentication auth = SecurityContextHolder
+			        .getContext()
+			        .getAuthentication();
+			UserDetails userDetail = (UserDetails) auth.getPrincipal();
+			
+			Usuario u = this.usuarioRepository.findByUsername(userDetail.getUsername()).get();
+			usuario=u;
+
+		return usuario;
 	}    
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import com.privacity.server.model.Grupo;
 import com.privacity.server.model.GrupoInvitation;
 import com.privacity.server.model.GrupoInvitationId;
 import com.privacity.server.security.Usuario;
@@ -20,7 +19,7 @@ public interface GrupoInvitationRepository extends CrudRepository<GrupoInvitatio
 	@Query("SELECT u.grupoInvitationId.grupo.idGrupo FROM GrupoInvitation u where "
 			+ " u.grupoInvitationId.usuarioInvitado = ?1  "
 			+ " and u.grupoInvitationId.grupo.deleted=false "
-			)	
+			)		
 	List<Long> findIdGrupoByGrupoInvitationUsuarioGrupo(Usuario u);
 	
 	// olds

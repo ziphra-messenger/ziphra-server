@@ -2,6 +2,7 @@ package com.privacity.server.util;
 
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -47,12 +48,13 @@ import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.model.UserForGrupoId;
 import com.privacity.server.security.Usuario;
 
+
 import lombok.extern.java.Log;
 
 @Service
 @Log
 public class MapperService {
-	
+	private static final Logger log = Logger.getLogger(MapperService.class.getCanonicalName());
 	@Autowired
 	@Lazy
 	private FacadeComponent comps;
@@ -75,7 +77,7 @@ public class MapperService {
 		UserForGrupoDTO ufgDTO = new UserForGrupoDTO();
 		ufgDTO.setIdGrupo(userForGrupo.getUserForGrupoId().getGrupo().getIdGrupo()+"");
 		ufgDTO.setUsuario(doitForGrupo(userForGrupo.getUserForGrupoId().getGrupo(),userForGrupo.getUserForGrupoId().getUser()));
-		ufgDTO.setRole(userForGrupo.getRole());
+ 		ufgDTO.setRole(userForGrupo.getRole());
 		//ufgDTO.setAesDTO( doit(userForGrupo.getAes()));
 		
 		ufgDTO.setAlias(userForGrupo.getAlias());
@@ -286,7 +288,9 @@ public class MapperService {
 		
 		
 	
-
+		if (comps.util().usuario().getUsuarioSystem().equals(usuarioCreacion)) {
+			dto.setSystemMessage(true);
+		}
 		
 		Message m = new Message();
 		//m.setDateCreation(new Date());
@@ -319,7 +323,7 @@ public class MapperService {
 		m.setMessagesDetail( comps.util().messageDetail().generateMessagesDetail(g.getIdGrupo(),m,usersForGrupo));
 		
 		if ( dto.getParentReply() != null) {
-			
+			log.fine("Procesando Reply idParentReply: grupo -> "  + dto.getParentReply().getIdGrupo() + " message: -> " + dto.getParentReply().getIdMessage() );
 			Message mr = comps.repo().message().findById( new MessageId (g, Long.parseLong(dto.getParentReply().getIdMessage()))).get();
 			m.setParentReply(mr);
 		}

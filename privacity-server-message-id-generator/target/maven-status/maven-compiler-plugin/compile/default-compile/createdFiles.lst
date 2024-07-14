@@ -1,0 +1,6 @@
+com\privacity\server\messageidgenerator\services\IdMessageGenerator.class
+com\privacity\server\messageidgenerator\util\KeyLocker.class
+com\privacity\server\messageidgenerator\controller\MainController.class
+com\privacity\server\messageidgenerator\PrivacityServerMessageIdGeneratorApplication.class
+com\privacity\server\messageidgenerator\model\Message.class
+com\privacity\server\messageidgenerator\repositories\MessageIdSequenceRepository.class

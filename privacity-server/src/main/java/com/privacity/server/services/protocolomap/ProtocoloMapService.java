@@ -10,7 +10,6 @@ import com.privacity.common.dto.EncryptKeysDTO;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.GrupoGralConfDTO;
 import com.privacity.common.dto.GrupoUserConfDTO;
-import com.privacity.common.dto.IdDTO;
 import com.privacity.common.dto.IdMessageDTO;
 import com.privacity.common.dto.LockDTO;
 import com.privacity.common.dto.MessageDTO;
@@ -40,8 +39,11 @@ import com.privacity.server.component.myaccount.MyAccountValidationService;
 import com.privacity.server.component.requestid.RequestIdValidationService;
 import com.privacity.server.component.serverconf.ServerConfValidationService;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @Component
+@Slf4j
 public class ProtocoloMapService {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -95,6 +97,7 @@ public class ProtocoloMapService {
 		}
 		ProtocoloValue v = ProtocoloValue.build(clazz, method,parameterType);
 		map.put(k, v);
+		log.trace( "buildItem-> key: " + k.toString() + " value: " + v.toString());
 	}
 
 	private synchronized void build() throws Exception {
@@ -104,10 +107,10 @@ public class ProtocoloMapService {
 
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.ENCRYPT_KEYS,ProtocoloActionsEnum.ENCRYPT_KEYS_GET,encryptKeysService,"getPublicKeyByCodigoInvitacion",PublicKeyByInvitationCodeRequestDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_ACCEPT_INVITATION,grupoValidationService,"acceptInvitation",GrupoInvitationAcceptRequestDTO.class);
-//		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO,grupoValidationService,"blockGrupoRemoto",GrupoDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_DELETE,grupoValidationService,"delete",IdDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_ID,grupoValidationService,"getGrupoById",IdDTO.class);
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_IDS,grupoValidationService,"getGrupoByIds",IdDTO[].class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO,grupoValidationService,"blockGrupoRemoto",GrupoDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_DELETE,grupoValidationService,"delete",GrupoDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_ID,grupoValidationService,"getGrupoById",GrupoDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_IDS,grupoValidationService,"getGrupoByIds",GrupoDTO[].class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_IDS_MY_GRUPOS,grupoValidationService,"getIdsMisGrupos");
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GRAL_CONF_SAVE_LOCK,grupoValidationService,"saveGrupoGralConfLock",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_LIST_MEMBERS,grupoValidationService,"getMembers",GrupoDTO.class);
@@ -146,8 +149,7 @@ public class ProtocoloMapService {
 		buildItem(Urls.CONSTANT_URL_PATH_PUBLIC,ProtocoloComponentsEnum.AUTH,ProtocoloActionsEnum.AUTH_REGISTER,authValidationService,"registerUser", RegisterUserRequestDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PUBLIC,ProtocoloComponentsEnum.AUTH,ProtocoloActionsEnum.AUTH_VALIDATE_USERNAME,authValidationService,"validateUsername", ValidateUsernameDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PUBLIC,ProtocoloComponentsEnum.REQUEST_ID,ProtocoloActionsEnum.REQUEST_ID_PUBLIC_GET,requestIdValidationService,"getNewRequestIdPublic", RequestIdDTO.class);
-
-		System.out.println(this.toString());
+		log.trace(this.toString());
 	}
 
 
@@ -164,7 +166,7 @@ public class ProtocoloMapService {
 	
 
 	public ProtocoloValue get (Urls url, ProtocoloComponentsEnum comp, ProtocoloActionsEnum act ) {
-		System.out.println("protocolo pedido " +  ProtocoloKey.build(url, comp, act).toString()) ;
+		log.debug("protocolo pedido " +  ProtocoloKey.build(url, comp, act).toString()) ;
 		return map.get( ProtocoloKey.build(url, comp, act));
 	}
 

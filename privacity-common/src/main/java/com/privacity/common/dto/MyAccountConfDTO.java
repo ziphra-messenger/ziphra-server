@@ -1,8 +1,5 @@
 package com.privacity.common.dto;
 
-import com.privacity.common.annotations.PrivacityId;
-import com.privacity.common.enumeration.ConfigurationStateEnum;
-
 import lombok.Data;
 
 @Data

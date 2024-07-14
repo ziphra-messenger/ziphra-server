@@ -1,25 +1,11 @@
 package com.privacity;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Date;
-
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.springframework.aop.interceptor.AbstractMonitoringInterceptor;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import com.privacity.common.annotations.ExcludeInterceptorLog;
-import com.privacity.server.util.LocalDateAdapter;
-
 public class MyPerformanceMonitorInterceptor extends AbstractMonitoringInterceptor {
-    
+	private static final int MAX_LOG = 500;
     public MyPerformanceMonitorInterceptor() {
     }
 
@@ -49,7 +35,7 @@ public class MyPerformanceMonitorInterceptor extends AbstractMonitoringIntercept
 
     	for ( int i = 0 ; i < args.length ; i++ ) {
     		if (args[i] != null) {
-    			System.out.println("        " + args[i].getClass().getName() + " -> " + args[i].toString());
+    			System.out.println("        " + args[i].getClass().getName() + " -> " + shrinkString(args[i].toString()));
     		}
 
     	}
@@ -72,5 +58,12 @@ public class MyPerformanceMonitorInterceptor extends AbstractMonitoringIntercept
 	private Object showReturn(Object proceed) {
 		// TODO Auto-generated method stub
 		return proceed;
+	}
+	
+	private String shrinkString(String s) {
+		String r = s.toString().replace("\n", "").replace("\t", "").replace("\r", "").replace("\b", "").replace("\f", "")
+				.replace("  ", " ").replace("  ", " ").replace("  ", " ").replace(", -" , "").replace(", " , "");
+						
+		return r.substring(0, (r.length()> MAX_LOG)? MAX_LOG : r.length()-1);
 	}
 }

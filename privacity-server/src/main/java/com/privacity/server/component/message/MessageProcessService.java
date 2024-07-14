@@ -27,7 +27,6 @@ import com.privacity.server.model.MessageDetail;
 import com.privacity.server.model.MessageId;
 import com.privacity.server.security.Usuario;
 import com.privacity.server.util.PrivacityLogguer;
-import com.privacity.server.websocket.WsQueue;
 
 import lombok.extern.java.Log;
 
@@ -39,10 +38,7 @@ public class MessageProcessService {
 	@Autowired @Lazy
 	private FacadeComponent comps;
 	
-	   @Autowired 
-	   @Lazy
-	   private WsQueue q;
-	
+
 		@Autowired @Lazy
 		private PrivacityLogguer privacityLogguer;
 		
@@ -375,8 +371,8 @@ public class MessageProcessService {
 	
 		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.MESSAGE,ProtocoloActionsEnum.MESSAGE_RECIVIED,responseWs);
 
-				if (responseServer.isSystemMessage() ) {
-					comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername(), true);
+				if (m.isSystemMessage() ) {
+					comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername(), false);
 				}else {
 					comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername(), true);
 				}

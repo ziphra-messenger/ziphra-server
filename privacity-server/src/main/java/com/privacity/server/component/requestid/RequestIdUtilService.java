@@ -39,7 +39,7 @@ public class RequestIdUtilService {
 		// AUNQUE NO ES NECESARIO
 		RequestIdDTO r =null;
 		if (!isPrivate) {
-			r = comps.service().requestIdPublic().getRequestIdsPublic().get(requestId.getRequestIdClientSide());
+			r = comps.service().requestIdPublic().get(requestId.getRequestIdClientSide());
 		}
 		
 			
@@ -71,7 +71,7 @@ public class RequestIdUtilService {
 			
 				if (requestId.getRequestIdServerSide().equals(r.getRequestIdServerSide())) {
 			
-						comps.service().requestIdPublic().getRequestIdsPublic().remove(requestId.getRequestIdClientSide());
+						comps.service().requestIdPublic().remove(requestId.getRequestIdClientSide());
 			
 				}else {
 					throw new ValidationException(ExceptionReturnCode.REQUEST_ID_NOT_EXISTS);

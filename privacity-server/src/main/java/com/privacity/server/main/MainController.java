@@ -1,46 +1,36 @@
 package com.privacity.server.main;
 
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.privacity.server.common.enumeration.Urls;
 
-
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping(path = "/entry")
+@Slf4j
 public class MainController {
-	
-	
-
-	   
-	/*
-	public static final String CONSTANT_URL_PATH_PRIVATE_DOWNLOAD_DATA = "/private/download/data";
-	public static final String CONSTANT_URL_PATH_PRIVATE = "/private/entry";
-	public static final String CONSTANT_URL_PATH_PRIVATE_SEND = "/private/send";
-	public static final String CONSTANT_URL_PATH_PUBLIC = "/public/entry";
-	public static final String CONSTANT_URL_PATH_FREE = "/free/entry";
-	*/
-		
 		
 	@PostMapping("/{controller}")
-	
-	public ModelAndView in2(@PathVariable String controller) {
+	public ModelAndView in2(@PathVariable String controller, @RequestHeader Map<String, String> headers) {
+		   
+		log.debug("************* EN ENTRADA UNICA: controller: " + controller);
 		
-			
-		try {
-			return new ModelAndView("forward:"+Enum.valueOf(Urls.class, controller));
-		} catch (Exception e) {
-			
-			return new ModelAndView("forward:"+Urls.CONSTANT_URL_PATH_ERROR);
+		log.trace("forward:"+Enum.valueOf(Urls.class, controller));
+		
+		log.trace("Header count:" + headers.size());
+		for (Map.Entry<String, String> entry : headers.entrySet()) {
+		    log.trace("Header: " + entry.getKey() + " - value: " + entry.getValue());
 		}
+	        
+			return new ModelAndView("forward:"+Enum.valueOf(Urls.class, controller));
 
-	}
-	
-	public static void main(String[] args) {
-		System.out.println(Urls.CONSTANT_URL_PATH_FREE.name());
 	}
 }

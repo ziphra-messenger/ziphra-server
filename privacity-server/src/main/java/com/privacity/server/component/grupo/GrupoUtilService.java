@@ -1,8 +1,6 @@
 package com.privacity.server.component.grupo;
 
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -10,24 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.privacity.common.dto.GrupoDTO;
-import com.privacity.common.dto.ProtocoloDTO;
-import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
-import com.privacity.common.enumeration.ProtocoloActionsEnum;
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
 import com.privacity.server.exceptions.ValidationException;
 import com.privacity.server.model.Grupo;
 import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.security.Usuario;
-import com.privacity.server.util.LocalDateAdapter;
-import com.privacity.server.websocket.WsMessage;
 
 import lombok.AllArgsConstructor;
 

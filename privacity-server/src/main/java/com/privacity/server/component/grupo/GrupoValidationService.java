@@ -1,10 +1,7 @@
 package com.privacity.server.component.grupo;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -13,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.GrupoGralConfDTO;
 import com.privacity.common.dto.GrupoUserConfDTO;
-import com.privacity.common.dto.IdDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.UserForGrupoDTO;
@@ -39,23 +35,25 @@ import com.privacity.server.model.GrupoUserConf;
 import com.privacity.server.model.Message;
 import com.privacity.server.model.UserForGrupo;
 import com.privacity.server.model.UserForGrupoId;
+import com.privacity.server.security.JwtUtils;
 import com.privacity.server.security.Usuario;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @AllArgsConstructor
-@Log
+@Slf4j
 public class GrupoValidationService {
-	private static final Logger log = Logger.getLogger(GrupoValidationService.class.getCanonicalName());
+
 	@Autowired
 	@Lazy
 	private FacadeComponent comps;
 	@Autowired
 	@Lazy
 	private EncryptKeysValidation encryptKeysValidation;
-
+	@Autowired @Lazy
+	private JwtUtils jwtUtils;
 	public boolean loginGrupo(GrupoDTO r) throws ValidationException {
 		Usuario u = comps.requestHelper().getUsuarioLogged();
 		Grupo g = comps.util().grupo().getGrupoByIdValidation(r.getIdGrupo());
@@ -68,27 +66,26 @@ public class GrupoValidationService {
 
 //	
 //	@com.privacity.common.RolesAllowed({GrupoRolesEnum.ADMIN,GrupoRolesEnum.MODERATOR} )
-//	public void blockGrupoRemoto (GrupoDTO grupoBlockRemotoRequestLocalDTO) throws Exception {
-//
-//
-//
-//			MessageDTO mensajeD = comps.webSocket().sender().buildSystemMessage(
-//					grupoBlockRemotoRequestLocalDTO.getGrupo(), 
-//					"BLOQUEO DE EMERGENCIA");
-//			Message mensaje = comps.common().mapper().doit(mensajeD, comps.util().usuario().getUsuarioSystem(), grupoBlockRemotoRequestLocalDTO.getGrupo());
-//			comps.process().message().sendNormal(comps.util().usuario().getUsuarioSystem().getIdUser(), mensaje, grupoBlockRemotoRequestLocalDTO.getGrupo().getIdGrupo());
-//			
-//			GrupoDTO grupoDTO = comps.process().grupo().getGrupoDTO(grupoBlockRemotoRequestLocalDTO.getUsuarioLoggued(), grupoBlockRemotoRequestLocalDTO.getUserForGrupo());
-//			
-//		ProtocoloDTO p;
-//			p = comps.webSocket().sender().buildProtocoloDTO(
-//					ProtocoloComponentsEnum.GRUPO,
-//					ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO);
-//		
-//				
-//				comps.webSocket().sender().senderToGrupoMinusCreator( comps.util().usuario().getUsuarioSystem().getIdUser(), grupoBlockRemotoRequestLocalDTO.getGrupo().getIdGrupo(), p);
-//
-//	}
+	public void blockGrupoRemoto (GrupoDTO grupoBlockRemotoRequestLocalDTO) throws Exception {
+
+			Grupo g  = comps.requestHelper().setGrupoInUse(grupoBlockRemotoRequestLocalDTO);
+
+			MessageDTO mensajeD = comps.webSocket().sender().buildSystemMessage(
+					g, 
+					"BLOQUEO DE EMERGENCIA");
+			Message mensaje = comps.common().mapper().doit(mensajeD, comps.util().usuario().getUsuarioSystem(), g);
+			
+			comps.process().message().sendNormal(comps.util().usuario().getUsuarioSystem().getIdUser(), mensaje, g.getIdGrupo());
+			
+		ProtocoloDTO p;
+			p = comps.webSocket().sender().buildProtocoloDTO(
+					ProtocoloComponentsEnum.GRUPO,
+					ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO,grupoBlockRemotoRequestLocalDTO);
+		
+				
+			comps.webSocket().sender().senderToGrupo(p, g.getIdGrupo(),  comps.requestHelper().getUsuarioUsername() , false);
+
+	}
 
 	public void saveGrupoGralConfLock(GrupoDTO request) throws ValidationException {
 		if (request.getLock().isEnabled()) {
@@ -101,8 +98,6 @@ public class GrupoValidationService {
 
 		Usuario u = comps.requestHelper().getUsuarioLogged();
 		Grupo g = comps.util().grupo().getGrupoByIdValidation(request.getIdGrupo());
-
-		UserForGrupo v = comps.util().userForGrupo().getValidation(u, g.getIdGrupo());
 
 		comps.util().grupo().validateRoleAdmin(u, g);
 
@@ -171,23 +166,10 @@ public class GrupoValidationService {
 
 	public int getMembersOnline(GrupoDTO request) throws PrivacityException {
 
-		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());
-
-		List<Usuario> users = comps.repo().userForGrupo().findByUsuariosForGrupoDeletedFalse(idGrupo);
-
-		int count = 0;
-		for (Usuario u : users) {
-
-			Set<String> online = comps.webSocket().socketSessionRegistry().getSessionIds(u.getUsername());
-
-			if (online.size() > 0) {
-				count++;
-			}
-		}
-
-		return count;
+			return comps.webSocket().sender().getMembersOnline(request);
 
 	}
+
 
 	public UserForGrupoDTO[] getMembers(GrupoDTO request) throws PrivacityException {
 
@@ -232,11 +214,11 @@ public class GrupoValidationService {
 
 	}
 
-	public void delete(IdDTO request) throws PrivacityException {
+	public void delete(GrupoDTO request) throws PrivacityException {
 		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 
 		// Grupo grupo = comps.util().grupo().getGrupoByIdValidation(request);
-		long idGrupo = Long.parseLong(request.getId());
+		long idGrupo = Long.parseLong(request.getIdGrupo());
 		UserForGrupo ufg = comps.util().userForGrupo().getValidation(usuarioLogged, idGrupo);
 		comps.util().grupo().validateRoleAdmin(usuarioLogged, ufg.getUserForGrupoId().getGrupo());
 
@@ -308,19 +290,21 @@ public class GrupoValidationService {
 
 		GrupoDTO grupoCreado = comps.process().grupo().newGrupo(usuarioLogged, g, aes);
 
-		return this.getGrupoById(new IdDTO(grupoCreado.getIdGrupo()));
+		return grupoCreado;
 	}
 
-	public IdDTO[] getIdsMisGrupos() throws Exception {
+	public GrupoDTO[] getIdsMisGrupos() throws Exception {
 		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		return comps.process().grupo().getIdsMisGrupos(usuarioLogged);
 	}
 
-	public GrupoDTO[] getGrupoByIds(IdDTO[] idDTO) throws Exception {
+	public GrupoDTO[] getGrupoByIds(GrupoDTO[] idDTO) throws Exception {
 		GrupoDTO[] r = new GrupoDTO[idDTO.length];
 
 		for (int i = 0; i < idDTO.length; i++) {
-			r[i] = getGrupoById(idDTO[i]);
+			GrupoDTO gg = new GrupoDTO();
+			gg.setIdGrupo(idDTO[i].getIdGrupo());
+			r[i] = getGrupoById(gg);
 		}
 
 		return r;
@@ -342,44 +326,34 @@ public class GrupoValidationService {
 	}
 
 	// hacer q reciba un array
-	public GrupoDTO getGrupoById(IdDTO idDTO) throws Exception {
-		Date inicio = new Date();
+	public GrupoDTO getGrupoById(GrupoDTO idDTO) throws Exception {
+
 		GrupoDTO r = null;
-		log.info("Entrada getGrupoById: " + idDTO.toString());
+		log.trace("Entrada getGrupoById: " + idDTO.getIdGrupo());
 
 		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
-		// log.info("2");
-
-		// log.info("3");
-
-		long idGrupo = idDTO.convertIdToLong();
-
+		long idGrupo = idDTO.convertIdGrupoToLong();
 		GrupoInvitation inv = comps.util().grupoInvitation().getGrupoInvitation(usuarioLogged.getIdUser(), idGrupo);
 
-		// log.info("4");
+
 		if (inv == null) {
-			// log.info("5");
+		
 			UserForGrupo v = comps.util().userForGrupo().getValidation(usuarioLogged, idGrupo);
-			// log.info("////log.info");
 			r = comps.process().grupo().getGrupoDTO(usuarioLogged, v);
 			Grupo g = comps.repo().grupo().findById(idGrupo).get();
-			// log.info("7");
 			r.setUserConfDTO(comps.process().grupo().getGrupoUserConf(usuarioLogged, g));
-
 			r.setMembersOnLine(this.getMembersOnline(r));
 
-		} else {
-			Grupo grupo = comps.util().grupo().getGrupoByIdValidation(idDTO.getId());
-			// log.info("8");
-			r = comps.process().grupo().getGrupoDTOInvitation(usuarioLogged, inv, grupo);
-			// log.info("9");
 
+
+		}else {
+			Grupo grupo = comps.util().grupo().getGrupoByIdValidation(idDTO.getIdGrupo());
+			r = comps.common().mapper().getGrupoDTOPropio( grupo);
+			r.setUserConfDTO(comps.process().grupo().getGrupoUserConf(usuarioLogged, grupo));
+			r.setMembersOnLine(this.getMembersOnline(r));
 		}
-		Date fin = new Date();
+		
 
-		double total = fin.getTime() - inicio.getTime();
-
-		// log.info("total:>> " + (total/1000));
 		return r;
 	}
 

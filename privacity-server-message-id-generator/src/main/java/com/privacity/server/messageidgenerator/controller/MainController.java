@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.privacity.server.messageidgenerator.services.IdMessageGenerator;
 import com.privacity.server.messageidgenerator.util.KeyLocker;
 
 

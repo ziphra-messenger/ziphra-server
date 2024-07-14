@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.privacity.server.component.auth.AuthValidationService;
-import com.privacity.server.component.common.service.RequestHelperService;
 import com.privacity.server.component.grupo.GrupoValidationService;
 import com.privacity.server.component.message.MessageValidationService;
 import com.privacity.server.component.requestid.RequestIdValidationService;

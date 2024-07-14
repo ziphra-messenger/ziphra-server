@@ -45,7 +45,7 @@ public class ProtocoloKey {
 
 	@Override
 	public String toString() {
-		return "Key [url=" + url + ", component=" + component + ", action=" + action + "]";
+		return "Key [url=" + url.name() + ", component=" + component + ", action=" + action + "]";
 	}
 
 //	public static void main(String[] args) {

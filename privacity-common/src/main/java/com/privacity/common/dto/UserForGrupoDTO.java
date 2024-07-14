@@ -8,7 +8,6 @@ import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.common.interfaces.IdGrupoInterface;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

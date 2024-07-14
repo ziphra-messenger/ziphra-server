@@ -1,11 +1,6 @@
 package com.privacity.server.util;
 
-import java.time.LocalDateTime;
-
 import org.springframework.stereotype.Service;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 @Service
 public class PrivacityLogguer {

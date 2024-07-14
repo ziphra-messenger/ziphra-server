@@ -3,8 +3,6 @@ package com.privacity.server.sessionmanager.util.pool;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import com.privacity.common.enumeration.RandomGeneratorType;
 import com.privacity.common.util.RandomGenerator;
 import com.privacity.server.sessionmanager.model.AESToUse;
