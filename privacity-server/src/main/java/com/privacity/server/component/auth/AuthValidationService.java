@@ -14,12 +14,12 @@ import com.privacity.common.dto.request.RegisterUserRequestDTO;
 import com.privacity.common.dto.request.ValidateUsernameDTO;
 import com.privacity.common.dto.response.LoginDTOResponse;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.EncryptKeys;
+import com.privacity.core.model.UserInvitationCode;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysValidation;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.EncryptKeys;
-import com.privacity.server.model.UserInvitationCode;
-import com.privacity.server.security.Usuario;
 
 @Service
 public class AuthValidationService {

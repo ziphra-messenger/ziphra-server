@@ -1,69 +1,56 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-        
-  	<parent>
+	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.5.2</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>2.7.18</version>
+		<relativePath />
 	</parent>
-  
-  <modelVersion>4.0.0</modelVersion>
-        
-  
-  
-  <groupId>com.privacity</groupId>
-        
-  
-  
-  <artifactId>privacity</artifactId>
-        
-  
-  
-    <version>2.2.0</version>
-        
-  
-  
-  <packaging>pom</packaging>
-        
-  
-  
-  <name>privacity</name>
-      
-  	
-  <properties>
-    		
-    <java.version>1.8</java.version>
-    	
-  </properties>
-  	
-  <dependencies>
-			<dependency>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.privacity</groupId>
+	<artifactId>privacity</artifactId>
+	<version>2.3.2-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>privacity</name>
+	<properties>
+		<java.version>1.8</java.version>
+		<privacity.version>2.3.2-SNAPSHOT</privacity.version>
+		<privacity.root.name>privacity</privacity.root.name>
+		<privacity.concatenate>-</privacity.concatenate>
+		<privacity.groupId>com.privacity</privacity.groupId>
+		<privacity.module.server>${privacity.root.name}${privacity.concatenate}server</privacity.module.server>
+		<privacity.module.messaging>${privacity.root.name}${privacity.concatenate}messaging</privacity.module.messaging>
+		<privacity.module.common>${privacity.root.name}${privacity.concatenate}common</privacity.module.common>
+		<privacity.module.idsprovider>${privacity.root.name}${privacity.concatenate}idsprovider</privacity.module.idsprovider>
+		<privacity.module.sessionmanager>${privacity.root.name}${privacity.concatenate}sessionmanager</privacity.module.sessionmanager>
+		<privacity.module.commonback>${privacity.root.name}${privacity.concatenate}commonback</privacity.module.commonback>
+		<privacity.module.core>${privacity.root.name}${privacity.concatenate}core</privacity.module.core>
+	</properties>
+	
+	<dependencies>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-	        	<dependency>
-		<groupId>com.google.code.gson</groupId>
-		<artifactId>gson</artifactId>
-<version>2.8.2</version>
-	</dependency>	
-  </dependencies>
-  <modules>
-              
-    
-    
-    <module>privacity-server</module>
-   
-      <module>privacity-server-websocket</module>  
-     
-    <module>privacity-common</module>
-    <module>privacity-server-loadbalance</module>
-    <module>privacity-server-loadbalance-messageid</module>
-    <module>privacity-server-message-id-generator</module>
-    <module>privacity-server-session-manager</module>
-    <module>privacity-server-common</module>
-  </modules>
-    
-
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+				<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+			<version>8.0.32</version>
+		</dependency>
+	</dependencies>
+	<modules>
+		<module>${privacity.module.server}</module>
+		<module>${privacity.module.messaging}</module>
+		<module>${privacity.module.common}</module>
+		<module>${privacity.module.idsprovider}</module>
+		<module>${privacity.module.sessionmanager}</module>
+		<module>${privacity.module.commonback}</module>
+		<module>${privacity.module.core}</module>
+	</modules>
 </project>

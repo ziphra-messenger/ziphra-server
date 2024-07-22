@@ -1,6 +1,5 @@
 package com.privacity.server.main;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +11,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
-import com.privacity.common.enumeration.ProtocoloActionsEnum;
-import com.privacity.server.common.adapters.LocalDateAdapter;
-import com.privacity.server.common.enumeration.Urls;
-import com.privacity.server.common.utils.UtilsString;
+import com.privacity.commonback.common.enumeration.Urls;
+import com.privacity.commonback.common.interfaces.HealthCheckerInterface;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 
@@ -33,37 +28,52 @@ public class PrivateController extends ControllerBase{
 
 	@Autowired @Lazy
 	private FacadeComponent comps;
-	
+	@Autowired
+	@Lazy
+	private HealthCheckerInterface healthChecker;
 	@PostMapping("/entry")
 	public ResponseEntity<String> inMain(@RequestBody String request, @RequestHeader Map<String, String> headers) throws Exception {
         
-		RequestEncryptDTO requestDTO = UtilsString.gson().fromJson(request, RequestEncryptDTO.class);
+		if ( checkServersSessionManager()!= null) return checkServersSessionManager();
+		if ( checkServersRequestId()!= null) return checkServersRequestId();
+				
+		RequestEncryptDTO requestDTO = comps.util().gson().fromJson(request, RequestEncryptDTO.class);
 		request = requestDTO.getRequest();
 		ProtocoloDTO p = comps.service().usuarioSessionInfo().decryptProtocolo(comps.requestHelper().getUsuarioUsername(), request, getUrl().name());
 
 		 log.debug( " ================================================================================");
 		
 		ProtocoloDTO retornoFuncion = super.in(p);
+		log.debug( " retornoFuncion >>  " + comps.util().string().cutStringToGson(retornoFuncion));
 		
-		if ("null".equals(retornoFuncion.getObjectDTO() ) && retornoFuncion.getCodigoRespuesta() != null ){
-			retornoFuncion.setObjectDTO(null);
-			return ResponseEntity.ok().body(UtilsString.gsonToSend(retornoFuncion));
-		}
-		String retornoFuncionJson = UtilsString.gsonToSend(retornoFuncion);
-		String retornoFuncionEncriptado = comps.service().usuarioSessionInfo().encryptSessionAESServerOut(comps.requestHelper().getUsuarioUsername(),retornoFuncionJson);
-
-			if ( retornoFuncion.getMessageDTO() != null)
-			{
-				log.debug ( " Salida >>  " + UtilsString.shrinkString(retornoFuncion.toString()));
-			}
-			else {
-				log.debug( " Salida >>  " + UtilsString.shrinkString(retornoFuncionJson));
-				log.debug( " ================================================================================");
-			}
+			String objetoRetorno = comps.service().usuarioSessionInfo().encryptProtocolo(
+					comps.requestHelper().getUsuarioUsername()
+					, retornoFuncion, getUrl().name());
 		
-		return ResponseEntity.ok().body(UtilsString.gsonToSend(retornoFuncionEncriptado));
+//		if ("null".equals(retornoFuncion.getObjectDTO() ) && retornoFuncion.getCodigoRespuesta() != null ){
+//			retornoFuncion.setObjectDTO(null);
+//			return ResponseEntity.ok().body(UtilsString.gsonToSend(retornoFuncion));
+//		}
+//		
+//		String retornoFuncionEncriptado = comps.service().usuarioSessionInfo().encryptSessionAESServerOut(comps.requestHelper().getUsuarioUsername(),comps.util().gson().toJson(retornoFuncion)   );
+//
+//			if ( retornoFuncion.getMessageDTO() != null)
+//			{
+//				log.debug ( " Salida >>  " + comps.util().string().cutString(retornoFuncion.toString()));
+//			}
+//			else {
+//				log.debug( " Salida >>  " + comps.util().string().cutString(retornoFuncionEncriptado));
+//				log.debug( " ================================================================================");
+//			}
+//		
+			
+			log.debug( " Salida >>  " + comps.util().string().cutString(objetoRetorno));
+		return ResponseEntity.ok().body(objetoRetorno);
 
 	}
+
+
+
 
 
 	@Override

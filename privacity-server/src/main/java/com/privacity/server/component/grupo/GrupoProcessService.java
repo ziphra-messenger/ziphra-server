@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.GrupoInvitationDTO;
 import com.privacity.common.dto.GrupoUserConfDTO;
-
+import com.privacity.common.dto.MembersQuantityDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.MessageDetailDTO;
 import com.privacity.common.dto.ProtocoloDTO;
@@ -21,28 +21,30 @@ import com.privacity.common.dto.response.InitGrupoResponse;
 import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.AES;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.GrupoGralConf;
+import com.privacity.core.model.GrupoGralConfLock;
+import com.privacity.core.model.GrupoGralConfPassword;
+import com.privacity.core.model.GrupoInvitation;
+import com.privacity.core.model.GrupoInvitationId;
+import com.privacity.core.model.GrupoUserConf;
+import com.privacity.core.model.GrupoUserConfId;
+import com.privacity.core.model.Message;
+import com.privacity.core.model.MessageDetail;
+import com.privacity.core.model.UserForGrupo;
+import com.privacity.core.model.UserForGrupoId;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.AES;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoGralConf;
-import com.privacity.server.model.GrupoGralConfLock;
-import com.privacity.server.model.GrupoGralConfPassword;
-import com.privacity.server.model.GrupoInvitation;
-import com.privacity.server.model.GrupoInvitationId;
-import com.privacity.server.model.GrupoUserConf;
-import com.privacity.server.model.GrupoUserConfId;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageDetail;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.model.UserForGrupoId;
-import com.privacity.server.security.Usuario;
 
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @NoArgsConstructor
+@Slf4j
 public class GrupoProcessService  {
 
 	@Autowired @Lazy
@@ -84,7 +86,7 @@ public class GrupoProcessService  {
 	}
 	
 	
-	public GrupoDTO getGrupoDTO(Usuario u, UserForGrupo v) throws ValidationException {
+	public GrupoDTO getGrupoDTO(Usuario u, UserForGrupo v) throws PrivacityException {
 		Grupo grupo = v.getUserForGrupoId().getGrupo();
 		
 		GrupoDTO g = comps.common().mapper().getGrupoDTOPropio(grupo);
@@ -95,6 +97,7 @@ public class GrupoProcessService  {
 		GrupoUserConfDTO grupoUserConf = comps.util().grupoUserConf().getGrupoUserConf(u, grupo);
 		g.setUserConfDTO(grupoUserConf);
 		
+		//g.setMembersQuantityDTO( comps.webSocket().sender().getMembersOnline(g));
 		return g;
 	} 
 
@@ -200,6 +203,8 @@ public class GrupoProcessService  {
 		
 		GrupoDTO ginfo = getGrupoDTOInvitation(UserInvitationCode, gi, g);
 		//ginfo.setGrupoInvitation(true);
+		ginfo.setMembersQuantityDTO(new MembersQuantityDTO());
+		ginfo.getMembersQuantityDTO().setTotalQuantity(0);
 		ginfo.setGrupoInvitationDTO(new GrupoInvitationDTO(
 				comps.common().mapper().doit(gi.getGrupoInvitationId().getUsuarioInvitante()), 
 				gi.getRole(),
@@ -214,7 +219,19 @@ public class GrupoProcessService  {
 				ProtocoloActionsEnum.GRUPO_INVITATION_RECIVED, 
 				ginfo);
 		
-		comps.webSocket().sender().senderToUser(p, UserInvitationCode);
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					comps.webSocket().sender().senderToUser(p, UserInvitationCode);
+				} catch (PrivacityException e) {
+					log.error("sentInvitation senderToUser: " + e.getMessage());
+				}
+				
+			}
+		}).start();;
+		
 		
 			//q.put(new WsMessage(gi.getGrupoInvitationId().getUsuarioInvitado().getUsername() ,p));
 
@@ -270,7 +287,11 @@ public class GrupoProcessService  {
 			
 			//GrupoDTO dto = getGrupo(comps.util().grupo().getGrupoById(ug.getUserForGrupoId().getGrupo().getIdGrupo()), ug.getUserForGrupoId().getUser());
 			//dto.setUserConfDTO(conf);
-			return getGrupoDTO(gi.getGrupoInvitationId().getUsuarioInvitado(), ug); //dto; 
+			refreshOnline(gi.getGrupoInvitationId().getGrupo().getIdGrupo());
+			
+			GrupoDTO ret = getGrupoDTO(gi.getGrupoInvitationId().getUsuarioInvitado(), ug); 
+			ret.setMembersQuantityDTO(comps.webSocket().sender().getMembersOnline(ret));
+			return ret;
 		}
 	}  	
 
@@ -386,11 +407,33 @@ public class GrupoProcessService  {
 ////		}
 //	}
 
+	public void refreshOnline(Long idGrupo ) {
+		GrupoDTO r = new GrupoDTO();
+		r.setIdGrupo(idGrupo+"");
+		
+		try {
+			r.setMembersQuantityDTO(
+					
+					comps.webSocket().sender().getMembersOnline(r)
+			);
+			
+			if (r.getMembersQuantityDTO().getQuantityOnline() != 0) {
+				ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
+						ProtocoloComponentsEnum.GRUPO,
+				        ProtocoloActionsEnum.GRUPO_HOW_MANY_MEMBERS_ONLINE,
+				        r);
+				comps.webSocket().sender().senderToGrupo(p, idGrupo);
 
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	public void removeMe(Usuario usuarioLogged, Usuario usuarioSystem, Grupo grupo, UserForGrupo userForGrupo) throws Exception {
 		//Grupo grupo = userForGrupo.getUserForGrupoId().getGrupo();
 		//removeMeAnonimo(usuarioLogged, grupo);
-		
+	
 		//mediaRepository.deleteAllMyMediaByGrupo(grupo, usuarioLogged);
 		//comps.repo().media().deleteAllMyMediasByGrupo(grupo.getIdGrupo(), usuarioLogged.getIdUser());
 		comps.repo().messageDetail().deleteLogicAllMyMessagesDetailByGrupo(grupo, usuarioLogged);
@@ -425,6 +468,8 @@ public class GrupoProcessService  {
 
 			MessageDTO mensaje = comps.webSocket().sender().buildSystemMessage(grupo, "USUARIO " + usuarioLogged.getNickname() + " HA DEJADO EL GRUPO " + grupo.getName());
 			comps.process().message().sendNormal(comps.util().usuario().getUsuarioSystem().getIdUser(), comps.common().mapper().doit(mensaje, usuarioSystem,grupo), grupo.getIdGrupo());
+			
+			refreshOnline(grupoRemove.convertIdGrupoToLong());
 
 	}
 

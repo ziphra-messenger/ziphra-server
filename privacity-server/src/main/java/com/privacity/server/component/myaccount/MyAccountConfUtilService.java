@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.servergralconf.SGCMyAccountConfDTO;
+import com.privacity.core.model.MyAccountConfLock;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.model.MyAccountConfLock;
-import com.privacity.server.security.Usuario;
 
 import lombok.AllArgsConstructor;
 

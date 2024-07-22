@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.EncryptKeysDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
-import com.privacity.server.exceptions.ValidationException;
+import com.privacity.common.exceptions.ValidationException;
 
 import lombok.AllArgsConstructor;
 

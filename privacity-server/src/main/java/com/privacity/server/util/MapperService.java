@@ -28,26 +28,26 @@ import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
 import com.privacity.common.enumeration.GrupoUserConfEnum;
 import com.privacity.common.enumeration.MessageState;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.common.exceptions.ProcessException;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.AES;
+import com.privacity.core.model.EncryptKeys;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.GrupoInvitation;
+import com.privacity.core.model.GrupoUserConf;
+import com.privacity.core.model.GrupoUserConfId;
+import com.privacity.core.model.Media;
+import com.privacity.core.model.MediaId;
+import com.privacity.core.model.Message;
+import com.privacity.core.model.MessageDetail;
+import com.privacity.core.model.MessageId;
+import com.privacity.core.model.MyAccountConf;
+import com.privacity.core.model.UserForGrupo;
+import com.privacity.core.model.UserForGrupoId;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.dao.factory.MessageIdSequenceFactory;
-import com.privacity.server.exceptions.ProcessException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.AES;
-import com.privacity.server.model.EncryptKeys;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoInvitation;
-import com.privacity.server.model.GrupoUserConf;
-import com.privacity.server.model.GrupoUserConfId;
-import com.privacity.server.model.Media;
-import com.privacity.server.model.MediaId;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageDetail;
-import com.privacity.server.model.MessageId;
-import com.privacity.server.model.MyAccountConf;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.model.UserForGrupoId;
-import com.privacity.server.security.Usuario;
-
+import com.privacity.server.factory.MessageIdGeneratorFactory;
 
 import lombok.extern.java.Log;
 
@@ -59,7 +59,7 @@ public class MapperService {
 	@Lazy
 	private FacadeComponent comps;
 	@Autowired @Lazy
-	private MessageIdSequenceFactory messageIdSequenceFactory;
+	private MessageIdGeneratorFactory messageIdSequenceFactory;
 
 	public UserForGrupoDTO getUserForGrupoDTOPropio(UserForGrupo userForGrupo) {
 		UserForGrupoDTO ufgDTO = new UserForGrupoDTO();
@@ -279,11 +279,11 @@ public class MapperService {
 	
 
 
-	public Message doit(MessageDTO dto, Usuario usuarioCreacion, Grupo g) throws ValidationException, ProcessException {
+	public Message doit(MessageDTO dto, Usuario usuarioCreacion, Grupo g) throws PrivacityException {
 		List<UserForGrupo> usersForGrupo = comps.repo().userForGrupo().findByForGrupo(g.getIdGrupo());
 		return doit(dto, usuarioCreacion, g, usersForGrupo, false);
 	}
-	public Message doit(MessageDTO dto, Usuario usuarioCreacion, Grupo g, List<UserForGrupo> usersForGrupo,  boolean newId) throws ValidationException, ProcessException {
+	public Message doit(MessageDTO dto, Usuario usuarioCreacion, Grupo g, List<UserForGrupo> usersForGrupo,  boolean newId) throws PrivacityException {
 		
 		
 		

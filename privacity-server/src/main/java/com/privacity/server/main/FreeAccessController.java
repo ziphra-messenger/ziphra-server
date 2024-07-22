@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.privacity.common.dto.ProtocoloDTO;
-import com.privacity.server.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.Urls;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
 import com.privacity.server.component.serverconf.ServerConfValidationService;
@@ -35,7 +35,7 @@ public class FreeAccessController extends ControllerBase{
 	}
 
 	@PostMapping("/entry")
-	public ProtocoloDTO in(@RequestBody ProtocoloDTO request) throws Exception {
+	public ProtocoloDTO in(@RequestBody ProtocoloDTO request)  {
 //    	new Thread(new Runnable() {
 //			
 //			@Override

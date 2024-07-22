@@ -4,21 +4,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.privacity.server.component.grupo.GrupoRepository;
-import com.privacity.server.component.grupoinvitation.GrupoInvitationRepository;
+import com.privacity.core.repository.GrupoInvitationRepository;
+import com.privacity.core.repository.GrupoRepository;
+import com.privacity.core.repository.MediaRepository;
+import com.privacity.core.repository.MessageDetailRepository;
+import com.privacity.core.repository.MessageRepository;
+import com.privacity.core.repository.RoleRepository;
+import com.privacity.core.repository.UserForGrupoRepository;
+import com.privacity.core.repository.UsuarioRepository;
 import com.privacity.server.component.grupouserconf.GrupoUserConfRepository;
-import com.privacity.server.component.media.MediaRepository;
-import com.privacity.server.component.message.MessageRepository;
-import com.privacity.server.component.messagedetail.MessageDetailDeletedRepository;
-import com.privacity.server.component.messagedetail.MessageDetailRepository;
-import com.privacity.server.component.userforgrupo.UserForGrupoRepository;
-import com.privacity.server.security.RoleRepository;
-import com.privacity.server.security.UsuarioRepository;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Component
 @NoArgsConstructor
+@Accessors(fluent = true, chain = false)
+@Getter
 public class FacadeRepositoryComponent {
 	
 	@Autowired @Lazy
@@ -44,11 +47,7 @@ public class FacadeRepositoryComponent {
 	@Autowired @Lazy
 	
 	private MessageDetailRepository messageDetail;
-	
-	@Autowired @Lazy
-	
-	private	MessageDetailDeletedRepository messageDetailDeleted;
-	
+
 	
 	@Autowired @Lazy
 	
@@ -64,54 +63,5 @@ public class FacadeRepositoryComponent {
 	private GrupoInvitationRepository grupoInvitation;
 
 
-	public UsuarioRepository user() {
-		return user;
-	}
-
-
-	public GrupoUserConfRepository grupoUserConf() {
-		return grupoUserConf;
-	}
-
-
-	public UserForGrupoRepository userForGrupo() {
-		return userForGrupo;
-	}
-
-
-	public MediaRepository media() {
-		return media;
-	}
-
-
-	public MessageRepository message() {
-		return message;
-	}
-
-
-	public MessageDetailRepository messageDetail() {
-		return messageDetail;
-	}
-
-
-	public MessageDetailDeletedRepository messageDetailDeleted() {
-		return messageDetailDeleted;
-	}
 	
-	public RoleRepository role() {
-		return role;
-	}
-
-
-	public GrupoRepository grupo() {
-		return grupo;
-	}
-
-
-	public GrupoInvitationRepository grupoInvitation() {
-		return grupoInvitation;
-	}
-
-
-
 }

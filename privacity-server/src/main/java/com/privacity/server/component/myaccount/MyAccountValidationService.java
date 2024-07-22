@@ -13,11 +13,11 @@ import com.privacity.common.dto.request.LoginRequestDTO;
 import com.privacity.common.dto.request.MyAccountNicknameRequestDTO;
 import com.privacity.common.dto.response.MyAccountGenerateInvitationCodeResponseDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.EncryptKeys;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysValidation;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.EncryptKeys;
-import com.privacity.server.security.Usuario;
 import com.privacity.server.util.UtilService;
 
 import lombok.AllArgsConstructor;

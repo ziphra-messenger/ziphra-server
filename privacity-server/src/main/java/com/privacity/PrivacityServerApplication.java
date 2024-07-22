@@ -3,6 +3,7 @@ package com.privacity;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
@@ -11,8 +12,8 @@ import com.privacity.server.security.CustomAuthenticationFailureHandler;
 
 
 @SpringBootApplication
-//@ComponentScan(basePackages = "com.privacity.server.component.grupo")
-//@ComponentScan(basePackages = "com.privacity.server.security")
+@ComponentScan(basePackages = "com.privacity.server.component")
+@ComponentScan(basePackages = "com.privacity.server.security")
 //@ComponentScan(basePackages = "com.privacity.server")
 //@EnableConfigurationProperties(value = MessageIdSequenceFactoryPropertiesEnumConfiguration.class)
 public class PrivacityServerApplication {
@@ -21,13 +22,14 @@ public class PrivacityServerApplication {
 		SpringApplication.run(PrivacityServerApplication.class, args);
 	}
 
+	
 	@Bean
-	public AccessDeniedHandler accessDeniedHandler() {
+	AccessDeniedHandler accessDeniedHandler() {
 	   return new CustomAccessDeniedHandler();
 	}
 	
 	@Bean
-	public AuthenticationFailureHandler authenticationFailureHandler() {
+	AuthenticationFailureHandler authenticationFailureHandler() {
 	    return new CustomAuthenticationFailureHandler();
 	} 
 	

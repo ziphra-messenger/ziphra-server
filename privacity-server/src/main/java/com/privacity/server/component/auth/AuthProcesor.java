@@ -25,22 +25,21 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.privacity.common.adapters.LocalDateAdapter;
 import com.privacity.common.dto.AESAllDTO;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.LoginDataDTO;
 import com.privacity.common.dto.response.LoginDTOResponse;
-import com.privacity.server.common.adapters.LocalDateAdapter;
-import com.privacity.server.common.enumeration.ERole;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.commonback.common.enumeration.ERole;
+import com.privacity.core.model.EncryptKeys;
+import com.privacity.core.model.MyAccountConf;
+import com.privacity.core.model.Role;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.encrypt.RSA;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.EncryptKeys;
-import com.privacity.server.model.MyAccountConf;
-import com.privacity.server.model.Role;
+import com.privacity.server.component.encryptkeys.RSAComponent;
+import com.privacity.server.component.usuario.UserDetailsImpl;
 import com.privacity.server.security.JwtUtils;
-import com.privacity.server.security.UserDetailsImpl;
-import com.privacity.server.security.Usuario;
-import com.privacity.server.util.PrivacityLogguer;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -54,9 +53,7 @@ public class AuthProcesor {
 	@Autowired @Lazy
 	private AuthenticationManager authenticationManager;
 
-	
-	@Autowired @Lazy
-	private PrivacityLogguer privacityLogguer;
+
 	
 
 	@Autowired @Lazy
@@ -71,7 +68,8 @@ public class AuthProcesor {
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getUsuarioPassword().getPassword()));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwt = jwtUtils.generateJwtToken(authentication);
+		
+		String jwt = jwtUtils.generateJwtToken(((UserDetailsImpl) authentication.getPrincipal()).getUsername());
 		
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 		userDetails.setJwt(jwt);
@@ -87,7 +85,7 @@ public class AuthProcesor {
 		 //
 		// Encriptar publica
 		
-		RSA t = comps.common().RSA();
+		RSAComponent t = comps.common().RSA();
 		
 //		{
 		EncryptKeys ek = usuarioDB.getEncryptKeys();
@@ -145,10 +143,10 @@ public class AuthProcesor {
 		data.setMyAccountGralConfDTO(comps.common().mapper().doit(comps.repo().user().findById(usuarioDB.getIdUser()).get().getMyAccountConf()));
 		data.setSessionAESDTOWS(aesAll.getSessionAESDTOWS());
 		data.setSessionAESDTOServerEncrypt(aesAll.getSessionAESDTOServerOut());
-		privacityLogguer.write(data);
+
 
 		data.setPublicKey(usuarioDB.getEncryptKeys().getPublicKey());
-			privacityLogguer.write(data);
+
 	
 //		
 		

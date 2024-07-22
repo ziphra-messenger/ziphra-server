@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.ProtocoloWrapperDTO;
-import com.privacity.server.common.enumeration.Urls;
-import com.privacity.server.common.utils.UtilsString;
+import com.privacity.commonback.common.enumeration.Urls;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 
@@ -45,12 +44,12 @@ public class PublicController extends ControllerBase{
 		AESToUse aes = new AESToUse(bitsEncrypt,Integer.parseInt(interationCount) ,key,salt);	
 		String protocoloJson = aes.getAESDecrypt(protocoloWrapperDTO.protocoloDTO);
 		
-        ProtocoloDTO retornoJson = UtilsString.gson().fromJson(protocoloJson, ProtocoloDTO.class);
+        ProtocoloDTO retornoJson = comps.util().gson().fromJson(protocoloJson, ProtocoloDTO.class);
 		
 		ProtocoloDTO retornoBase = super.in(retornoJson);
 
-		String retorno = UtilsString.gsonToSend(aes.getAES(UtilsString.gsonToSend(retornoBase)));
-		log.debug ( " Salida >>  " + UtilsString.shrinkString(retorno));
+		String retorno = comps.util().string().gsonToSendCompress(aes.getAES(comps.util().string().gsonToSend(retornoBase)));
+		log.debug ( " Salida >>  " + comps.util().string().cutString(retorno));
 		return ResponseEntity.ok().body(retorno);
 	}
 

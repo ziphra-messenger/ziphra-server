@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.encrypt.RSA;
 
 import lombok.extern.java.Log;
 
@@ -28,7 +27,7 @@ import lombok.extern.java.Log;
 @Log
 public class PrivacityRSAValidation {
 	
-	private final RSA rsa;
+	private final RSAComponent rsa;
 	private PublicKey publicKey;
 	private PrivateKey privateKey;
 

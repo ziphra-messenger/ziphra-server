@@ -1,20 +1,31 @@
 package com.privacity.common.dto;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @JsonInclude(Include.NON_NULL)
-public class ProtocoloDTO {
+@AllArgsConstructor
+public class ProtocoloDTO implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1468646917559489843L;
 
 	public ProtocoloDTO() {
 		super();
 	}
 
+
+	
 	public ProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action) {
 		super();
 		this.component = component;

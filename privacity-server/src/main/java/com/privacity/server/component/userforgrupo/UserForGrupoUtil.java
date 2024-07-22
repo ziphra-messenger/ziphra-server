@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.UserForGrupo;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.security.Usuario;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.java.Log;

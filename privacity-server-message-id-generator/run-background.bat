@@ -1,1 +1,0 @@
-mvn clean install spring-boot:run -Dspring-boot.run.profiles=dev3333

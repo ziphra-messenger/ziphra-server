@@ -1,5 +1,6 @@
 package com.privacity.server.component.grupo;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.GrupoGralConfDTO;
 import com.privacity.common.dto.GrupoUserConfDTO;
+import com.privacity.common.dto.MembersQuantityDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.UserForGrupoDTO;
@@ -20,29 +22,28 @@ import com.privacity.common.dto.request.GrupoInvitationAcceptRequestDTO;
 import com.privacity.common.dto.request.GrupoNewRequestDTO;
 import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
-import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.AES;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.GrupoInvitation;
+import com.privacity.core.model.GrupoInvitationId;
+import com.privacity.core.model.GrupoUserConf;
+import com.privacity.core.model.Message;
+import com.privacity.core.model.UserForGrupo;
+import com.privacity.core.model.UserForGrupoId;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysValidation;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.AES;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoInvitation;
-import com.privacity.server.model.GrupoInvitationId;
-import com.privacity.server.model.GrupoUserConf;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.model.UserForGrupoId;
 import com.privacity.server.security.JwtUtils;
-import com.privacity.server.security.Usuario;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@AllArgsConstructor
+
 @Slf4j
 public class GrupoValidationService {
 
@@ -54,6 +55,7 @@ public class GrupoValidationService {
 	private EncryptKeysValidation encryptKeysValidation;
 	@Autowired @Lazy
 	private JwtUtils jwtUtils;
+	
 	public boolean loginGrupo(GrupoDTO r) throws ValidationException {
 		Usuario u = comps.requestHelper().getUsuarioLogged();
 		Grupo g = comps.util().grupo().getGrupoByIdValidation(r.getIdGrupo());
@@ -63,6 +65,8 @@ public class GrupoValidationService {
 		return comps.process().grupo().loginGrupo(g, pw);
 
 	}
+	
+
 
 //	
 //	@com.privacity.common.RolesAllowed({GrupoRolesEnum.ADMIN,GrupoRolesEnum.MODERATOR} )
@@ -83,7 +87,7 @@ public class GrupoValidationService {
 					ProtocoloActionsEnum.GRUPO_BLOCK_REMOTO,grupoBlockRemotoRequestLocalDTO);
 		
 				
-			comps.webSocket().sender().senderToGrupo(p, g.getIdGrupo(),  comps.requestHelper().getUsuarioUsername() , false);
+			comps.webSocket().sender().senderToGrupo(p, g.getIdGrupo());
 
 	}
 
@@ -154,7 +158,7 @@ public class GrupoValidationService {
 
 				ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.GRUPO,
 						ProtocoloActionsEnum.GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK, c);
-				comps.webSocket().sender().senderToGrupo(p, g.getIdGrupo(), u.getUsername() , true);
+				comps.webSocket().sender().senderToGrupo(p, g.getIdGrupo(), u.getUsername());
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -164,7 +168,7 @@ public class GrupoValidationService {
 
 	}
 
-	public int getMembersOnline(GrupoDTO request) throws PrivacityException {
+	public MembersQuantityDTO getMembersOnline(GrupoDTO request) throws PrivacityException {
 
 			return comps.webSocket().sender().getMembersOnline(request);
 
@@ -198,8 +202,8 @@ public class GrupoValidationService {
 		comps.repo().grupo().save(g);
 	}
 
-	@com.privacity.common.RolesAllowed({ GrupoRolesEnum.ADMIN, GrupoRolesEnum.MODERATOR, GrupoRolesEnum.MEMBER,
-			GrupoRolesEnum.READONLY })
+//	@com.privacity.common.RolesAllowed({ GrupoRolesEnum.ADMIN, GrupoRolesEnum.MODERATOR, GrupoRolesEnum.MEMBER,
+	//		GrupoRolesEnum.READONLY })
 	public void removeMe(GrupoDTO request) throws PrivacityException {
 
 		Usuario usuarioSystem = comps.util().usuario().getUsuarioSystem();
@@ -232,7 +236,7 @@ public class GrupoValidationService {
 
 	}
 
-	public void sentInvitation(GrupoAddUserRequestDTO request) throws PrivacityException {
+	public void sentInvitation(GrupoAddUserRequestDTO request) throws PrivacityException, IOException {
 
 		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 
@@ -289,7 +293,8 @@ public class GrupoValidationService {
 		AES aes = comps.common().mapper().doit(request.getAesDTO());
 
 		GrupoDTO grupoCreado = comps.process().grupo().newGrupo(usuarioLogged, g, aes);
-
+		grupoCreado.setMembersQuantityDTO(new MembersQuantityDTO());
+		grupoCreado.getMembersQuantityDTO().setTotalQuantity(1);
 		return grupoCreado;
 	}
 
@@ -322,11 +327,11 @@ public class GrupoValidationService {
 
 		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.GRUPO, protocoloAction,
 				request);
-		comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername(), true);
+		comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername());
 	}
 
 	// hacer q reciba un array
-	public GrupoDTO getGrupoById(GrupoDTO idDTO) throws Exception {
+	public GrupoDTO getGrupoById(GrupoDTO idDTO) throws PrivacityException {
 
 		GrupoDTO r = null;
 		log.trace("Entrada getGrupoById: " + idDTO.getIdGrupo());
@@ -342,21 +347,45 @@ public class GrupoValidationService {
 			r = comps.process().grupo().getGrupoDTO(usuarioLogged, v);
 			Grupo g = comps.repo().grupo().findById(idGrupo).get();
 			r.setUserConfDTO(comps.process().grupo().getGrupoUserConf(usuarioLogged, g));
-			r.setMembersOnLine(this.getMembersOnline(r));
+			
+			
+			
+			
+			
 
-
+			try {
+				r.setMembersQuantityDTO(getMembersOnline(r));
+			} catch (PrivacityException e) {
+				log.error(ExceptionReturnCode.MESSAGING_GET_ONLINE_MEMBERS_FAIL.getToShow(idDTO.getIdGrupo(), e));  
+				r.setMembersQuantityDTO(new MembersQuantityDTO());
+			}
 
 		}else {
 			Grupo grupo = comps.util().grupo().getGrupoByIdValidation(idDTO.getIdGrupo());
 			r = comps.common().mapper().getGrupoDTOPropio( grupo);
 			r.setUserConfDTO(comps.process().grupo().getGrupoUserConf(usuarioLogged, grupo));
-			r.setMembersOnLine(this.getMembersOnline(r));
+			
+			try {
+				r.setMembersQuantityDTO(getMembersOnline(r));
+			} catch (PrivacityException e) {
+				r.setMembersQuantityDTO(new MembersQuantityDTO());
+			}
 		}
 		
+		
+//        new Thread(new Runnable() {
+//			//FacadeComponent val = GrupoValidationService.this.comps;
+//			@Override
+//			public void run() {
+//				comps.process().grupo().refreshOnline(idDTO.convertIdGrupoToLong());
+//				
+//			}
+//		}).start();
 
 		return r;
 	}
 
+	
 	public void saveGrupoGeneralConfiguration(GrupoGralConfDTO r) throws PrivacityException {
 		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		Grupo grupo = comps.requestHelper().setGrupoInUse(r);
@@ -375,6 +404,7 @@ public class GrupoValidationService {
 		GrupoInvitation gi = comps.repo().grupoInvitation()
 				.findByGrupoInvitationUsuarioGrupo(usuarioInvitado.getIdUser(), idGrupo);
 		if (gi == null) {
+			log.debug(ExceptionReturnCode.GRUPO_USER_NOT_EXISTS_INVITATION_CODE.getToShow());
 			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_NOT_EXISTS_INVITATION_CODE);
 		}
 
@@ -388,7 +418,7 @@ public class GrupoValidationService {
 		try {
 			return comps.process().grupo().acceptInvitation(gi, aes);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			log.error(ExceptionReturnCode.GRUPO_USER_NOT_EXISTS_INVITATION_CODE.getToShow(e));
 			e.printStackTrace();
 			throw new PrivacityException(e.getMessage());
 		}

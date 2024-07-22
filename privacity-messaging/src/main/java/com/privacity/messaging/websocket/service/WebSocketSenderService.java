@@ -1,0 +1,303 @@
+package com.privacity.messaging.websocket.service;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+
+import com.privacity.common.dto.MembersQuantityDTO;
+import com.privacity.common.dto.MessageDTO;
+import com.privacity.common.dto.ProtocoloDTO;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.commonback.common.enumeration.Urls;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.Usuario;
+import com.privacity.core.util.UtilsStringComponent;
+import com.privacity.messaging.websocket.model.WsMessage;
+import com.privacity.messaging.websocket.pool.WsQueue;
+import com.privacity.messaging.websocket.util.UtilFacade;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class WebSocketSenderService {
+
+
+	private static final String WEBSOCKET_CHANNEL = "/topic/reply";
+	@Autowired
+	@Lazy
+	private UtilsStringComponent utilStrings;
+	@Autowired
+	@Lazy
+	private UtilFacade uf;
+	@Autowired
+	@Lazy
+	private SimpMessagingTemplate simpMessagingTemplate;
+   @Autowired 
+   @Lazy
+   private WsQueue q;
+   
+
+//	public void sender(Usuario usuario, ProtocoloDTO protocoloDTP) throws PrivacityException {
+//		sender(usuario.getUsername(),protocoloDTP);
+//	}
+//
+//	public void sender(String username, ProtocoloDTO protocoloDTO) throws PrivacityException {
+//
+//		if (encryptIds) {
+//			//username = privacityIdServices.getAES(username);
+//		}
+//
+//		
+//		sentToUser(username, WEBSOCKET_CHANNEL , new Gson().toJson(protocoloDTO));
+//	}
+//
+	public MessageDTO buildSystemMessage(Grupo grupo, String text) {
+
+		MessageDTO mensaje = new MessageDTO();
+		mensaje.setIdGrupo(grupo.getIdGrupo()+"");
+		mensaje.setBlackMessage(false);
+		mensaje.setTimeMessage(0);
+		mensaje.setAnonimo(false);
+		mensaje.setSystemMessage(true);
+		mensaje.setText(text);
+
+		return mensaje;
+
+	}
+//
+//
+//
+//	public void sender(ProtocoloDTO p, Usuario destino) throws PrivacityException {
+//		sentToUser(destino.getUsername(), WEBSOCKET_CHANNEL , new Gson().toJson(p));	
+//	}
+//
+////	public void sender(Message m, String p) throws PrivacityException {
+////		
+////
+////		for ( MessageDetail md : m.getMessagesDetail() ) {
+////			
+////			if (!md.getMessageDetailId().getUserDestino().getIdUser().equals(m.getUserCreation().getIdUser())){
+//// 
+////				
+////				sentToUser(md.getMessageDetailId().getUserDestino().getUsername(), WEBSOCKET_CHANNEL , p);	
+////			}
+////
+////			
+////
+////		}
+//	
+////}
+//
+	
+	private void sentToUser(String user, String urlDestino, String mensaje) throws PrivacityException {
+		log.debug("SERVER CORE - Salida WS");
+		log.debug("user: " + user);
+		log.debug("urlDestino: " + urlDestino);
+		log.debug("mensaje: " + mensaje);
+		if (uf.socketSessionRegistry().getSessionIds(user).size() >0) {
+			
+		try {
+		
+			//String retornoFuncionEncriptado =comps.service().usuarioSessionInfo().encryptSessionAESServerWS(user,mensaje);
+
+
+			simpMessagingTemplate.convertAndSendToUser(user, urlDestino , mensaje);	
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+				
+		}
+		
+	}
+	
+	public void senderToGrupoMinusCreator(String username, long idGrupo, ProtocoloDTO p) throws PrivacityException {
+		
+		senderToGrupo(p,idGrupo, username, true);
+		
+	}
+
+	public void senderToUser(ProtocoloDTO p, Usuario usuario) throws PrivacityException {
+		senderToUser(p,usuario.getUsername());
+	}
+	
+	public void senderToUser(ProtocoloDTO p, String username) throws PrivacityException {
+		if (uf.socketSessionRegistry().isOnline(username)){
+			log.trace("Encriptando: " + username);
+			String protocoloEncr = uf.usuarioSessionInfo().encryptProtocoloWS(username, p, getUrl().name());
+	
+			WsMessage m = new WsMessage();
+			m.setUsername(username);
+			m.setProtocolo(protocoloEncr);
+			sender( m);
+		}else {
+			log.trace("Usuario Off Line - no enviado: " + username);
+		}
+
+	}
+	public void senderToUserNoEncrypt(String username,String protocoloEncr) throws PrivacityException {
+		if (uf.socketSessionRegistry().isOnline(username)){
+			log.trace("Encriptando: " + username);
+	
+			WsMessage m = new WsMessage();
+			m.setUsername(username);
+			m.setProtocolo(protocoloEncr);
+			sender( m);
+		}else {
+			log.trace("Usuario Off Line - no enviado: " + username);
+		}
+
+	}	
+	
+	
+	public void senderToGrupo(ProtocoloDTO p, Long idGrupo, String username, boolean minusCreator) throws PrivacityException {
+		log.debug("entrada - senderToGrupo" );
+		log.debug("idGrupo: " + idGrupo );
+		log.debug("username: " + username );
+		log.debug("minusCreator: " + minusCreator );
+		log.debug("ProtocoloDTO: " + uf.utilsString().cutStringToGson(p));
+		List<Usuario> lista = uf.userForGrupoRepository().findByUsuariosForGrupoDeletedFalse(idGrupo);
+		//List<String> listaToSend=new ArrayList<String>();
+		Queue<String> listaToSend = new ConcurrentLinkedQueue<String>();
+		lista.stream().forEach( destino -> {
+			
+			if (minusCreator && destino.getUsername().equals(username)) {
+				log.trace("usuario creador excluido: " + username);
+			}else {
+				try {
+					if (uf.socketSessionRegistry().isOnline(destino.getUsername())){
+						log.trace("adding to: " + destino.getUsername());
+						listaToSend.add(destino.getUsername());
+					}else {
+						log.trace("Usuario Off Line - no enviado: " + destino.getUsername());
+					}
+					//log.trace("sending to: " + destino.getUsername());
+					//senderToUser(p,  destino );
+				} catch (Exception e) {
+					log.error("entrada - senderToGrupo" );
+					log.error("idGrupo: " + idGrupo );
+					log.error("username: " + destino.getUsername() );
+					log.error("minusCreator: " + minusCreator );
+					log.error("ProtocoloDTO: " + uf.utilsString().cutStringToGson(p));
+
+					e.printStackTrace();
+				}	
+			}
+	});
+		
+		if (listaToSend.size() > 0) {
+			Map<String, String> map = uf.usuarioSessionInfo().encryptProtocoloWS(listaToSend, p, getUrl().name());
+			
+			map.entrySet()
+			   .parallelStream()
+			   .forEach(entry -> {
+				try {
+					senderToUserNoEncrypt(entry.getKey(),entry.getValue());
+				} catch (PrivacityException e) {
+					// TODO Auto-generated catch block
+					log.error("entrada - map senderToGrupo" );
+					log.error("idGrupo: " + idGrupo );
+					log.error("username: " + entry.getKey() );
+	
+				}
+			});
+		}
+	
+	}
+
+	
+//	public void senderToGrupo(ProtocoloDTO p, Long idGrupo, String username, boolean minusCreator) throws PrivacityException {
+//		log.debug("entrada - senderToGrupo" );
+//		log.debug("idGrupo: " + idGrupo );
+//		log.debug("username: " + username );
+//		log.debug("minusCreator: " + minusCreator );
+//		log.debug("ProtocoloDTO: " + uf.utilsString().cutStringToGson(p));
+//		List<Usuario> lista = uf.userForGrupoRepository().findByUsuariosForGrupoDeletedFalse(idGrupo);
+//		
+//		lista.parallelStream().forEach( destino -> {
+//			
+//			if (minusCreator &&destino.getUsername().equals(username)) {
+//				log.trace("usuario creador excluido: " + username);
+//			}else {
+//				try {
+//					log.trace("sending to: " + username);
+//					senderToUser(p,  destino );
+//				} catch (PrivacityException e) {
+//					log.error("entrada - senderToGrupo" );
+//					log.error("idGrupo: " + idGrupo );
+//					log.error("username: " + username );
+//					log.error("minusCreator: " + minusCreator );
+//					log.error("ProtocoloDTO: " + uf.utilsString().cutStringToGson(p));
+//
+//					e.printStackTrace();
+//				}	
+//			}
+//	});
+//		
+//	
+//	}
+	
+	public void sender(WsMessage msg) {
+		
+		String destino;
+		
+		destino = msg.getUsername();
+		try {	
+	        
+			sentToUser(destino, WEBSOCKET_CHANNEL , msg.getProtocolo());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public Urls getUrl() {
+		return Urls.CONSTANT_URL_PATH_PRIVATE_WS;
+	}
+	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum comp, ProtocoloActionsEnum action,
+			Object obj) throws PrivacityException  {
+		
+		ProtocoloDTO p = new ProtocoloDTO(comp,action);
+		p.setObjectDTO(utilStrings.gsonToSend(obj));
+		return p;
+	}
+	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum comp, ProtocoloActionsEnum action,
+			MessageDTO m) {
+		ProtocoloDTO p = new ProtocoloDTO(comp,action);
+		p.setMessageDTO(m);
+		return p;
+	}
+	public  MembersQuantityDTO getMembersOnlineByGrupo(String idGrupoS) throws Exception {
+		
+		Long idGrupo = Long.parseLong(idGrupoS);
+
+		List<Usuario> users = uf.userForGrupoRepository().findByUsuariosForGrupoDeletedFalse(idGrupo);
+
+		int count = 0;
+		for (Usuario u : users) {
+
+			Set<String> online = uf.socketSessionRegistry().getSessionIds(u.getUsername());
+
+			if (online.size() > 0) {
+				count++;
+			}
+		}
+
+		MembersQuantityDTO r = new MembersQuantityDTO();
+		r.setQuantityOnline(count);
+		r.setTotalQuantity(users.size());
+		return r;
+	}
+}

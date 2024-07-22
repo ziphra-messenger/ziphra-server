@@ -1,66 +1,159 @@
 package com.privacity.server.websocket;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.privacity.common.dto.GrupoDTO;
+import com.privacity.common.dto.MembersQuantityDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
+import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
-import com.privacity.server.common.enumeration.Urls;
-import com.privacity.server.common.utils.UtilsString;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.common.exceptions.ProcessException;
+import com.privacity.commonback.common.enumeration.HealthCheckerServerType;
+import com.privacity.commonback.constants.MessagingRestConstants;
+import com.privacity.commonback.pojo.HealthCheckerPojo;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ProcessException;
-import com.privacity.server.model.Grupo;
+import com.privacity.server.component.usuario.UserDetailsImpl;
 import com.privacity.server.security.JwtUtils;
-import com.privacity.server.security.Usuario;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class WebSocketSenderClientService {
 
-
-	@Value("${com.privacity.server.websocket.server}")
-	private String server;
-	
 	private static final String WEBSOCKET_CHANNEL = "/topic/reply";
-	
+
 	@Autowired
 	@Lazy
 	private FacadeComponent comps;
 	
 	@Autowired @Lazy
 	private JwtUtils jwtUtils;
-   
 
 
-//	public void sender(Usuario usuario, ProtocoloDTO protocoloDTP) throws PrivacityException {
-//		sender(usuario.getUsername(),protocoloDTP);
-//	}
-//
-//	public void sender(String username, ProtocoloDTO protocoloDTO) throws PrivacityException {
-//
-//		if (encryptIds) {
-//			//username = privacityIdServices.getAES(username);
-//		}
-//
-//		
-//		sentToUser(username, WEBSOCKET_CHANNEL , new Gson().toJson(protocoloDTO));
-//	}
-//
+
+	public void senderToUser(ProtocoloDTO p, Usuario usuario) throws PrivacityException  {
+		log.debug("senderToUser(ProtocoloDTO p, Usuario usuario");
+		
+		String urlTemplate = buildSenderUrl(MessagingRestConstants.SENDER_TO_USER);
+
+		MultiValueMap<String, String> params = new  LinkedMultiValueMap<String, String>();
+		params.add("obj", comps.util().string().gsonToSend(p));
+		params.add("username", usuario.getUsername());
+
+		send(urlTemplate, params);
+
+	}
+
+
+	
+	public void senderToGrupo(ProtocoloDTO p, Long idGrupo, String username) throws PrivacityException {
+		log.debug("senderToGrupo(ProtocoloDTO p, Long idGrupo, String username)");
+		
+		
+		String url = UriComponentsBuilder.fromHttpUrl(getServerWS() + MessagingRestConstants.SENDER + MessagingRestConstants.SENDER_TO_GRUPO_EXCLUDE_CREATOR )
+         .toUriString();
+
+		MultiValueMap<String, String> params = new  LinkedMultiValueMap<String, String>();
+		params.add("idGrupo", idGrupo+"");
+		params.add("username", username);
+		params.add("obj" ,comps.util().string().replacing( comps.util().gson().toJson(p)));
+		send(url, params);
+	}
+
+	public void senderToGrupo(ProtocoloDTO p, Long idGrupo) throws PrivacityException {
+		log.debug("senderToGrupo(ProtocoloDTO p, Long idGrupo, String username)");
+		
+		String urlTemplate = buildSenderUrl(MessagingRestConstants.SENDER_TO_GRUPO_ALL);
+
+		MultiValueMap<String, String> params = new  LinkedMultiValueMap<String, String>();
+		params.add("obj", comps.util().string().gsonToSend(p));
+		params.add("idGrupo", idGrupo+"");
+		
+		send(urlTemplate, params);
+
+	}
+
+
+	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum comp, ProtocoloActionsEnum action,
+			Object obj) throws PrivacityException  {
+
+		ProtocoloDTO p = new ProtocoloDTO(comp,action);
+		p.setObjectDTO(comps.util().string().gsonToSend(obj));
+		return p;
+	}
+	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum comp, ProtocoloActionsEnum action,
+			MessageDTO m) {
+		ProtocoloDTO p = new ProtocoloDTO(comp,action);
+		p.setMessageDTO(m);
+		return p;
+	}
+
+	public MembersQuantityDTO getMembersOnline(GrupoDTO grupo) throws PrivacityException {
+	
+		log.debug("getMembersOnline(GrupoDTO grupo))");
+		
+		String urlTemplate = buildOnlineMemberUrl(MessagingRestConstants.ONLINE_GET_GRUPO_MEMBERSQUANTITY);
+
+		MultiValueMap<String, String> params = new  LinkedMultiValueMap<String, String>();
+		params.add("idGrupo", grupo.getIdGrupo()+"");
+		
+		MembersQuantityDTO r=null;
+		r = new MembersQuantityDTO();
+		r.setQuantityOnline(0);
+		r.setTotalQuantity(0);
+	
+		try {
+			RestTemplate rest = new RestTemplate();
+
+			return rest.postForObject( urlTemplate, params, MembersQuantityDTO.class);
+		} catch (Exception e) {
+			log.error(ExceptionReturnCode.MESSAGING_GET_ONLINE_MEMBERS_FAIL.getToShow(grupo.getIdGrupo(), e));
+			comps.healthChecker().alertOffLine(HealthCheckerServerType.MESSAGING);
+		}
+
+		return r;
+		
+
+	}
+	public void getMembersOnlineRefresh(String username) throws PrivacityException  {
+		log.debug("getMembersOnlineRefresh(String username)");
+		
+		String urlTemplate = buildOnlineMemberUrl(MessagingRestConstants.ONLINE_REFRESH_FOR_USERNAME);
+
+		MultiValueMap<String, String> params = new  LinkedMultiValueMap<String, String>();
+		params.add("username", username);
+
+		send(urlTemplate, params);
+		
+	}
+	
+
+	private String getServerWS() throws PrivacityException {
+		return comps.healthChecker().getServerValidate(HealthCheckerServerType.MESSAGING);
+	}
+	
 	public MessageDTO buildSystemMessage(Grupo grupo, String text) throws ProcessException {
 
 		MessageDTO mensaje = new MessageDTO();
@@ -72,218 +165,75 @@ public class WebSocketSenderClientService {
 		mensaje.setText(text);
 		mensaje.setSystemMessage(true);
 		mensaje.setUsuarioCreacion(comps.util().usuario().getUsuarioSystemDTO());
-		
+
 		return mensaje;
 
 	}
-//
-//
-//
-//	public void sender(ProtocoloDTO p, Usuario destino) throws PrivacityException {
-//		sentToUser(destino.getUsername(), WEBSOCKET_CHANNEL , new Gson().toJson(p));	
-//	}
-//
-////	public void sender(Message m, String p) throws PrivacityException {
-////		
-////
-////		for ( MessageDetail md : m.getMessagesDetail() ) {
-////			
-////			if (!md.getMessageDetailId().getUserDestino().getIdUser().equals(m.getUserCreation().getIdUser())){
-//// 
-////				
-////				sentToUser(md.getMessageDetailId().getUserDestino().getUsername(), WEBSOCKET_CHANNEL , p);	
-////			}
-////
-////			
-////
-////		}
-//	
-////}
-//
-//	private void sentToUser(String user, String urlDestino, String mensaje) throws PrivacityException {
-//		System.out.println(" sentToUser(String user, String urlDestino, String mensaje)");
-//		System.out.println("SERVER CORE - Salida WS");
-//		System.out.println("user: " + user);
-//		System.out.println("urlDestino: " + urlDestino);
-//		System.out.println("mensaje: " + mensaje);
-//		if (comps.webSocket().socketSessionRegistry().getSessionIds(user).size() >0) {
-//			
-//		try {
-//		
-//			//String retornoFuncionEncriptado =comps.service().usuarioSessionInfo().encryptSessionAESServerWS(user,mensaje);
-//
-//
-//			comps.webSocket().simpMessagingTemplate().convertAndSendToUser(user, urlDestino , mensaje);	
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//						
-//						
-//				
-//		}
-		
 	
-//	 
-//	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, Object dto) throws ProcessException {
-//		return buildProtocoloDTO(component, action, dto, null);
-//	}
-//	
-//	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, MessageDTO messageDTO) throws ProcessException {
-//		return buildProtocoloDTO(component, action, null, messageDTO);
-//	}
-//	
-//	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action, Object dto, MessageDTO messageDTO) throws ProcessException {
-//		ProtocoloDTO p = new ProtocoloDTO();
-//		p.setComponent(component);
-//		p.setAction(action);
-//		
-//
-//		p.setObjectDTO(new Gson().toJson(dto));
-//
-//		return p;
-//	}
-
-//	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum component, ProtocoloActionsEnum action) {
-//		ProtocoloDTO p = new ProtocoloDTO();
-//		p.setComponent(component);
-//		p.setAction(action);
-//
-//		return p;
-//	}
-//	/*
-//	 * @param U ignora ese usuario
-//	 */
-//
-//
-//	public void senderPing(String username) throws PrivacityException {
-//		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.PING, ProtocoloActionsEnum.PING_ACTION);
-//			addMessageCola(p, username);
-//	}
-	
-
-		
-//	public void senderMessageToGrupoMinusCreator(String idUsuario, String idGrupo, ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, MessageDTO messageDTO ) throws PrivacityException {
-//
-//
-//		
-//		List<String> lista;
-//		
-//		if (messageDTO.isSystemMessage() ) {
-//			lista = comps.repo().userForGrupo().findByForGrupoAll(Long.parseLong(idGrupo));
-//		}else {
-//			lista = comps.repo().userForGrupo().findByForGrupoMinusCreator(Long.parseLong(idGrupo), Long.parseLong( idUsuario));	
-//		}
-//		
-//		
-//		lista.stream().forEach( username -> 
-//		senderMessageToGrupoMinusCreatorThread(username,componente, action, messageDTO)
-//	);
-//		
-//	}
-//	private void senderMessageToGrupoMinusCreatorThread (String username, ProtocoloComponentsEnum componente, ProtocoloActionsEnum action, MessageDTO messageDTO ){
-//		
-//		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-//				componente,
-//				action);
-//		
-//		p.setMessageDTO(messageDTO);
-//		addMessageCola(p, username);
-//	}
-	
-	public void senderToGrupoMinusCreator(String username, long idGrupo, ProtocoloDTO p) throws PrivacityException {
-		
-		senderToGrupo(p,idGrupo, username, true);
-		
-	}
-
-
-	
-	public void senderToUser(ProtocoloDTO p, Usuario usuario) throws PrivacityException {
-		System.out.println("senderToUser(ProtocoloDTO p, Usuario usuario");
-		String protocoloEncr = comps.service().usuarioSessionInfo().encryptProtocoloWS(usuario.getUsername(), p, getUrl().name());
-
-		WsMessage m = new WsMessage();
-		m.setUsername(usuario.getUsername());
-		m.setProtocolo(protocoloEncr);
-		sender( m);
-
-	}
-	
-	public void senderToGrupo(ProtocoloDTO p, Long idGrupo, String username, boolean minusCreator) throws PrivacityException {
-		System.out.println("senderToGrupo(ProtocoloDTO p, boolean minusCreator, boolean onlyOnline)");
-		List<Usuario> lista = comps.repo().userForGrupo().findByUsuariosForGrupoDeletedFalse(idGrupo);
-		//poner paralel stream
-		
-		for ( int k = 0 ; k < lista.size() ; k++ ) {
-
-			Usuario destino = lista.get(k); 
-			
-			if (destino.getUsername().equals(username) && minusCreator) {
-				System.out.println("usuario creador excluido: " + username);
-			}else {
-				senderToUser(p,  destino );	
-			}
-				
-			
-	
-		}
-		
-	}
-	
-	public void sender(WsMessage msg) {
-  	  RestTemplate rest = new RestTemplate();
-
-  	  MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-  	  map.add("msg",UtilsString.gsonToSend(msg));
-
-
-  	  rest.postForObject(server + "/entry/ws", map,String.class);
-  	  
-		
-	}
-	
-	public Urls getUrl() {
-		return Urls.CONSTANT_URL_PATH_PRIVATE_WS;
-	}
-	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum comp, ProtocoloActionsEnum action,
-			Object obj) {
-		
-		ProtocoloDTO p = new ProtocoloDTO(comp,action);
-		p.setObjectDTO(UtilsString.gsonToSend(obj));
-		return p;
-	}
-	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum comp, ProtocoloActionsEnum action,
-			MessageDTO m) {
-		ProtocoloDTO p = new ProtocoloDTO(comp,action);
-		p.setMessageDTO(m);
-		return p;
-	}
-	
-	public int getMembersOnline(GrupoDTO request) throws PrivacityException {
-
+	private HttpHeaders buildHeaders() throws PrivacityException {
 		Authentication auth = SecurityContextHolder
-		        .getContext()
-		        .getAuthentication();
-		String token = jwtUtils.generateJwtToken(auth);
+				.getContext()
+				.getAuthentication();
+		String token =jwtUtils.generateJwtToken(((UserDetailsImpl) auth.getPrincipal()).getUsername());
+
 		
-		 
-		RestTemplate rest = new RestTemplate();
-		
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("Authorization", "Bearer "+token);
-
-		HttpEntity<String> entity = new HttpEntity<String>(headers);
+		//headers.set("Content-Type", "application/json");
+		return headers;
+	}
+	
+	private String buildSenderUrl(String service) throws PrivacityException {
+		return UriComponentsBuilder.fromHttpUrl(getServerWS() + MessagingRestConstants.SENDER + service ).toUriString();
+	}
+	
+	private String buildOnlineMemberUrl(String service) throws PrivacityException {
+		return UriComponentsBuilder.fromHttpUrl(getServerWS() + MessagingRestConstants.ONLINE + service ).toUriString();
+	}
+	
+	private List<HttpMessageConverter<?>> getJsonMessageConverters() {
+	    List<HttpMessageConverter<?>> converters = new ArrayList<>();
+	    converters.add(new MappingJackson2HttpMessageConverter());
+	    return converters;
+	}
+	
+	private void send(String urlTemplate, MultiValueMap<String, String> params) throws PrivacityException {
 		
-  	  MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-  	  //map.add("idGrupo", "idGrupo=");
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					RestTemplate rest = new RestTemplate();
+					//rest.setMessageConverters(getJsonMessageConverters());
+					
+//					rest.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+		//
+		//
 
-  	  Integer idMessage = rest.postForObject(server + "/entry/ws/get/online/grupo/" + request.getIdGrupo(), entity, Integer.class);
-  	  if ( idMessage == null) {
-  		  return 0;
-  	  }
-      return idMessage;
+					
+					rest.postForObject( urlTemplate, params, String.class);
+
+
+		//
+//					
+//					rest.post
+//					
+//					(urlTemplate, entity);
+//					        
+//					String r = rest.postForObject(urlTemplate, params, String.class);
+
+				
+				} catch (RestClientException e) {
+					e.printStackTrace();
+					log.error(e.getMessage());
+					comps.healthChecker().alertOffLine(HealthCheckerServerType.MESSAGING);
+				} 
+				
+			}
+		}).start();;
 
 	}
 }

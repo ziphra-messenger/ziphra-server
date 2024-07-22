@@ -1,10 +1,16 @@
 package com.privacity.server.component.common.service.facade;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.privacity.common.adapters.LocalDateAdapter;
+import com.privacity.common.util.ZipUtilService;
 import com.privacity.server.component.auth.AuthUtil;
 import com.privacity.server.component.grupo.GrupoUtilService;
 import com.privacity.server.component.grupoinvitation.GrupoInvitationUtil;
@@ -16,14 +22,22 @@ import com.privacity.server.component.myaccount.MyAccountConfUtilService;
 import com.privacity.server.component.requestid.RequestIdUtilService;
 import com.privacity.server.component.userforgrupo.UserForGrupoUtil;
 import com.privacity.server.component.usuario.UserUtilService;
+import com.privacity.server.services.UtilsStringService;
 import com.privacity.server.util.UtilService;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Accessors(fluent = true, chain = false)
 @Component
 @NoArgsConstructor
+@Getter
 public class FacadeUtilComponent{
 
+	@Autowired @Lazy
+	private ZipUtilService zip;
+	
 	@Autowired
 	@Lazy	
 	private MediaUtilService media;
@@ -74,64 +88,17 @@ public class FacadeUtilComponent{
 	
 	@Autowired
 	@Lazy
-	private UtilService utilService;
-	public UtilService utilService() {
-		return utilService;
-	}	
-	public GrupoInvitationUtil grupoInvitation() {
-		return grupoInvitation;
-	}
+	private UtilService util;
 
+	@Autowired
+	@Lazy
+	private UtilsStringService string;
 	
-	public PasswordEncoder passwordEncoder() {
-		return passwordEncoder;
+	public final Gson gson() {
+		return new GsonBuilder()
+				.setPrettyPrinting()
+				.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
+				.create();
+
 	}
-
-	public AuthUtil auth() {
-		return auth;
-	}
-	
-	public MediaUtilService media() {
-		return media;
-	}
-
-	public UserForGrupoUtil userForGrupo() {
-		return userForGrupo;
-	}
-
-	public MessageUtilService message() {
-		return message;
-	}
-
-	public MessageDetailUtil messageDetail() {
-		return messageDetail;
-	}
-
-	public GrupoUtilService grupo() {
-		return grupo;
-	}
-
-	public MyAccountConfUtilService myAccountConf() {
-		return myAccountConf;
-	}
-
-	public GrupoUserConfUtil grupoUserConf() {
-		return grupoUserConf;
-	}
-
-	public UserUtilService usuario() {
-		return usuario;
-	}
-
-	public RequestIdUtilService requestId() {
-		return requestId;
-	}
-
-
-
-
-	
-//	@Autowired
-//	@Lazy
-//	private GrupoUserConfUtilService grupoUserConf;
 }

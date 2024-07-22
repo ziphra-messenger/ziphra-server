@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.privacity.common.adapters.LocalDateAdapter;
 import com.privacity.common.enumeration.RandomGeneratorType;
 import com.privacity.common.util.RandomGenerator;
-import com.privacity.server.common.adapters.LocalDateAdapter;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 
 @Service
@@ -33,15 +33,7 @@ public class UtilService {
 	                .create();
 	}
 	
-	public Object clon(Class clazz, Object o ) {
-		
-	       
-        String j = gson.toJson(o);
-        
-        Object fromJson = gson.fromJson(j, clazz);
-		return fromJson;
-		
-	}
+
 
 
  

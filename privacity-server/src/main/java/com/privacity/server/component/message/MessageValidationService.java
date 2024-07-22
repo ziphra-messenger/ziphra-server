@@ -1,5 +1,6 @@
 package com.privacity.server.component.message;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -15,15 +16,15 @@ import com.privacity.common.dto.MessageDetailDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
 import com.privacity.common.enumeration.MessageState;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.common.exceptions.ProcessException;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.Message;
+import com.privacity.core.model.MessageDetail;
+import com.privacity.core.model.UserForGrupo;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ProcessException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageDetail;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.security.Usuario;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -69,7 +70,7 @@ public class MessageValidationService {
 		
 	}
 	
-	public void deleteForEveryone(IdMessageDTO request) throws PrivacityException {
+	public void deleteForEveryone(IdMessageDTO request) throws PrivacityException, IOException {
 		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 
 		Long idGrupo = comps.util().grupo().convertIdGrupoStringToLong(request.getIdGrupo());

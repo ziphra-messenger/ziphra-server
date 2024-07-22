@@ -2,7 +2,6 @@ package com.privacity.server.main;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,70 +14,84 @@ import com.privacity.common.dto.AESAllDTO;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
-import com.privacity.server.common.enumeration.Urls;
-import com.privacity.server.common.utils.UtilsString;
+import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.commonback.common.enumeration.Urls;
+import com.privacity.commonback.common.interfaces.HealthCheckerInterface;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.UserForGrupo;
+import com.privacity.core.model.Usuario;
+import com.privacity.server.component.common.ControllerBaseUtil;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.security.Usuario;
 
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping(path = "/private")
 @Slf4j
-public class SendPrivateController {
-
+public class SendPrivateController extends ControllerBaseUtil{
+	@Autowired
+	@Lazy
+	private HealthCheckerInterface healthChecker;
 
 	@Autowired @Lazy
 	private FacadeComponent comps;
 	@PostMapping("/send")
 	public ResponseEntity<String> inMessage(@RequestParam String request, 
 			/*@RequestParam("data") */ MultipartFile data) throws PrivacityException {
-		try {
 
-			String username = comps.requestHelper().getUsuarioUsername();
+		if ( checkServersMessageId()!= null) return checkServersMessageId();
+		if ( checkServersSessionManager()!= null) return checkServersSessionManager();
+		if ( checkServersRequestId()!= null) return checkServersRequestId();
 
-			ProtocoloDTO p = comps.service().usuarioSessionInfo().decryptProtocolo(username, request, getUrl().name());
 
-			if (p.getMessageDTO().getMediaDTO() != null) {
+		String username = comps.requestHelper().getUsuarioUsername();
 
-				AESAllDTO aess = comps.service().usuarioSessionInfo().getAesDtoAll(username);
-				AESDTO aesdto =aess.getSessionAESDTOServerIn();
-				AESToUse c = new AESToUse(Integer.parseInt(aesdto.getBitsEncrypt()),
+		ProtocoloDTO p = comps.service().usuarioSessionInfo().decryptProtocolo(username, request, getUrl().name());
+
+		if (p.getMessageDTO().getMediaDTO() != null) {
+
+			AESAllDTO aess = comps.service().usuarioSessionInfo().getAesDtoAll(username);
+			AESDTO aesdto =aess.getSessionAESDTOServerIn();
+			AESToUse c;
+			try {
+				c = new AESToUse(Integer.parseInt(aesdto.getBitsEncrypt()),
 						Integer.parseInt(	 aesdto.iteration),
 						aesdto.getSecretKeyAES(),
 						aesdto.getSaltAES());
 
+
 				byte[] dataDescr = c.getAESDecryptData(data.getBytes());
 				p.getMessageDTO().getMediaDTO().setData(dataDescr);
-
+			} catch (NumberFormatException e) {
+				log.error(e.getMessage());
+				throw new PrivacityException(ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL);
+			} catch (Exception e) {
+				log.error(e.getMessage());
+				throw new PrivacityException(ExceptionReturnCode.ENCRYPT_PROCESS);
 			}
-
-			ProtocoloDTO retornoFuncion = this.in(p);
-
-			String retornoFuncionEncriptado = comps.service().usuarioSessionInfo().encryptProtocolo(username, UtilsString.gsonToSend( retornoFuncion), getUrl().name());	
-
-			log.debug("ENCRIPTADO >>" + UtilsString.shrinkString(retornoFuncionEncriptado));
-			return ResponseEntity.ok().body(UtilsString.gsonToSend(retornoFuncionEncriptado));
-
-		}catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);	
 		}
+
+		ProtocoloDTO retornoFuncion = this.in(p);
+
+		String retornoFuncionEncriptado = comps.service().usuarioSessionInfo().encryptProtocolo(
+				username,  retornoFuncion, getUrl().name());	
+
+		log.debug("ENCRIPTADO >>" + comps.util().string().cutString(retornoFuncionEncriptado));
+		return ResponseEntity.ok().body( comps.util().gson().toJson(retornoFuncionEncriptado));
+
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Object getDTOObject(String objectDTO, Class clazz) {
 
-		return UtilsString.gson().fromJson(objectDTO, clazz);
+		return comps.util().gson().fromJson(objectDTO, clazz);
 	}
 
 
-	public ProtocoloDTO in(@RequestBody ProtocoloDTO request) throws Exception {
+	public ProtocoloDTO in(@RequestBody ProtocoloDTO request)  {
 
-		log.debug("<<" + UtilsString.shrinkString(request.toString()));
+		log.debug("<<" + comps.util().string().cutString(request.toString()));
 
 		ProtocoloDTO p = new ProtocoloDTO();
 
@@ -113,7 +126,7 @@ public class SendPrivateController {
 		p.setMessageDTO(objetoRetorno);
 		p.setAsyncId(request.getAsyncId());
 
-		log.debug(">>" +UtilsString.shrinkString(p.toString()));
+		log.debug(">>" +comps.util().string().cutString(p.toString()));
 		return p;
 
 	}	

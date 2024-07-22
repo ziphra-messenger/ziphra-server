@@ -27,9 +27,11 @@ import com.privacity.common.dto.request.MyAccountNicknameRequestDTO;
 import com.privacity.common.dto.request.PublicKeyByInvitationCodeRequestDTO;
 import com.privacity.common.dto.request.RegisterUserRequestDTO;
 import com.privacity.common.dto.request.ValidateUsernameDTO;
+import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
-import com.privacity.server.common.enumeration.Urls;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.commonback.common.enumeration.Urls;
 import com.privacity.server.component.auth.AuthValidationService;
 import com.privacity.server.component.encryptkeys.EncryptKeysService;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
@@ -112,7 +114,7 @@ public class ProtocoloMapService {
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_ID,grupoValidationService,"getGrupoById",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_GRUPO_BY_IDS,grupoValidationService,"getGrupoByIds",GrupoDTO[].class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GET_IDS_MY_GRUPOS,grupoValidationService,"getIdsMisGrupos");
-		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_GRAL_CONF_SAVE_LOCK,grupoValidationService,"saveGrupoGralConfLock",GrupoDTO.class);
+		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_SAVE_GENERAL_CONFIGURATION_LOCK,grupoValidationService,"saveGrupoGralConfLock",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_LIST_MEMBERS,grupoValidationService,"getMembers",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_LOGIN,grupoValidationService,"loginGrupo",GrupoDTO.class);
 		buildItem(Urls.CONSTANT_URL_PATH_PRIVATE,ProtocoloComponentsEnum.GRUPO,ProtocoloActionsEnum.GRUPO_NEW_GRUPO,grupoValidationService,"newGrupo",GrupoNewRequestDTO.class);
@@ -165,9 +167,24 @@ public class ProtocoloMapService {
 	}
 	
 
-	public ProtocoloValue get (Urls url, ProtocoloComponentsEnum comp, ProtocoloActionsEnum act ) {
-		log.debug("protocolo pedido " +  ProtocoloKey.build(url, comp, act).toString()) ;
-		return map.get( ProtocoloKey.build(url, comp, act));
+	public ProtocoloValue get (Urls url, ProtocoloComponentsEnum comp, ProtocoloActionsEnum act ) throws PrivacityException {
+		log.debug("protocolo pedido " +  url.name() + " " + ProtocoloKey.build(url, comp, act).toString())  ;
+
+
+		ProtocoloValue r;
+		try {
+			r = map.get( ProtocoloKey.build(url, comp, act));
+			log.debug("value: " +  r.toString())  ;
+		} catch (Exception e) {
+			log.error(ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL.getCode() + " - " +
+					ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL.getDescription());
+
+			throw new PrivacityException(ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL);
+		}
+
+
+
+		return r;
 	}
 
 //	public static void main(String[] args) throws Exception {

@@ -6,20 +6,24 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.server.component.grupouserconf.GrupoUserConfService;
 import com.privacity.server.component.requestid.RequestIdPublicService;
-import com.privacity.server.encrypt.UsuarioSessionInfoService;
+import com.privacity.server.encrypt.SessionManagerInfoService;
 import com.privacity.server.services.protocolomap.ProtocoloMapService;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Service
 @NoArgsConstructor
+@Accessors(fluent = true, chain = false)
+@Getter
 public class FacadeServiceComponent {
 	
 	@Autowired @Lazy
 	private GrupoUserConfService grupoUserConf;
 
 	@Autowired @Lazy
-	private UsuarioSessionInfoService usuarioSessionInfo;
+	private SessionManagerInfoService usuarioSessionInfo;
 	
 	@Autowired @Lazy
 	private RequestIdPublicService requestIdPublic;
@@ -27,19 +31,6 @@ public class FacadeServiceComponent {
 	@Autowired @Lazy
 	private ProtocoloMapService protocoloMap;
 
-	
-	public RequestIdPublicService requestIdPublic() {
-		return requestIdPublic;
-	}
-	public GrupoUserConfService grupoUserConf() {
-		return grupoUserConf;
-	}
-	public UsuarioSessionInfoService usuarioSessionInfo() {
-		return usuarioSessionInfo;
-	}
-	public ProtocoloMapService protocoloMap() {
-		return protocoloMap;
-	}
 	
 	
 }

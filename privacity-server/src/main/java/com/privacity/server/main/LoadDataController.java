@@ -5,13 +5,11 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.privacity.common.dto.GrupoDTO;
-import com.privacity.server.common.enumeration.ERole;
-import com.privacity.server.model.Grupo2;
-import com.privacity.server.model.Role;
-import com.privacity.server.security.RoleRepository;
-import com.privacity.server.security.Usuario;
-import com.privacity.server.security.UsuarioRepository;
+import com.privacity.commonback.common.enumeration.ERole;
+import com.privacity.core.model.Role;
+import com.privacity.core.model.Usuario;
+import com.privacity.core.repository.RoleRepository;
+import com.privacity.core.repository.UsuarioRepository;
 import com.privacity.server.util.MapperService;
 
 
@@ -99,13 +97,5 @@ public class LoadDataController {
 ////		
 
 	}
-	static public GrupoDTO doit(Grupo2 grupo) {
-		
-		GrupoDTO g = new GrupoDTO();
-		g.setIdGrupo(grupo.getIdGrupo().toString());
-		g.setName(grupo.getName() + "");
-		g.setAlias(grupo.isDeleted() + "");
-		return g;
-	
-}
+
 }

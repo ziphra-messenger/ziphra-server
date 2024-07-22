@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.servergralconf.SystemGralConf;
+import com.privacity.common.exceptions.PrivacityException;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
 
 import lombok.AllArgsConstructor;
 

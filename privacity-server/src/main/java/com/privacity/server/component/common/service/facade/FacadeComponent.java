@@ -5,11 +5,16 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.privacity.server.component.common.service.RequestHelperService;
+import com.privacity.server.tasks.HealthChecker;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Component
 @NoArgsConstructor
+@Accessors(fluent = true, chain = false)
+@Getter
 public class FacadeComponent {
 	@Autowired @Lazy
 	private FacadeCommonComponent common;
@@ -32,35 +37,7 @@ public class FacadeComponent {
 	@Autowired @Lazy
 	private RequestHelperService requestHelper;
 	
-	public FacadeFactoryService factory() {
-		return factory;
-	}
+	@Autowired @Lazy
 	
-	public FacadeValidationService validation() {
-		return validation;
-	}
-	
-	public FacadeCommonComponent common() {
-		return common;
-	}
-	public FacadeRepositoryComponent repo() {
-		return repo;
-	}
-	public FacadeUtilComponent util() {
-		return util;
-	}
-	public FacadeServiceComponent service() {
-		return service;
-	}
-	public FacadeWebSocketComponent webSocket() {
-		return webSocket;
-	}
-	public FacadeProcessServiceComponent process() {
-		return process;
-	}
-	public RequestHelperService requestHelper() {
-		return requestHelper;
-	}
-
-
+	private HealthChecker healthChecker;
 }

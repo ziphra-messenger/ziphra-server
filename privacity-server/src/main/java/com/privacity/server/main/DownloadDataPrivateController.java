@@ -3,7 +3,6 @@ package com.privacity.server.main;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.privacity.common.adapters.LocalDateAdapter;
 import com.privacity.common.dto.AESAllDTO;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
-import com.privacity.server.common.adapters.LocalDateAdapter;
-import com.privacity.server.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.Urls;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.message.MessageValidationService;
 
@@ -78,16 +77,10 @@ Integer.parseInt(	 aesdto.iteration),
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Object getDTOObject(String objectDTO, Class clazz) {
-		if (showLog());////System.out.println("objectDTO:" + objectDTO + "clazz:" + clazz.getName());
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
-                .create();
-		return gson.fromJson(objectDTO, clazz);
+		return comps.util().gson().fromJson(objectDTO, clazz);
 	}
 
 	public MessageDTO in(@RequestBody ProtocoloDTO request) throws Exception {
-
 
 		MessageDTO objetoRetorno=null;
 			
@@ -102,18 +95,6 @@ Integer.parseInt(	 aesdto.iteration),
 						comps.requestHelper().getUsuarioUsername()
 						,objetoRetorno, MessageDTO.class.getName());
 
-
-
-	//	if(getEncryptIds()) {
-	//		objetoRetorno = getPrivacityIdServices().transformarDesencriptarOut(getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject));
-	//	}else {
-	//		objetoRetorno = getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject);
-	//	}	
-	// armo la devolucion
-			
-
-
-	if (showLog()); ////System.out.println(">>" + p.toString());
 	return objetoRetorno;
 
 }	
@@ -130,10 +111,6 @@ Integer.parseInt(	 aesdto.iteration),
 	}
 
 
-	
-	public boolean showLog() {
-		return false;
-	}
 
 	   public Urls getUrl() {
 			return Urls.CONSTANT_URL_PATH_PRIVATE_DOWNLOAD_DATA;

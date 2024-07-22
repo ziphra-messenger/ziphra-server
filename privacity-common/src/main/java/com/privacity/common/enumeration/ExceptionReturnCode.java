@@ -6,12 +6,14 @@ import java.util.Map;
 public enum ExceptionReturnCode {
 
 	GENERAL_INESPERADO("GI_000", "GENERAL_INESPERADO"),
-	
+
 	GENERAL_INVALID_ACCESS("GRAL_1000", "GENERAL_INVALID_ACCESS"),
 	GENERAL_NOT_SAVE_BECAUSE_NO_DATA_CHANGE("GRAL_1001", "GENERAL_NOT_SAVE_BECAUSE_NO_DATA_CHANGE"),
 	GENERAL_NO_INTERNET_ACCESS("GRAL_1002", "GENERAL_NO_INTERNET_ACCESS"),
-	GENERAL_INVALID_ACCESS_PROTOCOL("GRAL_1001", "GENERAL_INVALID_ACCESS_PROTOCOL"),
-	
+	GENERAL_INVALID_ACCESS_PROTOCOL("GRAL_1003", "GENERAL_INVALID_ACCESS_PROTOCOL"),
+
+	GENERAL_INVALID_SENT_DATA("GRAL_1004", "GENERAL_INVALID_SENT_DATA"),
+
 	GRUPO_USER_NOT_EXISTS_INVITATION_CODE("G_1000", "GRUPO_USER_NOT_EXISTS_INVITATION_CODE"),
 	GRUPO_USER_IS_IN_THE_GRUPO("G_1001", "GRUPO_USER_IS_IN_THE_GRUPO"),
 	GRUPO_GRUPOID_BADFORMAT("G_1002", "GRUPO_GRUPOID_BADFORMAT"),
@@ -25,100 +27,137 @@ public enum ExceptionReturnCode {
 	GRUPO_USER_CANT_SEND_MESSAGE("G_1010", "GRUPO_USER_CANT_SEND_MESSAGE"),
 	GRUPO_USER_CANT_SEND_MESSAGE_READ_ONLY("G_1011", "GRUPO_USER_CANT_SEND_MESSAGE_READ_ONLY"),
 	GRUPO_GENERAL_CONF_LOCK_MIN_SECONDS_VALIDATION("G_1012", "GRUPO_GENERAL_CONF_LOCK_MIN_SECONDS_VALIDATION"),
-	
+
 	GRUPO_ROLE_NOT_ALLOW_THIS_ACTION("G_1013", "GRUPO_ROLE_NOT_ALLOW_THIS_ACTION"),
-	
+
 	ZIP_COMPRESS("Z_1001", "ZIP_COMPRESS"),
-	ZIP_DESCOMPRESS("Z_1002", "ZIP_DESCOMPRESS"),
-	
+	ZIP_DECOMPRESS("Z_1002", "ZIP_DECOMPRESS"),
+
 	REQUEST_ID_BAD_LENGTH("RI_1000", "REQUEST_ID_BAD_LENGTH"),
 	REQUEST_ID_NOT_EXISTS("RI_1001", "REQUEST_ID_NOT_EXISTS"),
 	REQUEST_ID_EXPIRED("RI_1002", "REQUEST_ID_EXPIRED"),
 	REQUEST_ID_CANT_BE_NULL("RI_1003", "REQUEST_ID_CANT_BE_NULL"),
 	REQUEST_ID_CANT_BE_USED_MULTI_TIMES("RI_1004", "REQUEST_ID_CANT_BE_USED_MULTI_TIMES"),
-	
+	REQUEST_ID_OFFLINE("RI_1005", "REQUEST_ID_OFFLINE"),
+
 	USER_USER_SYSTEM_NOT_EXISTS("U_1000", "USER_USER_SYSTEM_NOT_EXISTS"),
 	USER_USER_NOT_LOGGER("U_1001", "USER_USER_NOT_LOGGER"),
 	USER_NICKNAME_IS_NULL("U_1002", "USER_NICKNAME_IS_NULL"),
 	USER_NICKNAME_TOO_LONG("U_1003", "USER_NICKNAME_TOO_LONG"),
 	USER_NOT_EXISTS("U_1004", "USER_NOT_EXISTS"),
-	
-	
+
+
 	AUTH_USERNAME_EXISTS("A_1000", "AUTH_USERNAME_EXISTS"),
 	AUTH_USERNAME_IS_NULL("A_1001", "AUTH_USERNAME_IS_NULL"),
 	AUTH_USERNAME_IS_TOO_SHORT("A_1002", "AUTH_USERNAME_IS_TOO_SHORT"),
 	AUTH_BAD_CREDENTIAL("A_1003", "AUTH_BAD_CREDENTIAL"),
 	AUTH_SESSION_OUTOFSYNC("A_1004", "AUTH_SESSION_OUTOFSYNC"),
+
+	AUTH_GETTING_TOKEN_FAIL("A1005","AUTH_GETTING_TOKEN_FAIL"),
 	
 	MESSAGE_MESSAGEID_BADFORMAT("M_1000", "MESSAGE_MESSAGEID_BADFORMAT"),
 	MESSAGE_NOT_EXISTS("M_1001", "MESSAGE_NOT_EXISTS"),
 	MESSAGE_NOT_MESSAGE_CREATOR("M_1002", "MESSAGE_NOT_MESSAGE_CREATOR"),
-	
+
 	MESSAGEDETAIL_MESSAGEDETAILID_BADFORMAT("MD_1000", "MESSAGEDETAIL_MESSAGEDETAILID_BADFORMAT"),
 	MESSAGEDETAIL_NOT_EXISTS("MD_1001", "MESSAGEDETAIL_NOT_EXISTS"),
 	MESSAGEDETAIL_IS_DELETED("MD_1002", "MESSAGEDETAIL_IS_DELETED"),
 	MESSAGEDETAIL_NOT_EXISTS_TIME_MESSAGE("MD_1003", "MESSAGEDETAIL_NOT_EXISTS_TIME_MESSAGE"),
-	
+
 	MYACCOUNT_INVITATION_CODE_NOT_AVAIBLE("MY_1000", "MYACCOUNT_INVITATION_CODE_NOT_AVAIBLE"),
 	MYACCOUNT_INVITATION_CODE_CANT_BE_EMPTY("MY_1001", "MYACCOUNT_INVITATION_CODE_CANT_BE_EMPTY"),
-	
+
 	MYACCOUNT_LOCK_MIN_SECONDS_VALIDATION("MY_1002", "MYACCOUNT_LOCK_MIN_SECONDS_VALIDATION"),	
-	
+
 	ENCRYPT_IS_NULL("E_1000", "ENCRYPT_IS_NULL"),
 	ENCRYPT_PRIVATE_KEY_IS_NULL("E_1001", "ENCRYPT_PRIVATE_KEY_IS_NULL"),
 	ENCRYPT_PUBLIC_KEY_IS_NULL("E_1002", "ENCRYPT_PUBLIC_KEY_IS_NULL"),
 	ENCRYPT_PUBLIC_KEY_NO_ENCRIPT_IS_NULL("E_1003", "ENCRYPT_PUBLIC_KEY_NO_ENCRIPT_IS_NULL"),
 	ENCRYPT_PUBLIC_KEY_MUST_BE_NULL("E_1006", "ENCRYPT_PUBLIC_KEY_MUST_BE_NULL"),
-	
+
+	ENCRYPT_PROCESS("EA_1001", "ENCRYPT_PROCESS"),
+
 	ENCRYPT_AES_IS_NULL("EA_1003", "ENCRYPT_AES_IS_NULL"),
 	ENCRYPT_AES_SECRET_KEY_IS_NULL("EA_1004", "ENCRYPT_AES_SECRET_KEY_IS_NULL"),
 	ENCRYPT_AES_SALT_IS_NULL("EA_1005", "ENCRYPT_AES_SALT_IS_NULL"),
-	ENCRYPT_PROCESS("EA_1006", "ENCRYPT_PROCESS");
+	ENCRYPT_AES_CREATION_FAIL("EA_1007", "ENCRYPT_AES_CREATION_FAIL"),
+
+	DECRYPT_ID_PROCESS_FAIL("DID_1001", "DECRYPT_ID_PROCESS_FAIL"),
+	ENCRYPT_ID_PROCESS_FAIL("EID_1001", "ENCRYPT_ID_PROCESS_FAIL"),
+
+	MESSAGING_OFFLINE("WE_1001", "MESSAGING_OFFLINE"),
+	MESSAGING_INVALID_ACCESS_PROTOCOL("ME_1002", "MESSAGING_INVALID_ACCESS_PROTOCOL"),
+	MESSAGING_GET_ONLINE_MEMBERS_FAIL("WE_1003", "MESSAGING_GET_ONLINE_MEMBERS_FAIL"),
 	
+	SESSION_MANAGER_OFFLINE("SM_1001", "SESSION_MANAGER_OFFLINE"),
 	
+	IDS_PROVIDER_OFFLINE("IP_1001", "IDS_PROVIDER_OFFLINE"),
 	
+	KEYLOCK_FAIL("KL_1001", "KEYLOCK_FAIL");
+
+
+
 	private static final String CONSTANT_DESCRIPTION = "description";
 	private static final String CONSTANT_CODE = "code";
 
 	private final String code;
 	private final String description;
 
-  private ExceptionReturnCode(String code, String description) {
-    this.code = code;
-    this.description = description;
-  }
+	private ExceptionReturnCode(String code, String description) {
+		this.code = code;
+		this.description = description;
+	}
 
-  public String getDescription() {
-     return description;
-  }
+	public String getDescription() {
+		return description;
+	}
 
-  public String getCode() {
-     return code;
-  }  
-  
-  public String toShow() {
-	     return getCode() + " _ " + getDescription();
-  }
+	public String getToShow() {
+		return code + " - " +description;
 
-  public String toShow(String exceptionMessage) {
+	}
+
+	public String getCode() {
+		return code;
+	}  
+
+	public String toShow() {
+		return getCode() + " _ " + getDescription();
+	}
+
+	public String toShow(String exceptionMessage) {
 		return exceptionMessage + " _ " + toString();
 	}  
-  
-  public Map<String, String> toReturn() {
-	  Map<String, String> r = new LinkedHashMap<String, String>();
-	  r.put(CONSTANT_CODE, code );
-	  r.put(CONSTANT_DESCRIPTION, description );
-	  return r;
-  }  
-  
-  public static ExceptionReturnCode getByCode(String code) {
-	  ExceptionReturnCode[] e = ExceptionReturnCode.class.getEnumConstants();
-	  
-	  for (int i=0 ; i < e.length ; i++ ) {
-		  if (e[i].getCode().equals(code)) {
-			  return e[i];
-		  }
-	  }
-	  return null;
-  }
+
+	public Map<String, String> toReturn() {
+		Map<String, String> r = new LinkedHashMap<String, String>();
+		r.put(CONSTANT_CODE, code );
+		r.put(CONSTANT_DESCRIPTION, description );
+		return r;
+	}  
+
+	public static ExceptionReturnCode getByCode(String code) {
+		ExceptionReturnCode[] e = ExceptionReturnCode.class.getEnumConstants();
+
+		for (int i=0 ; i < e.length ; i++ ) {
+			if (e[i].getCode().equals(code)) {
+				return e[i];
+			}
+		}
+		return null;
+	}
+
+	public String getToShow(Exception e) {
+
+		return getToShow() + " - " + e.getMessage() ;
+	}
+	
+	public String getToShow(String details) {
+
+		return getToShow() + " - " + details ;
+	}
+	public String getToShow(String details, Exception e) {
+
+		return getToShow() + " - " + details + " -" + e.getMessage() ;
+	}
 }

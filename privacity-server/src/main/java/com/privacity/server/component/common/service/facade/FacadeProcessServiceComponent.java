@@ -7,10 +7,14 @@ import org.springframework.stereotype.Service;
 import com.privacity.server.component.grupo.GrupoProcessService;
 import com.privacity.server.component.message.MessageProcessService;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Service
 @NoArgsConstructor
+@Accessors(fluent = true, chain = false)
+@Getter
 public class FacadeProcessServiceComponent {
 
 
@@ -20,14 +24,4 @@ public class FacadeProcessServiceComponent {
 	@Autowired @Lazy
 	private MessageProcessService message;
 
-	public GrupoProcessService grupo() {
-		return grupo;
-	}
-
-	public MessageProcessService message() {
-		return message;
-	}
-
-
-	
 }

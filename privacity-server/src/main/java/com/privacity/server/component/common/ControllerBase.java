@@ -1,49 +1,35 @@
 package com.privacity.server.component.common;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import java.io.IOException;
+
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.exceptions.ValidationException;
 import com.privacity.common.interfaces.IdGrupoInterface;
-import com.privacity.server.common.enumeration.Urls;
-import com.privacity.server.common.utils.UtilsString;
-import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.component.requestid.RequestIdUtilService;
-import com.privacity.server.exceptions.ValidationException;
+import com.privacity.commonback.common.enumeration.Urls;
 import com.privacity.server.services.protocolomap.ProtocoloValue;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class ControllerBase {
-
-	@Autowired
-	@Lazy
-	private RequestIdUtilService requestIdUtil;
-
-	@Autowired
-	@Lazy
-	private FacadeComponent comps;
-
+public abstract class ControllerBase extends ControllerBaseUtil {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected Object getDTOObject(ProtocoloDTO request, String objectDTO, Class clazz) {
-
-		log.debug("getDTOObject Base :" +UtilsString.shrinkString ( objectDTO) + "clazz:" + clazz.getName());
-
-		return UtilsString.gson().fromJson(objectDTO, clazz);
+	protected Object getDTOObject(ProtocoloDTO request, String objectDTO, Class clazz) throws IOException {
+		log.debug("getDTOObject Base :" +comps.util().string().cutString ( objectDTO) + "clazz:" + clazz.getName());
+		return comps.util().gson().fromJson(objectDTO, clazz);
 	}
 
 
-	public ProtocoloDTO in(@RequestBody ProtocoloDTO request) throws Exception {
+	public ProtocoloDTO in(@RequestBody ProtocoloDTO request)  {
 
 		log.debug(">> " + request.toString());
 
-		ProtocoloValue value = comps.service().protocoloMap().get(getUrl(),  request.getComponent(),  request.getAction());
+		
 		ProtocoloDTO p = new ProtocoloDTO();
 
 		// tomo el dto a ejecutar
@@ -52,13 +38,15 @@ public abstract class ControllerBase {
 
 
 		try {
+			ProtocoloValue value = comps.service().protocoloMap().get(getUrl(),  request.getComponent(),  request.getAction());
+			
 			if (value == null) {
 				throw new ValidationException(ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL);
 			}
 			if ( this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.REQUEST_ID_PRIVATE_GET)) {
-				requestIdUtil.existsRequestId(request.getRequestIdDTO(), true) ;
+				comps.util().requestId().existsRequestId(request.getRequestIdDTO(), true) ;
 			}else if ( !this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.REQUEST_ID_PUBLIC_GET)) {
-				requestIdUtil.existsRequestId(request.getRequestIdDTO(),false) ;
+				comps.util().requestId().existsRequestId(request.getRequestIdDTO(),false) ;
 			}
 
 			log.debug("URL Base = " + request.getComponent());
@@ -75,7 +63,7 @@ public abstract class ControllerBase {
 
 				log.debug("Invoke 1 parametro = " + value.getMethod().getName() + " " + value.getClazz().toString());
 
-				log.debug("Invoke 2 parameter = " + ((dtoObject==null) ? "null" : UtilsString.shrinkString(dtoObject.toString())));
+				log.debug("Invoke 2 parameter = " + ((dtoObject==null) ? "null" : comps.util().string().cutString(dtoObject.toString())));
 
 				if (dtoObject!= null && dtoObject instanceof IdGrupoInterface) {
 					comps.requestHelper().setGrupoInUse((IdGrupoInterface)dtoObject);
@@ -105,13 +93,13 @@ public abstract class ControllerBase {
 		} 
 
 
-		if ( this.isSecure()){
-
-			objetoRetorno= comps.service().usuarioSessionInfo().privacityIdServiceEncrypt2(
-					comps.requestHelper().getUsuarioUsername()
-					, objetoRetorno
-					,value.getReturnType().getName());
-		}
+		//		if ( this.isSecure()){
+		//
+		//			objetoRetorno= comps.service().usuarioSessionInfo().privacityIdServiceEncrypt2(
+		//					comps.requestHelper().getUsuarioUsername()
+		//					, objetoRetorno
+		//					,value.getReturnType().getName());
+		//		}
 
 		p.setComponent(request.getComponent());
 		p.setAction(request.getAction());
@@ -122,10 +110,15 @@ public abstract class ControllerBase {
 
 			String retornoJson=null;
 			if (objetoRetorno != null) {
-				retornoJson = UtilsString.gsonToSend(objetoRetorno);	
+				//				if ( !this.isSecure()){
+				//				retornoJson = UtilsString.gsonToSend(objetoRetorno);
+				//				}else {
+				retornoJson=comps.util().gson().toJson(objetoRetorno);
+				//}
+
 			}
 
-			log.debug("ProtocoloDTO Retorno >> " + UtilsString.shrinkString(retornoJson));
+			log.debug("ProtocoloDTO Retorno >> " + comps.util().string().cutString(retornoJson));
 
 			p.setObjectDTO(retornoJson);	
 		}
@@ -140,4 +133,6 @@ public abstract class ControllerBase {
 	public abstract boolean isRequestId();
 
 	public abstract Urls getUrl();
+	
+
 }

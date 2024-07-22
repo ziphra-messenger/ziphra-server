@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
-import com.privacity.server.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.Urls;
 
 import lombok.Getter;
 import lombok.Setter;

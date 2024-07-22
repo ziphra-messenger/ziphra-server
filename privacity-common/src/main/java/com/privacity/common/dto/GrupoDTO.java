@@ -37,27 +37,8 @@ public class GrupoDTO implements IdGrupoInterface{
 	public GrupoUserConfDTO userConfDTO;
 	    
 	@JsonInclude(Include.NON_NULL)
-	public int membersOnLine=0;
+	public MembersQuantityDTO membersQuantityDTO;
 	
-	public GrupoDTO(String name) {
-		super();
-		this.name = name;
-	}
-	public GrupoDTO(Long id) {
-		super();
-		this.idGrupo = id+"";
-	}	
-	public boolean isGrupoInvitation() {
-		if (grupoInvitationDTO == null) {
-			return false;
-		}
-		return true;
-	}
-	
-	//olds
-    public Long convertIdGrupoToLong() {
-		return Long.parseLong(idGrupo);
-	}
 	//public String nicknameForGrupo;
 	@JsonInclude(Include.NON_NULL)
 	public String alias;
@@ -78,5 +59,24 @@ public class GrupoDTO implements IdGrupoInterface{
 	public void setIdGrupo(String idGrupo) {
 		this.idGrupo=idGrupo;
 		
+	}
+	
+    public Long convertIdGrupoToLong() {
+		return Long.parseLong(idGrupo);
+	}
+    
+	public GrupoDTO(String name) {
+		super();
+		this.name = name;
+	}
+	public GrupoDTO(Long id) {
+		super();
+		this.idGrupo = id+"";
 	}	
+	public boolean isGrupoInvitation() {
+		if (grupoInvitationDTO == null) {
+			return false;
+		}
+		return true;
+	}
 }
