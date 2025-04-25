@@ -10,12 +10,28 @@
 	<name>${privacity.module.server}}</name>
 	<packaging>jar</packaging>
 	<dependencies>
+
 		<dependency>
 			<groupId>${privacity.groupId}</groupId>
 			<artifactId>${privacity.module.core}</artifactId>
 			<version>${privacity.version}</version>
 		</dependency>
 
+				<dependency>
+			<groupId>${privacity.groupId}</groupId>
+			<artifactId>${privacity.module.security}</artifactId>
+			<version>${privacity.version}</version>
+		</dependency>
+				<dependency>
+			<groupId>${privacity.groupId}</groupId>
+			<artifactId>${privacity.module.commonback}</artifactId>
+			<version>${privacity.version}</version>
+		</dependency>
+						<dependency>
+			<groupId>${privacity.groupId}</groupId>
+			<artifactId>${privacity.module.common}</artifactId>
+			<version>${privacity.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -24,6 +40,11 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
+		<dependency>
+    <groupId>javax.xml.bind</groupId>
+    <artifactId>jaxb-api</artifactId>
+    
+</dependency>
 		<dependency>
 			<groupId>io.github.hakky54</groupId>
 			<artifactId>sslcontext-kickstart</artifactId>
@@ -95,6 +116,14 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+		
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>

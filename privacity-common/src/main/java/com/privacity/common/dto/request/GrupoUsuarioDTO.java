@@ -7,19 +7,23 @@ import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.interfaces.IdGrupoInterface;
 import com.privacity.common.interfaces.IdUsuarioInterface;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class GrupoUsuarioDTO implements IdGrupoInterface, IdUsuarioInterface{
 	
 	@PrivacityId
 	@PrivacityIdOrder
 	@JsonInclude(Include.NON_NULL)
-	public String idGrupo;
+	private String idGrupo;
 	
 	@PrivacityId
 	@PrivacityIdOrder
 	@JsonInclude(Include.NON_NULL)
-	public String idUsuario;
+	private String idUsuario;
 
 }

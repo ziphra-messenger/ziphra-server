@@ -12,8 +12,10 @@ import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.enumeration.RulesConfEnum;
 import com.privacity.common.exceptions.ValidationException;
 import com.privacity.core.model.Grupo;
+import com.privacity.core.model.GrupoGralConf;
 import com.privacity.core.model.UserForGrupo;
 import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
@@ -48,7 +50,10 @@ public class GrupoUtilService {
 		return getGrupoByIdValidation(Long.parseLong(idGrupo));
 	}
 	public Grupo getGrupoByIdValidation(Long idGrupo) throws ValidationException {
-		
+		if ( idGrupo == null) {
+			throw new ValidationException(ExceptionReturnCode.GRUPO_ID_CANT_BE_NULL);
+			
+		}
 		Grupo g;
 		try {
 			g = comps.repo().grupo().findByIdGrupoAndDeleted(idGrupo, false);
@@ -71,10 +76,14 @@ public class GrupoUtilService {
 	}
 	
 	public void validateRoleAdmin(Usuario u, Grupo g ) throws ValidationException {
+		if ( g == null) {
+			throw new ValidationException(ExceptionReturnCode.GRUPO_ID_CANT_BE_NULL);
+			
+		}
 		GrupoRolesEnum rol = comps.util().usuario().getRoleForGrupo(u, g);
 		
 		if ( !rol.equals(GrupoRolesEnum.ADMIN)) {
-			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_NOT_HAVE_PERMITION_ON_THIS_GRUPO_TO_ADD_MEMBERS);	
+			throw new ValidationException(ExceptionReturnCode.GRUPO_ROLE_NOT_ALLOW_THIS_ACTION);	
 		}
 	}
 	
@@ -99,21 +108,24 @@ public class GrupoUtilService {
 	}
 	
 	public void getDefaultGrupoGeneralConfiguration(Grupo g) {
-		
-		g.getGralConf().setAnonimo(ConfigurationStateEnum.ALLOW);
-		g.getGralConf().setAudiochat(ConfigurationStateEnum.ALLOW);
+		g.setGralConf(new GrupoGralConf(g));
+		g.getGralConf().setAnonimo(RulesConfEnum.NULL);
+		g.getGralConf().setBlockAudioMessages(false);
+
 		g.getGralConf().setExtraEncrypt(ConfigurationStateEnum.ALLOW);
-		g.getGralConf().setResend(true);
+		g.getGralConf().setBlockResend(true);
 		g.getGralConf().setAudiochatMaxTime(300);
 		g.getGralConf().setBlackMessageAttachMandatory(false);
-		g.getGralConf().setChangeNicknameToNumber(false);
-		g.getGralConf().setDownloadAllowImage(ConfigurationStateEnum.ALLOW);
-		g.getGralConf().setDownloadAllowAudio(ConfigurationStateEnum.ALLOW);
-		g.getGralConf().setDownloadAllowVideo(ConfigurationStateEnum.ALLOW);
+		g.getGralConf().setRandomNickname(false);
+		g.getGralConf().setBlockMediaDownload(true);
+
 		g.getGralConf().setHideMessageDetails(false);
-		g.getGralConf().setHideMessageState(false);
+		g.getGralConf().setHideMemberList(false);
+		g.getGralConf().setHideMessageReadState(false);
 		g.getGralConf().setTimeMessageMandatory(false);
-		g.getGralConf().setTimeMessageMaxTimeAllow(300);
+		g.getGralConf().setTimeMessageMaxTimeAllow(300)
+		
+		;
 				
 		//g.setEncryptPublicKey(encrypt.getPublicKey());
 

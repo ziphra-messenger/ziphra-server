@@ -7,9 +7,9 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import com.privacity.messaging.websocket.handlers.HttpHandshakeInterceptor;
-import com.privacity.messaging.websocket.listeners.STOMPConnectEventListener;
-import com.privacity.messaging.websocket.listeners.STOMPDisconnectEventListener;
+import com.privacity.messaging.handlers.HttpHandshakeInterceptor;
+import com.privacity.messaging.listeners.STOMPConnectEventListener;
+import com.privacity.messaging.listeners.STOMPDisconnectEventListener;
 
 @Configuration
 @EnableWebSocketMessageBroker

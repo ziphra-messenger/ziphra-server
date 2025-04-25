@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.LockDTO;
 import com.privacity.common.dto.servergralconf.MinMaxLenghtDTO;
+import com.privacity.common.dto.servergralconf.PasswordConfigDTO;
+import com.privacity.common.dto.servergralconf.PasswordRulesDTO;
 import com.privacity.common.dto.servergralconf.SGCAESDTO;
 import com.privacity.common.dto.servergralconf.SGCAESSimple;
 import com.privacity.common.dto.servergralconf.SGCAsymEncrypt;
@@ -22,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Service
 @NoArgsConstructor
 public class ServerConfService {
-	
+	private SystemGralConf systemGralConf;
 	//SGCAsymEncrypt
 	@Value("${serverconf.asymEncrypt.type}")
 	private String AsymEncrypt_type;
@@ -42,8 +44,6 @@ public class ServerConfService {
 	private int requestId_maxLenght;	
 
 	// personalAES
-	@Value("${serverconf.personalAES.iterationMaxValue}")
-	private int personalAES_iterationValue;
 	@Value("${serverconf.personalAES.bits}")
 	private int personalAES_bits;
 
@@ -199,11 +199,201 @@ public class ServerConfService {
 	
 	@Value("${serverconf.myAccountConf_lock.min.seconds.validation}")	
 	private int myAccountConf_lock_min_seconds_validation;	
+
+	@Value("${usuario.validation.rule.lenght.mandatory.min}")
+	private int usuario_validationRuleLenghtMandatoryMin;
+	@Value("${usuario.validation.rule.lenght.mandatory.max}")
+	private int usuario_validationRuleLenghtMandatoryMax;
+	@Value("${usuario.validation.rule.lenght.sugerencia.min.enabled}")
+	private boolean usuario_validationRuleLenghtSugerenciaMinEnabled;
+	@Value("${usuario.validation.rule.lenght.sugerencia.min}")
+	private int usuario_validationRuleLenghtSugerenciaMin;
+	@Value("${usuario.validation.rule.uppercase.mandatory.enabled}")
+	private boolean usuario_validationRuleUppercaseMandatoryEnabled;
+	@Value("${usuario.validation.rule.uppercase.mandatory.quantity}")
+	private int usuario_validationRuleUppercaseMandatoryQuantity;
+	@Value("${usuario.validation.rule.uppercase.sugerencia.enabled}")
+	private boolean usuario_validationRuleUppercaseSugerenciaEnabled;
+	@Value("${usuario.validation.rule.uppercase.sugerencia.quantity}")
+	private int usuario_validationRuleUppercaseSugerenciaQuantity;
+	@Value("${usuario.validation.rule.lowercase.mandatory.enabled}")
+	private boolean usuario_validationRuleLowercaseMandatoryEnabled;
+	@Value("${usuario.validation.rule.lowercase.mandatory.quantity}")
+	private int usuario_validationRuleLowercaseMandatoryQuantity;
+	@Value("${usuario.validation.rule.lowercase.sugerencia.enabled}")
+	private boolean usuario_validationRuleLowercaseSugerenciaEnabled;
+	@Value("${usuario.validation.rule.lowercase.sugerencia.quantity}")
+	private int usuario_validationRuleLowercaseSugerenciaQuantity;
+	@Value("${usuario.validation.rule.especialchar.mandatory.enabled}")
+	private boolean usuario_validationRuleEspecialcharMandatoryEnabled;
+	@Value("${usuario.validation.rule.especialchar.mandatory.quantity}")
+	private int usuario_validationRuleEspecialcharMandatoryQuantity;
+	@Value("${usuario.validation.rule.especialchar.sugerencia.enabled}")
+	private boolean usuario_validationRuleEspecialcharSugerenciaEnabled;
+	@Value("${usuario.validation.rule.especialchar.sugerencia.quantity}")
+	private int usuario_validationRuleEspecialcharSugerenciaQuantity;
+	@Value("${usuario.validation.rule.digit.number.mandatory.enabled}")
+	private boolean usuario_validationRuleDigitNumberMandatoryEnabled;
+	@Value("${usuario.validation.rule.digit.number.mandatory.quantity}")
+	private int usuario_validationRuleDigitNumberMandatoryQuantity;
+	@Value("${usuario.validation.rule.digit.number.sugerencia.enabled}")
+	private boolean usuario_validationRuleDigitNumberSugerenciaEnabled;
+	@Value("${usuario.validation.rule.digit.number.sugerencia.quantity}")
+	private int usuario_validationRuleDigitNumberSugerenciaQuantity;
+	@Value("${usuario.validation.rule.repeat.char.restrict.enabled}")
+	private boolean usuario_validationRuleRepeatCharRestrictEnabled;
+	@Value("${usuario.validation.rule.repeat.char.restrict.quantity}")
+	private int usuario_validationRuleRepeatCharRestrictQuantity;
+	@Value("${usuario.validation.rule.repeat.char.sugerencia.enabled}")
+	private boolean usuario_validationRuleRepeatCharSugerenciaEnabled;
+	@Value("${usuario.validation.rule.repeat.char.sugerencia.quantity}")
+	private int usuario_validationRuleRepeatCharSugerenciaQuantity;
+	@Value("${usuario.validation.rule.whitespace.restrict.enabled}")
+	private boolean usuario_validationRuleWhitespaceRestrictEnabled;
+	@Value("${usuario.validation.rule.whitespace.sugerencia.enabled}")
+	private boolean usuario_validationRuleWhitespaceSugerenciaEnabled;
+	@Value("${usuario.validation.rule.username.restrict.enabled}")
+	private boolean usuario_validationRuleUsernameRestrictEnabled;
+	@Value("${usuario.validation.rule.username.sugerencia.enabled}")
+	private boolean usuario_validationRuleUsernameSugerenciaEnabled;
+	@Value("${usuario.validation.rule.nickname.restrict.enabled}")
+	private boolean usuario_validationRuleNicknameRestrictEnabled;
+	@Value("${usuario.validation.rule.nickname.sugerencia.enabled}")
+	private boolean usuario_validationRuleNicknameSugerenciaEnabled;
+	@Value("${usuario.validation.rule.password.restrict.enabled}")
+	private boolean usuario_validationRulePasswordRestrictEnabled;
+	@Value("${usuario.validation.rule.password.sugerencia.enabled}")
+	private boolean usuario_validationRulePasswordSugerenciaEnabled;
 	
+	@Value("${nickname.validation.rule.lenght.mandatory.min}")
+	private int nickname_validationRuleLenghtMandatoryMin;
+	@Value("${nickname.validation.rule.lenght.mandatory.max}")
+	private int nickname_validationRuleLenghtMandatoryMax;
+	@Value("${nickname.validation.rule.lenght.sugerencia.min.enabled}")
+	private boolean nickname_validationRuleLenghtSugerenciaMinEnabled;
+	@Value("${nickname.validation.rule.lenght.sugerencia.min}")
+	private int nickname_validationRuleLenghtSugerenciaMin;
+	@Value("${nickname.validation.rule.uppercase.mandatory.enabled}")
+	private boolean nickname_validationRuleUppercaseMandatoryEnabled;
+	@Value("${nickname.validation.rule.uppercase.mandatory.quantity}")
+	private int nickname_validationRuleUppercaseMandatoryQuantity;
+	@Value("${nickname.validation.rule.uppercase.sugerencia.enabled}")
+	private boolean nickname_validationRuleUppercaseSugerenciaEnabled;
+	@Value("${nickname.validation.rule.uppercase.sugerencia.quantity}")
+	private int nickname_validationRuleUppercaseSugerenciaQuantity;
+	@Value("${nickname.validation.rule.lowercase.mandatory.enabled}")
+	private boolean nickname_validationRuleLowercaseMandatoryEnabled;
+	@Value("${nickname.validation.rule.lowercase.mandatory.quantity}")
+	private int nickname_validationRuleLowercaseMandatoryQuantity;
+	@Value("${nickname.validation.rule.lowercase.sugerencia.enabled}")
+	private boolean nickname_validationRuleLowercaseSugerenciaEnabled;
+	@Value("${nickname.validation.rule.lowercase.sugerencia.quantity}")
+	private int nickname_validationRuleLowercaseSugerenciaQuantity;
+	@Value("${nickname.validation.rule.especialchar.mandatory.enabled}")
+	private boolean nickname_validationRuleEspecialcharMandatoryEnabled;
+	@Value("${nickname.validation.rule.especialchar.mandatory.quantity}")
+	private int nickname_validationRuleEspecialcharMandatoryQuantity;
+	@Value("${nickname.validation.rule.especialchar.sugerencia.enabled}")
+	private boolean nickname_validationRuleEspecialcharSugerenciaEnabled;
+	@Value("${nickname.validation.rule.especialchar.sugerencia.quantity}")
+	private int nickname_validationRuleEspecialcharSugerenciaQuantity;
+	@Value("${nickname.validation.rule.digit.number.mandatory.enabled}")
+	private boolean nickname_validationRuleDigitNumberMandatoryEnabled;
+	@Value("${nickname.validation.rule.digit.number.mandatory.quantity}")
+	private int nickname_validationRuleDigitNumberMandatoryQuantity;
+	@Value("${nickname.validation.rule.digit.number.sugerencia.enabled}")
+	private boolean nickname_validationRuleDigitNumberSugerenciaEnabled;
+	@Value("${nickname.validation.rule.digit.number.sugerencia.quantity}")
+	private int nickname_validationRuleDigitNumberSugerenciaQuantity;
+	@Value("${nickname.validation.rule.repeat.char.restrict.enabled}")
+	private boolean nickname_validationRuleRepeatCharRestrictEnabled;
+	@Value("${nickname.validation.rule.repeat.char.restrict.quantity}")
+	private int nickname_validationRuleRepeatCharRestrictQuantity;
+	@Value("${nickname.validation.rule.repeat.char.sugerencia.enabled}")
+	private boolean nickname_validationRuleRepeatCharSugerenciaEnabled;
+	@Value("${nickname.validation.rule.repeat.char.sugerencia.quantity}")
+	private int nickname_validationRuleRepeatCharSugerenciaQuantity;
+	@Value("${nickname.validation.rule.whitespace.restrict.enabled}")
+	private boolean nickname_validationRuleWhitespaceRestrictEnabled;
+	@Value("${nickname.validation.rule.whitespace.sugerencia.enabled}")
+	private boolean nickname_validationRuleWhitespaceSugerenciaEnabled;
+	@Value("${nickname.validation.rule.username.restrict.enabled}")
+	private boolean nickname_validationRuleUsernameRestrictEnabled;
+	@Value("${nickname.validation.rule.username.sugerencia.enabled}")
+	private boolean nickname_validationRuleUsernameSugerenciaEnabled;
+	@Value("${nickname.validation.rule.nickname.restrict.enabled}")
+	private boolean nickname_validationRuleNicknameRestrictEnabled;
+	@Value("${nickname.validation.rule.nickname.sugerencia.enabled}")
+	private boolean nickname_validationRuleNicknameSugerenciaEnabled;
+	@Value("${nickname.validation.rule.password.restrict.enabled}")
+	private boolean nickname_validationRulePasswordRestrictEnabled;
+	@Value("${nickname.validation.rule.password.sugerencia.enabled}")
+	private boolean nickname_validationRulePasswordSugerenciaEnabled;
 	
-	
-	private SystemGralConf systemGralConf;
-	
+	@Value("${password.usuarioregistration.validation.rule.lenght.mandatory.min}")
+	private int passwordUsuarioRegistration_validationRuleLenghtMandatoryMin;
+	@Value("${password.usuarioregistration.validation.rule.lenght.mandatory.max}")
+	private int passwordUsuarioRegistration_validationRuleLenghtMandatoryMax;
+	@Value("${password.usuarioregistration.validation.rule.lenght.sugerencia.min.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleLenghtSugerenciaMinEnabled;
+	@Value("${password.usuarioregistration.validation.rule.lenght.sugerencia.min}")
+	private int passwordUsuarioRegistration_validationRuleLenghtSugerenciaMin;
+	@Value("${password.usuarioregistration.validation.rule.uppercase.mandatory.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleUppercaseMandatoryEnabled;
+	@Value("${password.usuarioregistration.validation.rule.uppercase.mandatory.quantity}")
+	private int passwordUsuarioRegistration_validationRuleUppercaseMandatoryQuantity;
+	@Value("${password.usuarioregistration.validation.rule.uppercase.sugerencia.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleUppercaseSugerenciaEnabled;
+	@Value("${password.usuarioregistration.validation.rule.uppercase.sugerencia.quantity}")
+	private int passwordUsuarioRegistration_validationRuleUppercaseSugerenciaQuantity;
+	@Value("${password.usuarioregistration.validation.rule.lowercase.mandatory.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleLowercaseMandatoryEnabled;
+	@Value("${password.usuarioregistration.validation.rule.lowercase.mandatory.quantity}")
+	private int passwordUsuarioRegistration_validationRuleLowercaseMandatoryQuantity;
+	@Value("${password.usuarioregistration.validation.rule.lowercase.sugerencia.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleLowercaseSugerenciaEnabled;
+	@Value("${password.usuarioregistration.validation.rule.lowercase.sugerencia.quantity}")
+	private int passwordUsuarioRegistration_validationRuleLowercaseSugerenciaQuantity;
+	@Value("${password.usuarioregistration.validation.rule.especialchar.mandatory.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleEspecialcharMandatoryEnabled;
+	@Value("${password.usuarioregistration.validation.rule.especialchar.mandatory.quantity}")
+	private int passwordUsuarioRegistration_validationRuleEspecialcharMandatoryQuantity;
+	@Value("${password.usuarioregistration.validation.rule.especialchar.sugerencia.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleEspecialcharSugerenciaEnabled;
+	@Value("${password.usuarioregistration.validation.rule.especialchar.sugerencia.quantity}")
+	private int passwordUsuarioRegistration_validationRuleEspecialcharSugerenciaQuantity;
+	@Value("${password.usuarioregistration.validation.rule.digit.number.mandatory.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleDigitNumberMandatoryEnabled;
+	@Value("${password.usuarioregistration.validation.rule.digit.number.mandatory.quantity}")
+	private int passwordUsuarioRegistration_validationRuleDigitNumberMandatoryQuantity;
+	@Value("${password.usuarioregistration.validation.rule.digit.number.sugerencia.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleDigitNumberSugerenciaEnabled;
+	@Value("${password.usuarioregistration.validation.rule.digit.number.sugerencia.quantity}")
+	private int passwordUsuarioRegistration_validationRuleDigitNumberSugerenciaQuantity;
+	@Value("${password.usuarioregistration.validation.rule.repeat.char.restrict.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleRepeatCharRestrictEnabled;
+	@Value("${password.usuarioregistration.validation.rule.repeat.char.restrict.quantity}")
+	private int passwordUsuarioRegistration_validationRuleRepeatCharRestrictQuantity;
+	@Value("${password.usuarioregistration.validation.rule.repeat.char.sugerencia.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleRepeatCharSugerenciaEnabled;
+	@Value("${password.usuarioregistration.validation.rule.repeat.char.sugerencia.quantity}")
+	private int passwordUsuarioRegistration_validationRuleRepeatCharSugerenciaQuantity;
+	@Value("${password.usuarioregistration.validation.rule.whitespace.restrict.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleWhitespaceRestrictEnabled;
+	@Value("${password.usuarioregistration.validation.rule.whitespace.sugerencia.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleWhitespaceSugerenciaEnabled;
+	@Value("${password.usuarioregistration.validation.rule.username.restrict.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleUsernameRestrictEnabled;
+	@Value("${password.usuarioregistration.validation.rule.username.sugerencia.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleUsernameSugerenciaEnabled;
+	@Value("${password.usuarioregistration.validation.rule.nickname.restrict.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleNicknameRestrictEnabled;
+	@Value("${password.usuarioregistration.validation.rule.nickname.sugerencia.enabled}")
+	private boolean passwordUsuarioRegistration_validationRuleNicknameSugerenciaEnabled;
+	@Value("${password.usuarioregistration.validation.rule.password.restrict.enabled}")
+	private boolean passwordUsuarioRegistration_validationRulePasswordRestrictEnabled;
+	@Value("${password.usuarioregistration.validation.rule.password.sugerencia.enabled}")
+	private boolean passwordUsuarioRegistration_validationRulePasswordSugerenciaEnabled;	
 	public SystemGralConf getSystemGralConf(){
 		
 		if ( systemGralConf == null) {
@@ -229,7 +419,6 @@ public class ServerConfService {
 		
 		c.setPersonalAES( new SGCAESSimple() );
 		c.getPersonalAES().setBits(personalAES_bits);
-		c.getPersonalAES().setIteration(personalAES_iterationValue);
 		
 		c.setExtraAES( new SGCAESSimple() );
 		c.getExtraAES().setBits(extraAES_bits);
@@ -297,7 +486,7 @@ public class ServerConfService {
 		
 		c.setMyAccountConf(new SGCMyAccountConfDTO());
 		c.getMyAccountConf().setAudioMaxTimeInSeconds(myAccountConf_audioMaxTimeInSeconds);
-		c.getMyAccountConf().setBlackMessageAttachMandatory(myAccountConf_blackMessageAttachMandatory);
+//		c.getMyAccountConf().setBlackMessageAttachMandatory(myAccountConf_blackMessageAttachMandatory);
 		c.getMyAccountConf().setDownloadAttachAllowImage(myAccountConf_downloadAttachAllowImage);
 		c.getMyAccountConf().setHideMyInDetails(myAccountConf_hideMyInDetails);
 		c.getMyAccountConf().setHideMyMessageState(myAccountConf_hideMyMessageState);
@@ -326,6 +515,113 @@ public class ServerConfService {
 		c.getMyAccountConf().getLock().setSeconds(myAccountConf_lock_seconds);
 		c.getMyAccountConf().getLock().setMinSecondsValidation(myAccountConf_lock_min_seconds_validation);
 		
+		c.setPasswordConfig(new PasswordConfigDTO());
+		
+		c.getPasswordConfig().setUsuario(new PasswordRulesDTO());
+		c.getPasswordConfig().getUsuario().
+		setLenghtMandatoryMin(usuario_validationRuleLenghtMandatoryMin).
+		setLenghtMandatoryMax(usuario_validationRuleLenghtMandatoryMax).
+		setLenghtSugerenciaMinEnabled(usuario_validationRuleLenghtSugerenciaMinEnabled).
+		setLenghtSugerenciaMin(usuario_validationRuleLenghtSugerenciaMin).
+		setUppercaseMandatoryEnabled(usuario_validationRuleUppercaseMandatoryEnabled).
+		setUppercaseMandatoryQuantity(usuario_validationRuleUppercaseMandatoryQuantity).
+		setUppercaseSugerenciaEnabled(usuario_validationRuleUppercaseSugerenciaEnabled).
+		setUppercaseSugerenciaQuantity(usuario_validationRuleUppercaseSugerenciaQuantity).
+		setLowercaseMandatoryEnabled(usuario_validationRuleLowercaseMandatoryEnabled).
+		setLowercaseMandatoryQuantity(usuario_validationRuleLowercaseMandatoryQuantity).
+		setLowercaseSugerenciaEnabled(usuario_validationRuleLowercaseSugerenciaEnabled).
+		setLowercaseSugerenciaQuantity(usuario_validationRuleLowercaseSugerenciaQuantity).
+		setEspecialcharMandatoryEnabled(usuario_validationRuleEspecialcharMandatoryEnabled).
+		setEspecialcharMandatoryQuantity(usuario_validationRuleEspecialcharMandatoryQuantity).
+		setEspecialcharSugerenciaEnabled(usuario_validationRuleEspecialcharSugerenciaEnabled).
+		setEspecialcharSugerenciaQuantity(usuario_validationRuleEspecialcharSugerenciaQuantity).
+		setDigitNumberMandatoryEnabled(usuario_validationRuleDigitNumberMandatoryEnabled).
+		setDigitNumberMandatoryQuantity(usuario_validationRuleDigitNumberMandatoryQuantity).
+		setDigitNumberSugerenciaEnabled(usuario_validationRuleDigitNumberSugerenciaEnabled).
+		setDigitNumberSugerenciaQuantity(usuario_validationRuleDigitNumberSugerenciaQuantity).
+		setRepeatCharRestrictEnabled(usuario_validationRuleRepeatCharRestrictEnabled).
+		setRepeatCharRestrictQuantity(usuario_validationRuleRepeatCharRestrictQuantity).
+		setRepeatCharSugerenciaEnabled(usuario_validationRuleRepeatCharSugerenciaEnabled).
+		setRepeatCharSugerenciaQuantity(usuario_validationRuleRepeatCharSugerenciaQuantity).
+		setWhitespaceRestrictEnabled(usuario_validationRuleWhitespaceRestrictEnabled).
+		setWhitespaceSugerenciaEnabled(usuario_validationRuleWhitespaceSugerenciaEnabled).
+		setUsernameRestrictEnabled(usuario_validationRuleUsernameRestrictEnabled).
+		setUsernameSugerenciaEnabled(usuario_validationRuleUsernameSugerenciaEnabled).
+		setNicknameRestrictEnabled(usuario_validationRuleNicknameRestrictEnabled).
+		setNicknameSugerenciaEnabled(usuario_validationRuleNicknameSugerenciaEnabled).
+		setPasswordRestrictEnabled(usuario_validationRulePasswordRestrictEnabled).
+		setPasswordSugerenciaEnabled(usuario_validationRulePasswordSugerenciaEnabled);	
+		
+		c.getPasswordConfig().setNickname(new PasswordRulesDTO());
+		c.getPasswordConfig().getNickname().
+		setLenghtMandatoryMin(nickname_validationRuleLenghtMandatoryMin).
+		setLenghtMandatoryMax(nickname_validationRuleLenghtMandatoryMax).
+		setLenghtSugerenciaMinEnabled(nickname_validationRuleLenghtSugerenciaMinEnabled).
+		setLenghtSugerenciaMin(nickname_validationRuleLenghtSugerenciaMin).
+		setUppercaseMandatoryEnabled(nickname_validationRuleUppercaseMandatoryEnabled).
+		setUppercaseMandatoryQuantity(nickname_validationRuleUppercaseMandatoryQuantity).
+		setUppercaseSugerenciaEnabled(nickname_validationRuleUppercaseSugerenciaEnabled).
+		setUppercaseSugerenciaQuantity(nickname_validationRuleUppercaseSugerenciaQuantity).
+		setLowercaseMandatoryEnabled(nickname_validationRuleLowercaseMandatoryEnabled).
+		setLowercaseMandatoryQuantity(nickname_validationRuleLowercaseMandatoryQuantity).
+		setLowercaseSugerenciaEnabled(nickname_validationRuleLowercaseSugerenciaEnabled).
+		setLowercaseSugerenciaQuantity(nickname_validationRuleLowercaseSugerenciaQuantity).
+		setEspecialcharMandatoryEnabled(nickname_validationRuleEspecialcharMandatoryEnabled).
+		setEspecialcharMandatoryQuantity(nickname_validationRuleEspecialcharMandatoryQuantity).
+		setEspecialcharSugerenciaEnabled(nickname_validationRuleEspecialcharSugerenciaEnabled).
+		setEspecialcharSugerenciaQuantity(nickname_validationRuleEspecialcharSugerenciaQuantity).
+		setDigitNumberMandatoryEnabled(nickname_validationRuleDigitNumberMandatoryEnabled).
+		setDigitNumberMandatoryQuantity(nickname_validationRuleDigitNumberMandatoryQuantity).
+		setDigitNumberSugerenciaEnabled(nickname_validationRuleDigitNumberSugerenciaEnabled).
+		setDigitNumberSugerenciaQuantity(nickname_validationRuleDigitNumberSugerenciaQuantity).
+		setRepeatCharRestrictEnabled(nickname_validationRuleRepeatCharRestrictEnabled).
+		setRepeatCharRestrictQuantity(nickname_validationRuleRepeatCharRestrictQuantity).
+		setRepeatCharSugerenciaEnabled(nickname_validationRuleRepeatCharSugerenciaEnabled).
+		setRepeatCharSugerenciaQuantity(nickname_validationRuleRepeatCharSugerenciaQuantity).
+		setWhitespaceRestrictEnabled(nickname_validationRuleWhitespaceRestrictEnabled).
+		setWhitespaceSugerenciaEnabled(nickname_validationRuleWhitespaceSugerenciaEnabled).
+		setUsernameRestrictEnabled(nickname_validationRuleUsernameRestrictEnabled).
+		setUsernameSugerenciaEnabled(nickname_validationRuleUsernameSugerenciaEnabled).
+		setNicknameRestrictEnabled(nickname_validationRuleNicknameRestrictEnabled).
+		setNicknameSugerenciaEnabled(nickname_validationRuleNicknameSugerenciaEnabled).
+		setPasswordRestrictEnabled(nickname_validationRulePasswordRestrictEnabled).
+		setPasswordSugerenciaEnabled(nickname_validationRulePasswordSugerenciaEnabled);	
+		
+		c.getPasswordConfig().setPasswordUsuarioRegistration(new PasswordRulesDTO());
+		c.getPasswordConfig().getPasswordUsuarioRegistration().
+		setLenghtMandatoryMin(passwordUsuarioRegistration_validationRuleLenghtMandatoryMin).
+		setLenghtMandatoryMax(passwordUsuarioRegistration_validationRuleLenghtMandatoryMax).
+		setLenghtSugerenciaMinEnabled(passwordUsuarioRegistration_validationRuleLenghtSugerenciaMinEnabled).
+		setLenghtSugerenciaMin(passwordUsuarioRegistration_validationRuleLenghtSugerenciaMin).
+		setUppercaseMandatoryEnabled(passwordUsuarioRegistration_validationRuleUppercaseMandatoryEnabled).
+		setUppercaseMandatoryQuantity(passwordUsuarioRegistration_validationRuleUppercaseMandatoryQuantity).
+		setUppercaseSugerenciaEnabled(passwordUsuarioRegistration_validationRuleUppercaseSugerenciaEnabled).
+		setUppercaseSugerenciaQuantity(passwordUsuarioRegistration_validationRuleUppercaseSugerenciaQuantity).
+		setLowercaseMandatoryEnabled(passwordUsuarioRegistration_validationRuleLowercaseMandatoryEnabled).
+		setLowercaseMandatoryQuantity(passwordUsuarioRegistration_validationRuleLowercaseMandatoryQuantity).
+		setLowercaseSugerenciaEnabled(passwordUsuarioRegistration_validationRuleLowercaseSugerenciaEnabled).
+		setLowercaseSugerenciaQuantity(passwordUsuarioRegistration_validationRuleLowercaseSugerenciaQuantity).
+		setEspecialcharMandatoryEnabled(passwordUsuarioRegistration_validationRuleEspecialcharMandatoryEnabled).
+		setEspecialcharMandatoryQuantity(passwordUsuarioRegistration_validationRuleEspecialcharMandatoryQuantity).
+		setEspecialcharSugerenciaEnabled(passwordUsuarioRegistration_validationRuleEspecialcharSugerenciaEnabled).
+		setEspecialcharSugerenciaQuantity(passwordUsuarioRegistration_validationRuleEspecialcharSugerenciaQuantity).
+		setDigitNumberMandatoryEnabled(passwordUsuarioRegistration_validationRuleDigitNumberMandatoryEnabled).
+		setDigitNumberMandatoryQuantity(passwordUsuarioRegistration_validationRuleDigitNumberMandatoryQuantity).
+		setDigitNumberSugerenciaEnabled(passwordUsuarioRegistration_validationRuleDigitNumberSugerenciaEnabled).
+		setDigitNumberSugerenciaQuantity(passwordUsuarioRegistration_validationRuleDigitNumberSugerenciaQuantity).
+		setRepeatCharRestrictEnabled(passwordUsuarioRegistration_validationRuleRepeatCharRestrictEnabled).
+		setRepeatCharRestrictQuantity(passwordUsuarioRegistration_validationRuleRepeatCharRestrictQuantity).
+		setRepeatCharSugerenciaEnabled(passwordUsuarioRegistration_validationRuleRepeatCharSugerenciaEnabled).
+		setRepeatCharSugerenciaQuantity(passwordUsuarioRegistration_validationRuleRepeatCharSugerenciaQuantity).
+		setWhitespaceRestrictEnabled(passwordUsuarioRegistration_validationRuleWhitespaceRestrictEnabled).
+		setWhitespaceSugerenciaEnabled(passwordUsuarioRegistration_validationRuleWhitespaceSugerenciaEnabled).
+		setUsernameRestrictEnabled(passwordUsuarioRegistration_validationRuleUsernameRestrictEnabled).
+		setUsernameSugerenciaEnabled(passwordUsuarioRegistration_validationRuleUsernameSugerenciaEnabled).
+		setNicknameRestrictEnabled(passwordUsuarioRegistration_validationRuleNicknameRestrictEnabled).
+		setNicknameSugerenciaEnabled(passwordUsuarioRegistration_validationRuleNicknameSugerenciaEnabled).
+		setPasswordRestrictEnabled(passwordUsuarioRegistration_validationRulePasswordRestrictEnabled).
+		setPasswordSugerenciaEnabled(passwordUsuarioRegistration_validationRulePasswordSugerenciaEnabled);
+		
 		this.systemGralConf = c;
 		
 	}
@@ -333,3 +629,4 @@ public class ServerConfService {
 
 
 }
+     

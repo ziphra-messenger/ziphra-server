@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonSyntaxException;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.exceptions.PrivacityException;
@@ -39,7 +42,7 @@ public class DecryptController {
 	}
 	
 	@PostMapping(SessionManagerRestConstants.DECRYPT_IDS)
-	public Object decryptPrivacityIdEncoder(@RequestParam String username, @RequestParam String obj, @RequestParam String className) throws PrivacityException  {
+	public Object decryptPrivacityIdEncoder(@RequestParam String username, @RequestParam String obj, @RequestParam String className) throws Exception  {
 		log.debug("entrada - decryptPrivacityIdEncoder");
 		log.debug("username" + username);
 		log.debug("className: " + className);
@@ -47,7 +50,19 @@ public class DecryptController {
 
 		Object o;
 		try {
-			o = uf.gson().fromJson(obj, Class.forName(className));
+
+			ObjectMapper mapper = new ObjectMapper();
+			try {
+				o = mapper.readValue(obj, Class.forName(className));
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+				log.error(ExceptionReturnCode.DECRYPT_PROCESS.toShow(e));
+				throw new PrivacityException(ExceptionReturnCode.DECRYPT_PROCESS);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+				log.error(ExceptionReturnCode.DECRYPT_PROCESS.toShow(e));
+				throw new PrivacityException(ExceptionReturnCode.DECRYPT_PROCESS);
+			}
 		} catch (JsonSyntaxException e) {
 			e.printStackTrace();
 			throw new PrivacityException(ExceptionReturnCode.GENERAL_INVALID_SENT_DATA, e);

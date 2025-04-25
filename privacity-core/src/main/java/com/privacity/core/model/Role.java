@@ -1,5 +1,7 @@
 package com.privacity.core.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,40 +11,31 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.privacity.commonback.common.enumeration.ERole;
+import com.privacity.commonback.common.enumeration.RolesSecurityAccessToServerEnum;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Entity
 @Table(name = "roles")
-public class Role {
+@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class Role implements Serializable{
+	
+	private static final long serialVersionUID = -7096490481619023464L;
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20)
-	private ERole name;
+	private RolesSecurityAccessToServerEnum name;
 
-	public Role() {
 
-	}
-
-	public Role(ERole name) {
-		this.name = name;
-	}
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public ERole getName() {
-		return name;
-	}
-
-	public void setName(ERole name) {
-		this.name = name;
-	}
 }

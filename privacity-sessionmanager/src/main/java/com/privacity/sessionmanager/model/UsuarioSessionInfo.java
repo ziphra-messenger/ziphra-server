@@ -2,6 +2,7 @@ package com.privacity.sessionmanager.model;
 import java.security.PublicKey;
 
 import com.privacity.common.dto.AESAllDTO;
+import com.privacity.commonback.common.utils.AESToUse;
 import com.privacity.commonback.common.utils.PrivacityIdEncoder;
 
 import lombok.Getter;

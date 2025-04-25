@@ -10,7 +10,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 
+import lombok.experimental.Accessors;
 
+@Accessors(chain = true)
 @Embeddable
 @SequenceGenerator(name = "message_secuencia", initialValue = 10000, allocationSize = 1)
 public class MessageId implements Serializable {

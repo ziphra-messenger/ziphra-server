@@ -14,18 +14,27 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.exceptions.PrivacityException;
 import com.privacity.common.exceptions.ValidationException;
 import com.privacity.common.interfaces.IdGrupoInterface;
 import com.privacity.core.model.Grupo;
+import com.privacity.core.model.GrupoUserConf;
+import com.privacity.core.model.GrupoUserConfId;
 import com.privacity.core.model.UserForGrupo;
 import com.privacity.core.model.Usuario;
 import com.privacity.core.repository.UserForGrupoRepository;
 import com.privacity.core.repository.UsuarioRepository;
+import com.privacity.security.util.UserDetailsImpl;
 import com.privacity.server.component.grupo.GrupoUtilService;
-import com.privacity.server.component.usuario.UserDetailsImpl;
+import com.privacity.server.component.grupouserconf.GrupoUserConfRepository;
+import com.privacity.server.factory.IdsGeneratorFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 @RequestScope
 @Component
+@Slf4j
 public class RequestHelperService {
 
 	private Usuario usuario=null;
@@ -40,14 +49,33 @@ public class RequestHelperService {
 	@Autowired @Lazy
 	private UsuarioRepository usuarioRepository;
 	
+	@Autowired @Lazy
+	private GrupoUserConfRepository grupoUserConfRepository;
+	
+	private Map<Long, String> ramdonNicknameGrupoInUse;
+	@Autowired @Lazy
+	IdsGeneratorFactory f;
+	public String getRandomNicknameByGrupo(Long idGrupo,Long idUsuario) throws PrivacityException {
+		if  (ramdonNicknameGrupoInUse == null) {
+				ramdonNicknameGrupoInUse=  f.getRandomNicknameByGrupo(idGrupo+"");
+		}
+			return ramdonNicknameGrupoInUse.get(idUsuario+"");
+	}
+	
 	private Map<Long, Usuario> mapUsuarioByIdUsuario = new HashMap<Long, Usuario>();
 	private Map<String, Usuario> mapUsuarioByUsername = new HashMap<String, Usuario>();
+	private GrupoUserConf grupoUserConfInUse;
 
 	public Grupo setGrupoInUse( IdGrupoInterface grupoI) throws ValidationException {
 		if (grupoI.getIdGrupo() == null) return null;
 		return setGrupoInUse(Long.parseLong(grupoI.getIdGrupo()));
 	}
-
+	public GrupoUserConf getGrupoUserConfInUse() throws ValidationException {
+		if (grupoUserConfInUse == null) {
+			grupoUserConfInUse  = grupoUserConfRepository.findById(new GrupoUserConfId(getUsuarioLogged(), getGrupoInUse())).get();
+		}
+		return grupoUserConfInUse; 
+	}
 	public Grupo setGrupoInUse(String idGrupo) throws ValidationException {
 		if (idGrupo == null) return null;
 		return setGrupoInUse(Long.parseLong(idGrupo));
@@ -65,6 +93,14 @@ public class RequestHelperService {
 		return grupoInUse;
 	}
 
+	public void validationUserInTheGrupo() throws ValidationException {
+		
+		if ( getUserForGrupoInUse() == null ) {
+			log.error(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO.toShow(" usuario: " + getUsuarioId() + " grupo: " + getGrupoInUse().getIdGrupo()));
+			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO);	
+		}
+	}
+	
 	public UserForGrupo getUserForGrupoInUse() throws ValidationException {
 
 		if (userForGrupoInUse==null) {
@@ -145,6 +181,10 @@ public class RequestHelperService {
 		return getUsersForGrupoInUse(false,false);
 	}
 	
+	public boolean isUsuarioLoggedAdminOnGrupoInUse() throws ValidationException {
+		return getUserForGrupoInUse().getRole().equals(GrupoRolesEnum.ADMIN);
+	}
+	
 	public Usuario getUsuarioLogged() throws ValidationException {
 		if (usuario == null) {
 			usuario = getUsuarioLoggedValidate();	
@@ -219,5 +259,9 @@ public class RequestHelperService {
 			usuario=u;
 
 		return usuario;
+	}
+	public void setGrupoInUse(Grupo grupo) {
+		this.grupoInUse=grupo;
+		
 	}    
 }

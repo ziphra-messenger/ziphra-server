@@ -33,14 +33,51 @@ public class KeyLocker {
             }
         }
     }
-
+    private void lockAll() throws InterruptedException {
+    	log.warn("lockAll");
+        synchronized (lockedKeys) {
+            while (!lockedKeys.isEmpty()) {
+            	log.warn("lockAll wait");
+                lockedKeys.wait();
+            }
+        }
+    }
     private void unlock(Object key) {
         synchronized (lockedKeys) {
             lockedKeys.remove(key);
             lockedKeys.notifyAll();
         }
     }
+    
+    private void unlockAll() {
+        synchronized (lockedKeys) {
+        	log.warn("unlockAll notifyAll");
+            lockedKeys.notifyAll();
+        }
+    }   
+    public void doSynchronouslyOnlyForAllKeys() throws PrivacityException  {
+    	log.warn("doSynchronouslyOnlyForAllKeys");
+        try {
+        	lockAll();
+        	log.warn("doSynchronouslyOnlyForAllKeys sequence.clear()");
+        	sequence.clear();
+        	log.warn("doSynchronouslyOnlyForAllKeys lockedKeys.clear()");
+        	lockedKeys.clear();
+        	
+        } catch (InterruptedException e) {
+        	e.printStackTrace();
+        	
+        	log.error(ExceptionReturnCode.KEYLOCK_REFRESH_FAIL.getToShow());
+			throw new PrivacityException(ExceptionReturnCode.KEYLOCK_REFRESH_FAIL);
+			
+		} finally {
+			log.warn("finally unlockAll()");
+            unlockAll();
+            
+        }
+        
 
+    }
     public Object doSynchronouslyOnlyForEqualKeys(Object key) throws PrivacityException  {
     	Object r;
         try {

@@ -10,7 +10,7 @@ import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.exceptions.ValidationException;
 import com.privacity.common.interfaces.IdGrupoInterface;
-import com.privacity.commonback.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.ServerUrls;
 import com.privacity.server.services.protocolomap.ProtocoloValue;
 
 import lombok.extern.slf4j.Slf4j;
@@ -105,7 +105,7 @@ public abstract class ControllerBase extends ControllerBaseUtil {
 		p.setAction(request.getAction());
 
 		if (objetoRetorno instanceof MessageDTO ) {
-			p.setMessageDTO((MessageDTO)objetoRetorno);
+			p.setMessage((MessageDTO)objetoRetorno);
 		}else {
 
 			String retornoJson=null;
@@ -132,7 +132,7 @@ public abstract class ControllerBase extends ControllerBaseUtil {
 
 	public abstract boolean isRequestId();
 
-	public abstract Urls getUrl();
+	public abstract ServerUrls getUrl();
 	
 
 }

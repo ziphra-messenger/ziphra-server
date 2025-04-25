@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.enumeration.ProtocoloComponentsEnum;
-import com.privacity.commonback.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.ServerUrls;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,11 +12,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProtocoloKey {
-	private Urls url;
+	private ServerUrls url;
 	private ProtocoloComponentsEnum component;
 	private ProtocoloActionsEnum action;
 	
-	public ProtocoloKey(Urls url, ProtocoloComponentsEnum component, ProtocoloActionsEnum action) {
+	public ProtocoloKey(ServerUrls url, ProtocoloComponentsEnum component, ProtocoloActionsEnum action) {
 		super();
 		this.url = url;
 		this.component = component;
@@ -39,7 +39,7 @@ public class ProtocoloKey {
 		return action == other.action && component == other.component && url == other.url;
 	}
 
-	public static ProtocoloKey build(Urls url, ProtocoloComponentsEnum component, ProtocoloActionsEnum action) {
+	public static ProtocoloKey build(ServerUrls url, ProtocoloComponentsEnum component, ProtocoloActionsEnum action) {
 		return new ProtocoloKey(url,component,action);
 	}
 

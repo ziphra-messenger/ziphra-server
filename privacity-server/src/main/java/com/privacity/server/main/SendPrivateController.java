@@ -1,5 +1,6 @@
 package com.privacity.server.main;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,9 @@ import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.exceptions.PrivacityException;
-import com.privacity.commonback.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.ServerUrls;
 import com.privacity.commonback.common.interfaces.HealthCheckerInterface;
+import com.privacity.commonback.common.utils.AESToUse;
 import com.privacity.core.model.Grupo;
 import com.privacity.core.model.UserForGrupo;
 import com.privacity.core.model.Usuario;
@@ -40,7 +42,7 @@ public class SendPrivateController extends ControllerBaseUtil{
 	public ResponseEntity<String> inMessage(@RequestParam String request, 
 			/*@RequestParam("data") */ MultipartFile data) throws PrivacityException {
 
-		if ( checkServersMessageId()!= null) return checkServersMessageId();
+		//if ( checkServersMessageId()!= null) return checkServersMessageId();
 		if ( checkServersSessionManager()!= null) return checkServersSessionManager();
 		if ( checkServersRequestId()!= null) return checkServersRequestId();
 
@@ -49,20 +51,23 @@ public class SendPrivateController extends ControllerBaseUtil{
 
 		ProtocoloDTO p = comps.service().usuarioSessionInfo().decryptProtocolo(username, request, getUrl().name());
 
-		if (p.getMessageDTO().getMediaDTO() != null) {
+		ProtocoloDTO p2 = comps.service().usuarioSessionInfo().decryptProtocolo(username, request, getUrl().name());
+		
+		p2.getMessage().setMedia(null);
+		
+		System.out.println(comps.util().string().gsonPretty().toJson(p2));
+		
+		if (p.getMessage().getMedia() != null) {
 
 			AESAllDTO aess = comps.service().usuarioSessionInfo().getAesDtoAll(username);
 			AESDTO aesdto =aess.getSessionAESDTOServerIn();
 			AESToUse c;
 			try {
-				c = new AESToUse(Integer.parseInt(aesdto.getBitsEncrypt()),
-						Integer.parseInt(	 aesdto.iteration),
-						aesdto.getSecretKeyAES(),
-						aesdto.getSaltAES());
+				c = new AESToUse(aesdto);
 
 
-				byte[] dataDescr = c.getAESDecryptData(data.getBytes());
-				p.getMessageDTO().getMediaDTO().setData(dataDescr);
+				byte[] dataDescr = data.getBytes(); //c.getAESDecryptData(data.getBytes());
+				p.getMessage().getMedia().setData(dataDescr);
 			} catch (NumberFormatException e) {
 				log.error(e.getMessage());
 				throw new PrivacityException(ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL);
@@ -101,10 +106,10 @@ public class SendPrivateController extends ControllerBaseUtil{
 		try {
 
 
-			dtoObject =  request.getMessageDTO();
+			dtoObject =  request.getMessage();
 
 			Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
-			Grupo grupo = comps.requestHelper().setGrupoInUse(dtoObject.idGrupo);
+			Grupo grupo = comps.requestHelper().setGrupoInUse(dtoObject.getIdGrupo());
 			UserForGrupo ufg = comps.requestHelper().getUserForGrupoInUse();
 
 			objetoRetorno =comps.validation().message().send(dtoObject,grupo,usuarioLogged,ufg);
@@ -123,7 +128,7 @@ public class SendPrivateController extends ControllerBaseUtil{
 		} 
 		p.setComponent(request.getComponent());
 		p.setAction(request.getAction());
-		p.setMessageDTO(objetoRetorno);
+		p.setMessage(objetoRetorno);
 		p.setAsyncId(request.getAsyncId());
 
 		log.debug(">>" +comps.util().string().cutString(p.toString()));
@@ -143,7 +148,7 @@ public class SendPrivateController extends ControllerBaseUtil{
 	}
 
 
-	public Urls getUrl() {
-		return Urls.CONSTANT_URL_PATH_PRIVATE_SEND;
+	public ServerUrls getUrl() {
+		return ServerUrls.CONSTANT_URL_PATH_PRIVATE_SEND;
 	}
 }

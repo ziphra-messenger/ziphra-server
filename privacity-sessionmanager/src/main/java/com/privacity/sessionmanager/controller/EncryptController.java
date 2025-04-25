@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.commonback.common.utils.AESToUse;
 import com.privacity.commonback.constants.SessionManagerRestConstants;
-import com.privacity.sessionmanager.model.AESToUse;
 import com.privacity.sessionmanager.services.UtilFacade;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class EncryptController {
 	@PostMapping(SessionManagerRestConstants.ENCRYPT_IDS)
 	public Object encryptPrivacityIdEncoder(@RequestParam String username, @RequestParam String obj, @RequestParam String className) throws Throwable, Exception {
 		log.debug("entrada - encryptPrivacityIdEncoder");
-		log.debug("username" + username);
+		log.debug("username: " + username);
 		log.debug("className: " + className);
 		log.debug("obj: " + uf.utilsString().cutString(obj));
 		

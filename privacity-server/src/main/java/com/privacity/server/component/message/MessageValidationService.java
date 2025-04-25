@@ -1,7 +1,6 @@
 package com.privacity.server.component.message;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,9 @@ import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.MessageDetailDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.enumeration.MediaTypeEnum;
 import com.privacity.common.enumeration.MessageState;
+import com.privacity.common.enumeration.RulesConfEnum;
 import com.privacity.common.exceptions.PrivacityException;
 import com.privacity.common.exceptions.ProcessException;
 import com.privacity.common.exceptions.ValidationException;
@@ -27,12 +28,11 @@ import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @AllArgsConstructor
-@Log	
-
+@Slf4j
 public class MessageValidationService {
 	
 	@Autowired @Lazy
@@ -97,7 +97,7 @@ public class MessageValidationService {
 	
 	public MessageDTO get(MessageDTO request) throws Exception {
 		
-		log.fine("Get Message Reply idParentReply: grupo -> "  + request.getIdGrupo() + " message: -> " + request.getIdMessage() );
+		log.trace("Get Message Reply idParentReply: grupo -> "  + request.getIdGrupo() + " message: -> " + request.getIdMessage() );
 		
 		String username = comps.requestHelper().getUsuarioUsername();
 		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
@@ -128,15 +128,17 @@ public class MessageValidationService {
 		comps.util().messageDetail().getMessageDetailValidateTimeMessage(m, comps.requestHelper().getUsuarioLogged());
 		
 		MessageDTO r = new MessageDTO();
-		r.setMediaDTO(new MediaDTO());
-		r.getMediaDTO().setData(m.getMedia().getData());
+		r.setMedia(new MediaDTO());
+		r.getMedia().setData(m.getMedia().getData());
 		return r;
 	}
 	
 	public MessageDTO[] getAllidMessageUnreadMessages() throws Exception {
 		return comps.process().message().getAllidMessageUnreadMessages();
 	}
-	
+	public MessageDTO[] getAllidMessageDestinyServerMessages() throws Exception {
+		return comps.process().message().getAllidMessageDestinyServerMessages();
+	}
 	public MessageDTO[] getHistorialId(IdMessageDTO request) throws Exception {
 		return comps.process().message().getHistorialId(request);
 	}
@@ -146,12 +148,12 @@ public class MessageValidationService {
 	}
 	
 	public void deleteAllMyMessageForEverybodyByGrupo(String idGrupo) throws Exception {
-		log.fine("Procesando deleteAllMyMessageForEverybodyByGrupo: grupo -> "  + idGrupo);
+		log.trace("Procesando deleteAllMyMessageForEverybodyByGrupo: grupo -> "  + idGrupo);
 		comps.process().message().emptyList(idGrupo);
 	}
 	
 	public MessageDetailDTO changeState(MessageDetailDTO request) throws Exception {
-		log.fine("Procesando changeState (" + request.getEstado().name() +   " ): grupo -> "  + request.getIdGrupo() + " message: -> " + request.getIdMessage() );
+		log.trace("Procesando changeState (" + request.getEstado().name() +   " ): grupo -> "  + request.getIdGrupo() + " message: -> " + request.getIdMessage() );
 		Grupo g = comps.requestHelper().setGrupoInUse(request);
 		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
 
@@ -163,32 +165,69 @@ public class MessageValidationService {
 		Message m = comps.util().message().getMessage(g.getIdGrupo(), idMessage);
 		
 		MessageDetail md = comps.util().messageDetail().getMessageDetail(m, usuarioLogged);
-		
+		MessageState oldState = md.getState();
+		md.setHideRead(request.isHideRead());
 		MessageState state =request.getEstado();
 		
-		return comps.process().message().changeState(usuarioLogged, m, md, state,request);
+		return comps.process().message().changeState(usuarioLogged, m, md, state,request,oldState);
 	}
 	
 	public MessageDTO[] loadMessages(MessageDTO request) throws Exception {
 		return comps.process().message().loadMessages(request);
 	}
 	
-	
-	
 
 	public MessageDTO send(MessageDTO request, Grupo grupo, Usuario usuarioLogged, UserForGrupo ufg) throws Exception {
 		
-		Date inicio = new Date();
+		comps.requestHelper().setGrupoInUse(grupo);
+		if ( (comps.requestHelper().getUserForGrupoInUse().getRole().equals(GrupoRolesEnum.READONLY) )) {
+			
+			log.error(ExceptionReturnCode.GRUPO_USER_CANT_SEND_MESSAGE_READ_ONLY.toShow("send"));
+			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_CANT_SEND_MESSAGE_READ_ONLY);
+		}
+			
+		if ( request.getMedia() != null && request.getMedia().getMediaType().equals(MediaTypeEnum.AUDIO_MESSAGE)) { 
+			if (grupo.getGralConf().isBlockAudioMessages()) {
+				throw new ValidationException(ExceptionReturnCode.GRUPO_GENERAL_CONF__VALIDATION__AUDIO_MESSAGE__NOT_ALLOW);
+			}
+		}
+		if (grupo.getGralConf().isBlockResend()) {
+			request.setBlockResend(true);
+		}
+		
+		if (request.getMedia() != null) {
+			if (MediaTypeEnum.IMAGE.equals(request.getMedia().getMediaType())
+					||MediaTypeEnum.VIDEO.equals(request.getMedia().getMediaType())
+					) {
+				if (grupo.getGralConf().isBlackMessageAttachMandatory()
+						|| comps.requestHelper().getUsuarioLogged().getMyAccountConf().isBlackMessageAttachMandatory()
+						|| comps.requestHelper().getGrupoUserConfInUse().getBlackMessageAttachMandatory().equals(RulesConfEnum.ON)
+						) {
+					request.setBlackMessage(true);
+				}
+			}
+	}
+		if (grupo.getGralConf().isHideMessageReadState()) {
+			request.setHideMessageReadState(true);
+		}
+		if (grupo.getGralConf().getAnonimo().equals(RulesConfEnum.MANDATORY)) {
+			request.setAnonimo(true);
+		}
+		if (request.isAnonimo() &&     
+				grupo.getGralConf().getAnonimo().equals(RulesConfEnum.BLOCK)) {
+			throw new ValidationException(ExceptionReturnCode.GRUPO_GENERAL_CONF__VALIDATION__ANONIMO_MESSAGE__NOT_ALLOW);
+		}
 		
 		List<UserForGrupo> usersForGrupo = comps.repo().userForGrupo().findByForGrupo(grupo.getIdGrupo());
 		Message m = comps.common().mapper().doit(request, usuarioLogged,grupo,usersForGrupo, true);
+
+		if (m.getParentResend() != null) {
+			if (m.getParentResend().isBlockResend()) {
+				throw new ValidationException(ExceptionReturnCode.MESSAGE_IS_CONFIGURATED_TO_BLOCK_RESEND);
+			}
+		}
 		MessageDTO r = comps.process().message().send(usuarioLogged.getIdUser(), m, grupo.getIdGrupo());
 		
-		Date fin = new Date();
-		
-		double total = fin.getTime() - inicio.getTime();
-		
-		log.info("total:>> " + (total/1000));
 		return r;
 	}
 

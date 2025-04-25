@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
-import com.privacity.commonback.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.ServerUrls;
 import com.privacity.commonback.common.interfaces.HealthCheckerInterface;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
@@ -44,8 +44,8 @@ public class PrivateController extends ControllerBase{
 		 log.debug( " ================================================================================");
 		
 		ProtocoloDTO retornoFuncion = super.in(p);
-		log.debug( " retornoFuncion >>  " + comps.util().string().cutStringToGson(retornoFuncion));
-		
+		//log.debug( " retornoFuncion >>  " + comps.util().string().cutStringToGson(retornoFuncion));
+		//System.out.println("ret completp " + comps.util().string().gsonPretty().toJson(retornoFuncion));
 			String objetoRetorno = comps.service().usuarioSessionInfo().encryptProtocolo(
 					comps.requestHelper().getUsuarioUsername()
 					, retornoFuncion, getUrl().name());
@@ -67,7 +67,8 @@ public class PrivateController extends ControllerBase{
 //			}
 //		
 			
-			log.debug( " Salida >>  " + comps.util().string().cutString(objetoRetorno));
+			log.debug( " Salida >>  " + comps.util().string().gsonPretty().toJson(objetoRetorno));
+			System.out.println(comps.util().string().gsonPretty().toJson(objetoRetorno));
 		return ResponseEntity.ok().body(objetoRetorno);
 
 	}
@@ -87,8 +88,8 @@ public class PrivateController extends ControllerBase{
 	}
 	
 	@Override
-	public Urls getUrl() {
-		return Urls.CONSTANT_URL_PATH_PRIVATE;
+	public ServerUrls getUrl() {
+		return ServerUrls.CONSTANT_URL_PATH_PRIVATE;
 	}
 
 }

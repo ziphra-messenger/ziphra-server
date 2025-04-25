@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.privacity.server.factory.MessageIdGeneratorFactory;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -16,6 +14,6 @@ import lombok.experimental.Accessors;
 @Getter
 public class FacadeFactoryService {
 	@Autowired @Lazy
-	private MessageIdGeneratorFactory messageIdSequence;
+	private com.privacity.server.factory.IdsGeneratorFactory idsGenerator;
 
 }

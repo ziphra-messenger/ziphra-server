@@ -13,7 +13,7 @@
 	<packaging>pom</packaging>
 	<name>privacity</name>
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<privacity.version>2.3.2-SNAPSHOT</privacity.version>
 		<privacity.root.name>privacity</privacity.root.name>
 		<privacity.concatenate>-</privacity.concatenate>
@@ -25,6 +25,7 @@
 		<privacity.module.sessionmanager>${privacity.root.name}${privacity.concatenate}sessionmanager</privacity.module.sessionmanager>
 		<privacity.module.commonback>${privacity.root.name}${privacity.concatenate}commonback</privacity.module.commonback>
 		<privacity.module.core>${privacity.root.name}${privacity.concatenate}core</privacity.module.core>
+		<privacity.module.security>${privacity.root.name}${privacity.concatenate}security</privacity.module.security>
 	</properties>
 	
 	<dependencies>
@@ -52,5 +53,6 @@
 		<module>${privacity.module.sessionmanager}</module>
 		<module>${privacity.module.commonback}</module>
 		<module>${privacity.module.core}</module>
+		<module>${privacity.module.security}</module>
 	</modules>
 </project>

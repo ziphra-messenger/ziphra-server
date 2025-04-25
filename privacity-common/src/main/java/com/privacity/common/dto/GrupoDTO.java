@@ -1,8 +1,9 @@
 package com.privacity.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.annotations.PrivacityId;
+import com.privacity.common.annotations.PrivacityIdExclude;
 import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.interfaces.IdGrupoInterface;
 
@@ -14,40 +15,28 @@ import lombok.experimental.Accessors;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = true)
 @Data
+@Accessors(chain = true)
+@JsonInclude(JsonInclude.Include.CUSTOM)
+
 public class GrupoDTO implements IdGrupoInterface{
 	@PrivacityId
 	@PrivacityIdOrder
-	public String idGrupo;
-	@JsonInclude(Include.NON_NULL)
-	public String name;
+	private String idGrupo;
+	
+	@PrivacityIdExclude	
+	private String name;
 
-	@JsonInclude(Include.NON_NULL)
-	public GrupoInvitationDTO grupoInvitationDTO;
+	private GrupoInvitationDTO grupoInvitationDTO;
+	private UserForGrupoDTO userForGrupoDTO;
+	private GrupoGralConfDTO gralConfDTO;
+	private GrupoUserConfDTO userConfDTO;
+	private MembersQuantityDTO membersQuantityDTO;
 	
-	@JsonInclude(Include.NON_NULL)
-	public UserForGrupoDTO userForGrupoDTO;
-	
-	@JsonInclude(Include.NON_NULL)
-	
-	public GrupoGralConfDTO gralConfDTO;
-	
-	@JsonInclude(Include.NON_NULL)
-	public GrupoUserConfDTO userConfDTO;
-	    
-	@JsonInclude(Include.NON_NULL)
-	public MembersQuantityDTO membersQuantityDTO;
-	
-	//public String nicknameForGrupo;
-	@JsonInclude(Include.NON_NULL)
-	public String alias;
-	
-	@JsonInclude(Include.NON_NULL)
-	public LockDTO lock;
-	
-	@JsonInclude(Include.NON_NULL)
-	public GrupoGralConfPasswordDTO password;
+	@PrivacityIdExclude	
+	private String alias;
+	private LockDTO lock;
+	private GrupoGralConfPasswordDTO password;
 
 	@Override
 	public String getIdGrupo() {
@@ -55,17 +44,13 @@ public class GrupoDTO implements IdGrupoInterface{
 		return idGrupo;
 	}
 
-	@Override
-	public void setIdGrupo(String idGrupo) {
-		this.idGrupo=idGrupo;
-		
-	}
+
 	
-    public Long convertIdGrupoToLong() {
+	public Long convertIdGrupoToLong() {
 		return Long.parseLong(idGrupo);
 	}
     
-	public GrupoDTO(String name) {
+    public GrupoDTO(String name) {
 		super();
 		this.name = name;
 	}
@@ -73,6 +58,8 @@ public class GrupoDTO implements IdGrupoInterface{
 		super();
 		this.idGrupo = id+"";
 	}	
+
+	@JsonIgnore
 	public boolean isGrupoInvitation() {
 		if (grupoInvitationDTO == null) {
 			return false;

@@ -1,20 +1,18 @@
 package com.privacity.core.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -26,11 +24,17 @@ import lombok.Data;
 		uniqueConstraints = { 
 			@UniqueConstraint(columnNames = "username"),
 		})
-@SequenceGenerator(name = "usuario_secuencia", initialValue = 155997, allocationSize = 17)
 
-public class Usuario {
+
+public class Usuario implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5694310689191434637L;
+
+	public static final Long  CONSTANT_ID_STARTS_AT=150000L;
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "usuario_secuencia")
 	private Long idUser;
 
 	
@@ -38,9 +42,9 @@ public class Usuario {
 
 	private String nickname;
 	
+	
     @OneToOne(mappedBy = "usuario", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
-    
     private UsuarioPassword usuarioPassword;
 
     @OneToOne(mappedBy = "usuario", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
@@ -53,7 +57,7 @@ public class Usuario {
 //    @PrimaryKeyJoinColumn
 //    private MessageConf messageConf;
     
-    @OneToOne( cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    @OneToOne( cascade = CascadeType.ALL)
     @JoinColumn(name="id_encrypt_keys")
     private EncryptKeys encryptKeys;
 
@@ -62,8 +66,8 @@ public class Usuario {
     private UserInvitationCode UserInvitationCode;   
     
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(	name = "user_roles", 
-				joinColumns = @JoinColumn(name = "user_id"), 
+	@JoinTable(	name = "usuario_roles", 
+				joinColumns = @JoinColumn(name = "usuario_id"), 
 				inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 

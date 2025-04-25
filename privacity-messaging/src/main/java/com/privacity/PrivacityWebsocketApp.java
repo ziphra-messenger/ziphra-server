@@ -3,12 +3,20 @@ package com.privacity;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import com.privacity.commonback.annotations.SpringIgnoreThisComponent;
 
 
 @SpringBootApplication
 //@ComponentScan(basePackages = "com.privacity.server.component.grupo")
 @ComponentScan(basePackages = "com.privacity.commonback.controller")
 @ComponentScan(basePackages = "com.privacity")
+@EnableJpaRepositories(excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = {
+        		SpringIgnoreThisComponent.class})
+})
 //@EnableConfigurationProperties(value = MessageIdSequenceFactoryPropertiesEnumConfiguration.class)
 public class PrivacityWebsocketApp {
 

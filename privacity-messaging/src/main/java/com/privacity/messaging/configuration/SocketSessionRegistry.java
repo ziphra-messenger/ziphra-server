@@ -55,7 +55,8 @@ public class SocketSessionRegistry{
      * @param user
      * @param sessionId
      */
-    public void registerSessionId(String user, String sessionId) {
+    @SuppressWarnings({ "unused", "rawtypes", "unchecked" })
+	public void registerSessionId(String user, String sessionId) {
         Assert.notNull(user, "User must not be null");
         Assert.notNull(sessionId, "Session ID must not be null");
         Object var3 = this.lock;

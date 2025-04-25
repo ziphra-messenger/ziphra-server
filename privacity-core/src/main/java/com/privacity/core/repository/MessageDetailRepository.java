@@ -25,16 +25,30 @@ public interface MessageDetailRepository extends CrudRepository<MessageDetail, M
 
 	@Query("SELECT m FROM MessageDetail m  "
 			+ "WHERE m.messageDetailId.userDestino.idUser = ?1"
-			+ " and m.state not in (0,1, 4) and m.deleted =false "
+			+ " and m.state not in (0,1,2, 5) and m.deleted =false "
 			+ " and m.messageDetailId.message.deleted = false "
 			+ " and m.messageDetailId.message.messageId.grupo.idGrupo in ( "
 			 + " 	Select ufg.userForGrupoId.grupo.idGrupo From "
 			+ " 	UserForGrupo ufg "
 			+ " 	where ufg.userForGrupoId.grupo.deleted = false "
+			+ "    and ufg.deleted = false "
+			+ " 	and ufg.userForGrupoId.user.idUser = ?1 )" 
+			)
+	List<MessageDetail> getAllidMessageDestinyServerMessages(Long idUser);
+
+	@Query("SELECT m FROM MessageDetail m  "
+			+ "WHERE m.messageDetailId.userDestino.idUser = ?1"
+			+ " and m.state not in (0,1,2, 4,5) and m.deleted =false "
+			+ " and m.messageDetailId.message.deleted = false "
+			+ " and m.messageDetailId.message.messageId.grupo.idGrupo in ( "
+			 + " 	Select ufg.userForGrupoId.grupo.idGrupo From "
+			+ " 	UserForGrupo ufg "
+			+ " 	where ufg.userForGrupoId.grupo.deleted = false "
+			+ "    and ufg.deleted = false "
 			+ " 	and ufg.userForGrupoId.user.idUser = ?1 )" 
 			)
 	List<MessageDetail> getAllidMessageUnreadMessages(Long idUser);
-
+	
 	@Query("SELECT m FROM MessageDetail m WHERE m.messageDetailId.userDestino.idUser = :iduser "
 
 			+ " and m.messageDetailId.message.messageId.grupo.idGrupo = :idgrupo "

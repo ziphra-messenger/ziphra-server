@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.commonback.common.utils.AESToUse;
 import com.privacity.commonback.common.utils.PrivacityIdEncoder;
-import com.privacity.sessionmanager.model.AESToUse;
 import com.privacity.sessionmanager.model.Session;
 import com.privacity.sessionmanager.model.UsuarioSessionInfo;
 import com.privacity.sessionmanager.util.pool.ProducersGenerator;
@@ -110,7 +110,7 @@ public class UsuarioSessionInfoService{
 
 
 				t.setPrivacityIdEncoder(new PrivacityIdEncoder
-						(encryptIds, sDB.getAESDTOPrivacityId(), 
+						(encryptIds, new AESToUse(sDB.getAESDTOPrivacityId()), 
 								Long.parseLong( sDB.privacityIdOrderSeed), 
 								Long.parseLong(	sDB.orderRamdomNumber),
 								Integer.parseInt(	sDB.base),
@@ -126,12 +126,12 @@ public class UsuarioSessionInfoService{
 				t.setSessionAESServerIn(ProducersGenerator.dataQueue.poll());
 				t.setSessionAESServerOut(ProducersGenerator.dataQueue.poll());
 				t.setPrivacityIdEncoder(new PrivacityIdEncoder(encryptIds,
-						ProducersGenerator.dataQueue.poll().getAESDTO()));
+						ProducersGenerator.dataQueue.poll()));
 
 				Session s = new Session(username, t.getSessionAESServerIn().getAESDTO(), 
 						t.getSessionAESServerOut().getAESDTO(),
 						t.getSessionAESWS().getAESDTO(),
-						t.getPrivacityIdEncoder().getAESDTO(),
+						t.getPrivacityIdEncoder().getAesToUse().getAESDTO(),
 						t.getPrivacityIdEncoder().getPrivacityIdOrderSeed()+"",
 						t.getPrivacityIdEncoder().getOrderRamdomNumber()+"",
 						t.getPrivacityIdEncoder().getMutateDigitUtil().getBase()+"",

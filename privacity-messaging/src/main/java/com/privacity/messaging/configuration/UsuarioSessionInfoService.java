@@ -40,6 +40,7 @@ public class UsuarioSessionInfoService {
 	private String getServerSM() {
 		return urlService;
 	}
+	@SuppressWarnings("deprecation")
 	public String encryptProtocoloWS(String username, ProtocoloDTO p, String url) throws PrivacityException {
 		try {
 
@@ -53,7 +54,7 @@ public class UsuarioSessionInfoService {
 			HttpHeaders headers = new HttpHeaders();		
 
 			headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-			HttpEntity<?> entity = new HttpEntity<Object>(map);
+//			HttpEntity<?> entity = new HttpEntity<Object>(map);
 
 			String url2 = UriComponentsBuilder.fromHttpUrl(getServerSM() +  SessionManagerRestConstants.PROTOCOLO_ENCRYPT +  SessionManagerRestConstants.PROTOCOLO_ENCRYPT_WS ).toUriString();
 
@@ -66,6 +67,7 @@ public class UsuarioSessionInfoService {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public Map<String, String> encryptProtocoloWS(Queue<String> userslist, ProtocoloDTO p, String url) throws PrivacityException {
 		try {
 			RestTemplate rest = new RestTemplate();
@@ -83,6 +85,7 @@ public class UsuarioSessionInfoService {
 
 			String url2 = UriComponentsBuilder.fromHttpUrl(getServerSM() +  SessionManagerRestConstants.PROTOCOLO_ENCRYPT +  SessionManagerRestConstants.PROTOCOLO_ENCRYPT_WS_USERLIST ).toUriString();
 
+			@SuppressWarnings("unchecked")
 			Map<String, String> r = rest.postForObject(url2, map, Map.class);
 
 			return r;

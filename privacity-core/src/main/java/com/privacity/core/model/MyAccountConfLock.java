@@ -3,30 +3,37 @@ package com.privacity.core.model;
 import java.io.Serializable;
 import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
-
-import com.privacity.common.annotations.ExcludeInterceptorLog;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Accessors(chain = true)
 public class MyAccountConfLock implements Serializable{
 
 	private static final long serialVersionUID = 5332391329597095242L;
 
-	@Id
-	@OneToOne
-	@ExcludeInterceptorLog
+	  @Id
+	    @Column(name = "id_user")
+	    private Long idMyAccountConfLock;
+	  
+	    @OneToOne
+	    @MapsId
+	    @JoinColumn(name = "id_user")
 	@ToString.Exclude	
 	private MyAccountConf myAccountConf;
 	
@@ -34,7 +41,7 @@ public class MyAccountConfLock implements Serializable{
 	public Integer seconds;
 	@Override
 	public int hashCode() {
-		return Objects.hash(enabled, myAccountConf.getUsuario().getIdUser(), seconds);
+		return Objects.hash(enabled, getIdMyAccountConf(myAccountConf), seconds);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -45,7 +52,16 @@ public class MyAccountConfLock implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		MyAccountConfLock other = (MyAccountConfLock) obj;
-		return enabled == other.enabled && Objects.equals(myAccountConf.getUsuario().getIdUser(), other.myAccountConf.getUsuario().getIdUser())
+		return enabled == other.enabled && Objects.equals(getIdMyAccountConf(myAccountConf), getIdMyAccountConf(other.myAccountConf))
 				&& Objects.equals(seconds, other.seconds);
+	}
+	
+	private Long getIdMyAccountConf(MyAccountConf u) {
+		if (u!= null) {
+			return u.getIdMyAccountConf();
+		}else {
+			return 0L;
+		}
+		
 	}
 }

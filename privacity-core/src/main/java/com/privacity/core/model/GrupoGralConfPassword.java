@@ -1,20 +1,26 @@
 package com.privacity.core.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-@Data
+import lombok.Setter;
+import lombok.experimental.Accessors;
+@Getter
+@Setter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-//@Table(name = "user_password")
+@Accessors(chain = true)
 public class GrupoGralConfPassword implements Serializable{
 	/**
 	 * 
@@ -25,10 +31,15 @@ public class GrupoGralConfPassword implements Serializable{
 		this.grupo=grupo;
 	}
 		
-	@Id
-	@OneToOne
-	@ToString.Exclude	
-	private Grupo grupo;
+	  @Id
+	    @Column(name = "id_grupo")
+	    private Long idGrupoGralConfPassword;
+	  
+	    @OneToOne
+	    @MapsId
+	    @JoinColumn(name = "id_grupo")
+	  private Grupo grupo;
+	  
 	
 	private boolean extraEncryptDefaultEnabled;
 	private boolean deleteExtraEncryptEnabled;
@@ -39,6 +50,37 @@ public class GrupoGralConfPassword implements Serializable{
 
 	@Override
 	public String toString() {
-		return "";
+		return "GrupoGralConfPassword [grupo=" + getIdGrupo(grupo) + ", extraEncryptDefaultEnabled=" + extraEncryptDefaultEnabled
+				+ ", deleteExtraEncryptEnabled=" + deleteExtraEncryptEnabled + ", enabled=" + enabled + ", password="
+				+ password + ", passwordExtraEncrypt=" + passwordExtraEncrypt + "]";
+	}
+	
+	private Long getIdGrupo(Grupo u) {
+		if (u!= null) {
+			return grupo.getIdGrupo();
+		}else {
+			return 0L;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(deleteExtraEncryptEnabled, enabled, extraEncryptDefaultEnabled, getIdGrupo(grupo), password,
+				passwordExtraEncrypt);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GrupoGralConfPassword other = (GrupoGralConfPassword) obj;
+		return deleteExtraEncryptEnabled == other.deleteExtraEncryptEnabled && enabled == other.enabled
+				&& extraEncryptDefaultEnabled == other.extraEncryptDefaultEnabled && Objects.equals(getIdGrupo(grupo), getIdGrupo(other.grupo))
+				&& Objects.equals(password, other.password)
+				&& Objects.equals(passwordExtraEncrypt, other.passwordExtraEncrypt);
 	}
 }

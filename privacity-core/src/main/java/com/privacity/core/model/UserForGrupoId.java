@@ -13,9 +13,11 @@ import com.privacity.common.annotations.ExcludeInterceptorLog;
 
 import lombok.Data;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Data
 @Embeddable
+@Accessors(chain = true)
 public class UserForGrupoId implements Serializable {
 
     private static final long serialVersionUID = 1L;

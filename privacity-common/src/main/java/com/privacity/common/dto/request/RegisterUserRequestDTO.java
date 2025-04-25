@@ -1,16 +1,30 @@
 package com.privacity.common.dto.request;
 
+import java.io.Serializable;
+
+import com.privacity.common.annotations.PrivacityIdExclude;
 import com.privacity.common.dto.EncryptKeysDTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class RegisterUserRequestDTO {
+@AllArgsConstructor
+@NoArgsConstructor
+public class RegisterUserRequestDTO implements Serializable{
 	
-	public String username;
-	public String nickname;
-	public String password;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5474314920738614640L;
+	@PrivacityIdExclude	
+	private String username;
+	@PrivacityIdExclude	
+	private String nickname;
+	@PrivacityIdExclude	
+	private String password;
 
-	public EncryptKeysDTO encryptKeysDTO;
-	public EncryptKeysDTO invitationCodeEncryptKeysDTO;
+	private EncryptKeysDTO encryptKeysDTO;
+	private EncryptKeysDTO invitationCodeEncryptKeysDTO;
 }

@@ -30,6 +30,11 @@
 			<version>${privacity.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>${privacity.groupId}</groupId>
+			<artifactId>${privacity.module.security}</artifactId>
+			<version>${privacity.version}</version>
+		</dependency>		
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
@@ -121,6 +126,7 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>

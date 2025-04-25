@@ -15,10 +15,10 @@ public class IdMessageDTO implements IdGrupoInterface{
 
 	@PrivacityId
 	@PrivacityIdOrder
-	public String idGrupo;
+	private String idGrupo;
 	
 	@PrivacityIdOrder
-	public String idMessage;
+	private String idMessage;
 	
     public String buildIdMessageToMap() {
     	return idGrupo + "{-}" + idMessage;

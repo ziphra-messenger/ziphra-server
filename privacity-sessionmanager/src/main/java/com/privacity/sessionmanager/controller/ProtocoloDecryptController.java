@@ -26,37 +26,38 @@ public class ProtocoloDecryptController {
 	private UtilFacade uf;
 
 	@PostMapping(SessionManagerRestConstants.PROTOCOLO_DECRYPT_SERVER_IN)
-	public ProtocoloDTO decryptProtocolo(@RequestParam String username, @RequestParam String obj, @RequestParam String url) throws Throwable, Exception {
+	public String decryptProtocolo(@RequestParam String username, @RequestParam String obj, @RequestParam String url) throws Throwable, Exception {
 		log.debug("entrada - decryptProtocolo");
 		log.debug("username" + username);
 		log.debug("url " + Urls.valueOf(url));
 		log.debug("obj: " + uf.utilsString().cutString(obj));
 
-
-		String pS = uf.usuarioSessionInfo().get(username).getSessionAESServerIn().getAESDecrypt(obj);
-		log.trace("Decrypt: " + uf.utilsString().cutString(pS));
-		ProtocoloDTO p =  uf.gson().fromJson(pS, ProtocoloDTO.class);
+		ProtocoloDTO p = uf.utilsString().protocoloToSendDecrypt(uf.usuarioSessionInfo().get(username).getSessionAESServerIn(), obj);
 
 		log.trace("Protocolo: " + uf.utilsString().cutStringToGson(p));
 
 		ProtocoloValue value = uf.map().get(Urls.valueOf(url),  p.getComponent(),  p.getAction());
 
-
 		if ( p.getObjectDTO() != null ) {
+			 
 			log.debug("p.getObjectDTO(): " + p.getObjectDTO());
 			Object o = uf.gson().fromJson(p.getObjectDTO(),value.getParametersType());
 			o = uf.usuarioSessionInfo().get(username).getPrivacityIdEncoder().decryptIds(o);
+			if ( p.getObjectDTO().equals("[]")) {
+				o=null;
+			}
 			p.setObjectDTO( uf.utilsString().gsonToSend(o)) ;
 		}
 
-		if (p.getMessageDTO()!= null) {
-			MessageDTO m = (MessageDTO) uf.usuarioSessionInfo().get(username).getPrivacityIdEncoder().decryptIds(p.getMessageDTO());
-			p.setMessageDTO(m);
+		if (p.getMessage()!= null) {
+			MessageDTO m = (MessageDTO) uf.usuarioSessionInfo().get(username).getPrivacityIdEncoder().decryptIds(p.getMessage());
+			p.setMessage(m);
 		}
 
-		log.debug("salida decryptProtocolo : " + uf.gson().toJson(p));
-		return p;
+		log.debug("salida decryptProtocolo : " + uf.utilsString().gsonToSend(p));
+		return  uf.utilsString().gsonToSend(p);
 	}
+
 
 
 }

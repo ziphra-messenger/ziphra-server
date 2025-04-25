@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.privacity.commonback.common.interfaces.HealthCheckerInterface;
 import com.privacity.commonback.security.JwtUtilsAbstract;
-import com.privacity.messaging.task.HealthChecker;
+import com.privacity.messaging.task.HealthCheckerTask;
 
 
 @Component
@@ -15,7 +15,7 @@ public class JwtUtils extends JwtUtilsAbstract{
 
 	@Autowired
 	@Lazy
-	private HealthChecker healthChecker;
+	private HealthCheckerTask healthChecker;
 	protected HealthCheckerInterface getHealthChecker() {
 		return healthChecker;
 	}

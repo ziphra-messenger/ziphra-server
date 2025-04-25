@@ -45,7 +45,7 @@ public class ZipUtil {
 	}
 	
 	public byte[] decompress(String data) throws IOException {
-		return compress(data.getBytes());
+		return decompress(data.getBytes());
 	}
 
 	public byte[] decompress(byte[] compressed) throws IOException {

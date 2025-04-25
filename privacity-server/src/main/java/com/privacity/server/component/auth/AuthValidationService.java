@@ -14,14 +14,19 @@ import com.privacity.common.dto.request.RegisterUserRequestDTO;
 import com.privacity.common.dto.request.ValidateUsernameDTO;
 import com.privacity.common.dto.response.LoginDTOResponse;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.exceptions.PrivacityException;
 import com.privacity.common.exceptions.ValidationException;
+import com.privacity.commonback.common.enumeration.RolesSecurityAccessToServerEnum;
 import com.privacity.core.model.EncryptKeys;
 import com.privacity.core.model.UserInvitationCode;
 import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.EncryptKeysValidation;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class AuthValidationService {
 
 	public final static String METHOD_ACTION_AUTH_LOGIN ="login"; 
@@ -48,10 +53,12 @@ public class AuthValidationService {
 	public Boolean validateUsername(String username) throws ValidationException {
 		
 		if ( username == null) {
+			log.error(ExceptionReturnCode.AUTH_USERNAME_IS_NULL.getToShow(username));
 			throw new ValidationException(ExceptionReturnCode.AUTH_USERNAME_IS_NULL);
 		}
 
 		if ( username.length() < 3) {
+			log.error(ExceptionReturnCode.AUTH_USERNAME_IS_TOO_SHORT.getToShow(username));
 			throw new ValidationException(ExceptionReturnCode.AUTH_USERNAME_IS_TOO_SHORT);
 		}
 		
@@ -65,32 +72,40 @@ public class AuthValidationService {
 			Usuario usuario = new Usuario(request.getUsername(),request.getPassword());
 		
 		
-
-				return authProcesor.login(usuario);
+			LoginDTOResponse r = authProcesor.login(usuario);
+			
+				return r;
 			} catch (IllegalAccessException | NoSuchFieldException | SecurityException | ValidationException
 					| IOException | GeneralSecurityException e) {
-				// TODO Auto-generated catch block
+				log.error(ExceptionReturnCode.GENERAL_INESPERADO.getToShow(e));
 				e.printStackTrace();
 				throw new ValidationException(e.getMessage());
 		} catch (BadCredentialsException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			log.error(ExceptionReturnCode.AUTH_BAD_CREDENTIAL.getToShow(request.toString()));
 			throw new ValidationException(ExceptionReturnCode.AUTH_BAD_CREDENTIAL);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			log.error(ExceptionReturnCode.GENERAL_INESPERADO.getToShow(e));
 			e.printStackTrace();
 			throw new ValidationException(e.getMessage());
 		}
 	}
-	public void registerUser(RegisterUserRequestDTO request) throws ValidationException {
+	public void registerUser(RegisterUserRequestDTO request) throws PrivacityException {
+		registerUser(request, RolesSecurityAccessToServerEnum.ROLE_USER);
+	}
+	public void registerUser(RegisterUserRequestDTO request, RolesSecurityAccessToServerEnum erole) throws PrivacityException {
 		if (validateUsername(request.getUsername())) {
+			log.error(ExceptionReturnCode.AUTH_USERNAME_EXISTS.getToShow(request.toString()));
 			throw new ValidationException(ExceptionReturnCode.AUTH_USERNAME_EXISTS);
 		}
 		Usuario usuario = new Usuario(request.getUsername(),request.getPassword());
 		
 		if ( request.getNickname() == null || request.getNickname().trim().equals("")) {
 			
-			if (request.getNickname().length() > ConstantValidation.USER_NICKNAME_MAX_LENGTH) {
+			if (request.getNickname().length() > ConstantValidation.USER_NICKNAME_MAX_LENGTH) 
+			{
+				log.error(ExceptionReturnCode.AUTH_USERNAME_EXISTS.getToShow(request.toString()));
 				throw new ValidationException(ExceptionReturnCode.USER_NICKNAME_TOO_LONG);
 			}
 			
@@ -110,7 +125,8 @@ public class AuthValidationService {
 		usuario.setUserInvitationCode(new UserInvitationCode());
 		usuario.getUserInvitationCode().setEncryptKeys(invitationCodeEncrypt);
 		usuario.getUserInvitationCode().setInvitationCode(comps.common().randomGenerator().invitationCode());
-		authProcesor.registerUser(usuario);
+		log.trace("Termino de crear el Usuario nuevo");
+		log.trace(usuario.toString());
+		authProcesor.registerUser(usuario,erole);
 	}
-
 }

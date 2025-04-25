@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.privacity.server.security.SocketSessionRegistry;
 import com.privacity.server.websocket.WebSocketSenderClientService;
 
 import lombok.Getter;
@@ -17,9 +16,7 @@ import lombok.experimental.Accessors;
 @Getter
 public class FacadeWebSocketComponent {
 	
-	@Autowired
-	@Lazy
-	private SocketSessionRegistry socketSessionRegistry;
+
 	
 	@Autowired
 	@Lazy

@@ -2,33 +2,38 @@ package com.privacity.common.dto.servergralconf;
 
 import com.privacity.common.annotations.PrivacityId;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
+import com.privacity.common.interfaces.IdGrupoInterface;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class SGCGrupoGralConfDTO {
+@AllArgsConstructor
+@NoArgsConstructor
+public class SGCGrupoGralConfDTO implements IdGrupoInterface{
 
 	@PrivacityId
-	public String idGrupo;
+	private String idGrupo;
 	
-	public ConfigurationStateEnum resend;
-	public ConfigurationStateEnum anonimo;
+	private ConfigurationStateEnum resend;
+	private ConfigurationStateEnum anonimo;
 	
-	public boolean timeMessageMandatory;
-	public int timeMessageMaxTimeAllow;
-	public ConfigurationStateEnum audiochat;
+	private boolean timeMessageMandatory;
+	private int timeMessageMaxTimeAllow;
+	private ConfigurationStateEnum audiochat;
 
-	public int audiochatMaxTime;
-	public boolean blackMessageAttachMandatory;
+	private int audiochatMaxTime;
+	private boolean blackMessageAttachMandatory;
 
-	public boolean downloadAllowImage;
-	public boolean downloadAllowAudio;
-	public boolean downloadAllowVideo;
+	private boolean downloadAllowImage;
+	private boolean downloadAllowAudio;
+	private boolean downloadAllowVideo;
 	
-	public boolean changeNicknameToNumber;
-	public boolean hideMessageDetails;
-	public boolean hideMessageState;
-	public boolean hideMemberList;
-	public ConfigurationStateEnum extraEncrypt;
+	private boolean changeNicknameToNumber;
+	private boolean hideMessageDetails;
+	private boolean hideMessageState;
+	private boolean hideMemberList;
+	private ConfigurationStateEnum extraEncrypt;
 
 }

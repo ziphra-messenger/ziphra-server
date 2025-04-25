@@ -29,11 +29,10 @@ import com.privacity.common.exceptions.PrivacityException;
 import com.privacity.common.exceptions.ProcessException;
 import com.privacity.commonback.common.enumeration.HealthCheckerServerType;
 import com.privacity.commonback.constants.MessagingRestConstants;
-import com.privacity.commonback.pojo.HealthCheckerPojo;
 import com.privacity.core.model.Grupo;
 import com.privacity.core.model.Usuario;
+import com.privacity.security.util.UserDetailsImpl;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.component.usuario.UserDetailsImpl;
 import com.privacity.server.security.JwtUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -106,7 +105,7 @@ public class WebSocketSenderClientService {
 	public ProtocoloDTO buildProtocoloDTO(ProtocoloComponentsEnum comp, ProtocoloActionsEnum action,
 			MessageDTO m) {
 		ProtocoloDTO p = new ProtocoloDTO(comp,action);
-		p.setMessageDTO(m);
+		p.setMessage(m);
 		return p;
 	}
 

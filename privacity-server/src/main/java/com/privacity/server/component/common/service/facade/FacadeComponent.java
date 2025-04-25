@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.privacity.server.component.common.service.RequestHelperService;
-import com.privacity.server.tasks.HealthChecker;
+import com.privacity.server.tasks.HealthCheckerTask;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +30,7 @@ public class FacadeComponent {
 	private FacadeProcessServiceComponent process;
 	@Autowired @Lazy
 	private FacadeValidationService validation;
-	
+		
 	@Autowired @Lazy
 	private FacadeFactoryService factory;
 	
@@ -39,5 +39,5 @@ public class FacadeComponent {
 	
 	@Autowired @Lazy
 	
-	private HealthChecker healthChecker;
+	private HealthCheckerTask healthChecker;
 }

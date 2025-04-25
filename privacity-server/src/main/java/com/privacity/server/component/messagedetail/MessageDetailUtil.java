@@ -55,7 +55,7 @@ public class MessageDetailUtil {
 		
 		MessageDetail r = getMessageDetail(message,usuario);
 		if (message.isTimeMessage() 
-				&& r.getState().equals(MessageState.DESTINY_READED)) {
+				&& r.getState().equals(MessageState.DESTINY_READ)) {
 			throw new ValidationException(ExceptionReturnCode.MESSAGEDETAIL_NOT_EXISTS_TIME_MESSAGE);
 			
 		}

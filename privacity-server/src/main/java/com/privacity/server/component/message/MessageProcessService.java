@@ -2,7 +2,9 @@ package com.privacity.server.component.message;
 
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import com.privacity.core.model.Grupo;
 import com.privacity.core.model.Media;
 import com.privacity.core.model.Message;
 import com.privacity.core.model.MessageDetail;
+import com.privacity.core.model.MessageDetailId;
 import com.privacity.core.model.MessageId;
 import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
@@ -48,7 +51,7 @@ public class MessageProcessService {
 
 
 	private MessageDTO getNormal(Grupo grupo, Long idMessage, Message m) throws Exception {
-
+		log.trace("getNormal: ", grupo.getIdGrupo(), " " + idMessage );
 
 
 		MessageDTO response = new MessageDTO();
@@ -56,36 +59,70 @@ public class MessageProcessService {
 		response.setText(m.getText());
 		response.setSecretKeyPersonal(m.isSecretKeyPersonal());
 		response.setIdMessage(idMessage+"");
-		response.setMessagesDetailDTO(new MessageDetailDTO[1]);
+		response.setMessagesDetail(new MessageDetailDTO[1]);
 		response.setBlackMessage(m.isBlackMessage());
 		response.setAnonimo(m.isAnonimo());
 		response.setTimeMessage(m.getTimeMessage());
 		response.setSystemMessage(m.isSystemMessage());
 
-		response.setUsuarioCreacion(comps.common().mapper().doitForGrupo(grupo, m.getUserCreation()));
-		Set<MessageDetail> details = m.getMessagesDetail();
+		response.setUsuarioCreacion(comps.common().mapper().doitForGrupo(grupo, m.getUserCreation(),m.isChangeNicknameToRandom()));
+		response.setChangeNicknameToRandom(grupo.getGralConf().isRandomNickname());
 
-		response.setMessagesDetailDTO(new MessageDetailDTO[details.size()]);
+		
 
 
 
+		Set<MessageDetail> details;
+
+		if (!m.getMessageId().getGrupo().getGralConf().isHideMessageReadState()) { 
+			
+			details = m.getMessagesDetail();
+			
+		}else {
+			MessageDetailId mdid = new MessageDetailId();
+			mdid.setMessage(m);
+			mdid.setUserDestino(comps.requestHelper().getUsuarioLogged());
+			Optional<MessageDetail> userDetail = comps.repo().messageDetail().findById(mdid);
+			
+			Set<MessageDetail> s = new HashSet<MessageDetail>() ;
+			if (userDetail.isPresent()) {
+				
+				s.add(userDetail.get());
+				
+			}
+			details=s;		
+			
+		}
+
+
+		
+		response.setMessagesDetail(new MessageDetailDTO[details.size()]);
+		
 		int i=0;
 		for ( MessageDetail d : details) {
 
-			response.getMessagesDetailDTO()[i] = new MessageDetailDTO();
+			response.getMessagesDetail()[i] = new MessageDetailDTO();
 			//			if ( u.getUsername().equals(d.getMessageDetailId().getUserDestino())) {
 			//				response.getMessagesDetailDTO()[i].setText(d.getText());	
 			//			}
 
-			response.getMessagesDetailDTO()[i].setIdGrupo(grupo.getIdGrupo()+"");
-			response.getMessagesDetailDTO()[i].setIdMessage(idMessage+"");
+			response.getMessagesDetail()[i].setIdGrupo(grupo.getIdGrupo()+"");
+			response.getMessagesDetail()[i].setIdMessage(idMessage+"");
 			//response.getMessagesDetailDTO()[i].setIdMessageDetail(d.getMessageDetailId().getIdMessageDetail()+"");
 
-			response.getMessagesDetailDTO()[i].setUsuarioDestino(
-					comps.common().mapper().doitForGrupo(grupo, d.getMessageDetailId().getUserDestino())
+			response.getMessagesDetail()[i].setUsuarioDestino(
+					comps.common().mapper().doitForGrupo(grupo, d.getMessageDetailId().getUserDestino(),m.isChangeNicknameToRandom())
 					);
+			
+			if (d.isHideRead() && d.getState().equals(MessageState.DESTINY_READ) && d.getMessageDetailId().getUserDestino().getIdUser().equals( comps.requestHelper().getUsuarioId())) {
+				response.getMessagesDetail()[i].setEstado(MessageState.DESTINY_DELIVERED);
+				response.setHideMessageDetails(false);
+			}else {
+				response.getMessagesDetail()[i].setEstado(d.getState());
+				response.setHideMessageDetails(d.isHideRead());
+			}
 
-			response.getMessagesDetailDTO()[i].setEstado(d.getState());
+			
 
 			i++;
 		}
@@ -93,7 +130,7 @@ public class MessageProcessService {
 	
 		Media media = m.getMedia();
 		MediaDTO mediaDTO = comps.common().mapper().doit(media,true);
-		response.setMediaDTO(mediaDTO);
+		response.setMedia(mediaDTO);
 		if (media != null) {
 			log.trace(media.toString());
 		}
@@ -126,7 +163,14 @@ public class MessageProcessService {
 
 		return r;
 	}
+	public MessageDTO[] getAllidMessageDestinyServerMessages() throws Exception {
+		Usuario u = comps.requestHelper().getUsuarioLogged();
+		List<MessageDetail> l = comps.repo().messageDetail().getAllidMessageDestinyServerMessages(u.getIdUser());
 
+		MessageDTO[] r = comps.util().message().convertArrayListToArray(l);
+
+		return r;
+	}
 	public void emptyList(String idGrupo) throws Exception {
 		Usuario u = comps.requestHelper().getUsuarioLogged();
 
@@ -141,27 +185,57 @@ public class MessageProcessService {
 		comps.repo().message().deleteAllMyMessageForEverybodyByGrupo(Long.parseLong(idGrupo), u.getIdUser());
 	}
 
-	public MessageDetailDTO changeState(Usuario u, Message m, MessageDetail md, MessageState state, MessageDetailDTO request) throws Exception {
+	public MessageDetailDTO changeState(Usuario u, Message m, MessageDetail md, MessageState state, MessageDetailDTO request, MessageState oldState) throws Exception {
 
 
-		if (m.isTimeMessage() && state.equals(MessageState.DESTINY_READED)) {
+		if (m.isTimeMessage() && state.equals(MessageState.DESTINY_READ)) {
 			md.setDeleted(true);
 		}
 		md.setState(state);
 
-
+		boolean hide=false;
+		if (md.isHideRead() || m.getMessageId().getGrupo().getGralConf().isHideMessageReadState()) {
+			hide = true;
+		}
+		
 		MessageDetailDTO retornoServer = comps.common().mapper().doit(md);
-		MessageDetailDTO retornoWS = comps.common().mapper().doit(md);
+		retornoServer.setHideRead(hide);
 
-		comps.repo().messageDetail().save(md);		
+			
 
-		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
-				ProtocoloComponentsEnum.MESSAGE,
-				ProtocoloActionsEnum.MESSAGE_CHANGE_STATE ,
-				retornoWS);
 
-		comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername());
+		comps.repo().messageDetail().save(md);	
+			
+		
+				
+			MessageDetailDTO retornoWS = comps.common().mapper().doit(md);
+			
+			if  (hide && md.getState().equals(MessageState.DESTINY_READ)  ) {
+				retornoWS.setEstado(MessageState.DESTINY_DELIVERED);
+				
+				if (!oldState.equals(MessageState.DESTINY_DELIVERED) ) {
+					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
+							ProtocoloComponentsEnum.MESSAGE,
+							ProtocoloActionsEnum.MESSAGE_CHANGE_STATE ,
+							retornoWS);
 
+					
+					comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername());
+
+				}
+				
+				
+			}else{
+				ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
+						ProtocoloComponentsEnum.MESSAGE,
+						ProtocoloActionsEnum.MESSAGE_CHANGE_STATE ,
+						retornoWS);
+
+				
+				comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername());
+
+			}
+		
 		return retornoServer;
 
 
@@ -176,7 +250,7 @@ public class MessageProcessService {
 
 		MessageId idm = new MessageId();
 		idm.setGrupo(comps.requestHelper().getGrupoInUse());
-		idm.setIdMessage(comps.factory().messageIdSequence().get());
+		//idm.setIdMessage(comps.factory().idsGenerator().getNextMessageId());
 
 		m.setMessageId(idm);
 
@@ -204,11 +278,20 @@ public class MessageProcessService {
 		Media media = m.getMedia();
 		m.setMedia(media);
 
-		MessageDTO responseServer = comps.common().mapper().doit(m);
+		m.setChangeNicknameToRandom(m.getMessageId().getGrupo().getGralConf().isRandomNickname());
 
-		MessageDTO responseWs = comps.common().mapper().doit(m);
+		
+		if (m.isAnonimo()) {
+			m.setUserCreation(comps.util().usuario().getUsuarioAnonimo());
+		}
 		comps.repo().message().save(m);
-
+		
+		MessageDTO responseServer=null;
+		
+		if (!m.getMessageId().getGrupo().getGralConf().isHideMessageDetails() || m.isAnonimo()) {
+			responseServer = comps.common().mapper().doit(m);
+			MessageDTO responseWs = comps.common().mapper().doit(m);
+			responseWs.setChangeNicknameToRandom(m.getMessageId().getGrupo().getGralConf().isRandomNickname());
 		ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.MESSAGE,ProtocoloActionsEnum.MESSAGE_RECIVIED,responseWs);
 
 		if (m.isSystemMessage() ) {
@@ -216,8 +299,35 @@ public class MessageProcessService {
 		}else {
 			comps.webSocket().sender().senderToGrupo(p, comps.requestHelper().getGrupoInUse().getIdGrupo(), comps.requestHelper().getUsuarioUsername());
 		}
+			
+		}else {
+			
 
+			
+			for (MessageDetail d : m.getMessagesDetail()) {
+				MessageDTO responseWs = comps.common().mapper().doit(m);
+				MessageDetailDTO[] md = new MessageDetailDTO[1];
+				md[0]=comps.common().mapper().doit(d);
+				responseWs.setMessagesDetail(md);
+
+					if ((d.getMessageDetailId().getUserDestino().getIdUser().longValue() != comps.requestHelper().getUsuarioId().longValue())) {
+					ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(ProtocoloComponentsEnum.MESSAGE,ProtocoloActionsEnum.MESSAGE_RECIVIED,responseWs);
+					
+					
+					if (m.isSystemMessage() ) {
+						comps.webSocket().sender().senderToUser(p, d.getMessageDetailId().getUserDestino());
+					}else {
+						comps.webSocket().sender().senderToUser(p, d.getMessageDetailId().getUserDestino());
+					}
+				}else {
+					responseServer= responseWs;
+				}
+
+			}
+			
+		}
 		return comps.common().mapper().doitWithOutTextAndMedia(responseServer);
+		
 
 	}	
 

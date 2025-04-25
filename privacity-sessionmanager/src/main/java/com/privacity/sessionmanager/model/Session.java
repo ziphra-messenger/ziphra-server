@@ -78,29 +78,39 @@ public class Session {
 	}
 	
 	public AESDTO getAESDTOWS() {
-		return new AESDTO(sessionAESDTOServerWSSecretKeyAES, 
-				sessionAESDTOServerWSSaltAES, 
-			Integer.parseInt(sessionAESDTOServerWSIteration), 
-			Integer.parseInt(sessionAESDTOServerWSBitsEncrypt));
+		return (new AESDTO()) 
+		.setBitsEncrypt(sessionAESDTOServerWSBitsEncrypt)
+		.setIteration(sessionAESDTOServerWSIteration)
+		.setSecretKeyAES(sessionAESDTOServerWSSecretKeyAES)
+		.setSaltAES(sessionAESDTOServerWSSaltAES);
 	}
 
 	public AESDTO getAESDTOServerIn() {
-		return new AESDTO(sessionAESDTOServerInSecretKeyAES, 
-				sessionAESDTOServerInSaltAES, 
-			Integer.parseInt(sessionAESDTOServerInIteration), 
-			Integer.parseInt(sessionAESDTOServerInBitsEncrypt));
+		
+		return (new AESDTO()) 
+		.setBitsEncrypt(sessionAESDTOServerInBitsEncrypt)
+		.setIteration(sessionAESDTOServerInIteration)
+		.setSecretKeyAES(sessionAESDTOServerInSecretKeyAES)
+		.setSaltAES(sessionAESDTOServerInSaltAES);
+		
 	}
 	public AESDTO getAESDTOServerOut() {
-		return new AESDTO(sessionAESDTOServerOutSecretKeyAES, 
-				sessionAESDTOServerOutSaltAES, 
-			Integer.parseInt(sessionAESDTOServerOutIteration), 
-			Integer.parseInt(sessionAESDTOServerOutBitsEncrypt));
+		
+		return (new AESDTO()) 
+		.setBitsEncrypt(sessionAESDTOServerOutBitsEncrypt)
+		.setIteration(sessionAESDTOServerOutIteration)
+		.setSecretKeyAES(sessionAESDTOServerOutSecretKeyAES)
+		.setSaltAES(sessionAESDTOServerOutSaltAES);
+
 	}
 	
 	public AESDTO getAESDTOPrivacityId() {
-		return new AESDTO(privacityIdSecretKeyAES, 
-				privacityIdSaltAES, 
-			Integer.parseInt(privacityIdIteration), 
-			Integer.parseInt(privacityIdBitsEncrypt));
+		
+		return (new AESDTO()) 
+		.setBitsEncrypt(privacityIdBitsEncrypt)
+		.setIteration(privacityIdIteration)
+		.setSecretKeyAES(privacityIdSecretKeyAES)
+		.setSaltAES(privacityIdSaltAES);
+
 	}
 }

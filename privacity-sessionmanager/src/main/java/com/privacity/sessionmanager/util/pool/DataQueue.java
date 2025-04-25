@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Logger;
 
-import com.privacity.sessionmanager.model.AESToUse;
+import com.privacity.commonback.common.utils.AESToUse;
 
 import lombok.Getter;
 

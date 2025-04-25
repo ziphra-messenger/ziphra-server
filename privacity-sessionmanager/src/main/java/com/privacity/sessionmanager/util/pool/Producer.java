@@ -1,14 +1,17 @@
 package com.privacity.sessionmanager.util.pool;
 
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.Logger;
 
+import com.privacity.common.dto.AESDTO;
 import com.privacity.common.enumeration.RandomGeneratorType;
 import com.privacity.common.util.RandomGenerator;
-import com.privacity.sessionmanager.model.AESToUse;
+import com.privacity.commonback.common.utils.AESToUse;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Producer implements Runnable {
-    private static final Logger log = Logger.getLogger(Producer.class.getCanonicalName());
+
     private boolean running = false;
     private final DataQueue dataQueue;
 
@@ -71,7 +74,7 @@ public class Producer implements Runnable {
             	AESToUse m = generateMessage();
             	
             	dataQueue.add(m);
-            	log.fine("Aes Generado: " + m.getAESDTO().toStringComplete() + " Queue Size: " + dataQueue.getSize() );
+            	log.trace("Aes Generado: " + m.getAESDTO().toStringComplete() + " Queue Size: " + dataQueue.getSize() );
         
             }
             
@@ -93,7 +96,13 @@ public class Producer implements Runnable {
 		while (message == null) {
         try {
 					
-					message  = new AESToUse(bits, AesIteration, AesKey,AesSalt );
+					message  = new AESToUse((new AESDTO()) 
+							.setBitsEncrypt(bits+"")
+							.setIteration(AesIteration+"")
+							.setSecretKeyAES(AesKey)
+							.setSaltAES(AesSalt)); 
+							
+
 					
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

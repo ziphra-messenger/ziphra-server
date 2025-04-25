@@ -30,21 +30,24 @@ import com.privacity.common.dto.AESAllDTO;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.LoginDataDTO;
 import com.privacity.common.dto.response.LoginDTOResponse;
-import com.privacity.common.exceptions.ValidationException;
-import com.privacity.commonback.common.enumeration.ERole;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.commonback.common.enumeration.RolesSecurityAccessToServerEnum;
 import com.privacity.core.model.EncryptKeys;
 import com.privacity.core.model.MyAccountConf;
 import com.privacity.core.model.Role;
 import com.privacity.core.model.Usuario;
+import com.privacity.security.util.UserDetailsImpl;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.encryptkeys.RSAComponent;
-import com.privacity.server.component.usuario.UserDetailsImpl;
 import com.privacity.server.security.JwtUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Service
 //@RequestMapping("/api/auth")
+@Slf4j
 public class AuthProcesor {
 
 	@Value("${serverconf.privacityIdAESOn}")
@@ -68,14 +71,13 @@ public class AuthProcesor {
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getUsuarioPassword().getPassword()));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
-		String jwt = jwtUtils.generateJwtToken(((UserDetailsImpl) authentication.getPrincipal()).getUsername());
+		String jwt = jwtUtils.generateJwtToken(loginRequest.getUsername());
 		
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-		userDetails.setJwt(jwt);
-		List<String> roles = userDetails.getAuthorities().stream()
-				.map(item -> item.getAuthority())
-				.collect(Collectors.toList());
+//		userDetails.setJwt(jwt);
+//		List<String> roles = userDetails.getAuthorities().stream()
+//				.map(item -> item.getAuthority())
+//				.collect(Collectors.toList());
 
 		//List<UsuarioSessionIdInfo> info = SocketSessionRegistry.getSessionIds(userDetails.getUsername());
 		
@@ -153,6 +155,7 @@ public class AuthProcesor {
 		
 		response.setLoginDataDTO(data);
 		
+		log.trace("LoginDTOResponse salida-> " + comps.util().string().gsonToSend(response));
 		return response;
 	}
 
@@ -163,7 +166,7 @@ public class AuthProcesor {
 		return false;
 	}
 	
-	public void registerUser(Usuario usuario) throws ValidationException {
+	public void registerUser(Usuario usuario, RolesSecurityAccessToServerEnum erole) throws PrivacityException {
 		
 
 		// Create new user's account
@@ -173,17 +176,21 @@ public class AuthProcesor {
 		user.setNickname(usuario.getNickname());
 		Set<Role> roles = new HashSet<>();
 
-		Role userRole = comps.repo().role().findByName(ERole.ROLE_USER).get();
+		Role userRole = comps.repo().role().findByName(erole).get();
 		roles.add(userRole);
 		user.setRoles(roles);
 		usuario.getUserInvitationCode().setUsuario(user);
 		user.setEncryptKeys(usuario.getEncryptKeys());
-		user.setUserInvitationCode(usuario.getUserInvitationCode());
+		user.getEncryptKeys().setIdEncryptKeys(comps.factory().idsGenerator().getNextEncryptKeysId());
 		
+		comps.repo().encryptKeys().save(user.getEncryptKeys());
+		
+		user.setUserInvitationCode(usuario.getUserInvitationCode());
+		user.getUserInvitationCode().getEncryptKeys().setIdEncryptKeys(comps.factory().idsGenerator().getNextEncryptKeysId());
 		user.setMyAccountConf(new MyAccountConf(user));
 		comps.util().myAccountConf().getDefaultConf(user);
-
 		
+		user.setIdUser(comps.factory().idsGenerator().getNextUsuarioId());
 		comps.repo().user().save(user);
 
 	

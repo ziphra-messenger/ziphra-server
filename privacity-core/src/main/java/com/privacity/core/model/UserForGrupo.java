@@ -1,5 +1,7 @@
 package com.privacity.core.model;
 
+import java.io.Serializable;
+
 import javax.persistence.CascadeType;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -12,12 +14,14 @@ import com.privacity.common.enumeration.PasswordGrupoTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Entity
 @Data
 @AllArgsConstructor
+@Accessors(chain = true)
 @NoArgsConstructor
-public class UserForGrupo {
+public class UserForGrupo implements Serializable {
 
 	@EmbeddedId
 	private UserForGrupoId userForGrupoId; 

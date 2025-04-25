@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.GrupoUserConfDTO;
-import com.privacity.common.enumeration.GrupoUserConfEnum;
+import com.privacity.common.enumeration.RulesConfEnum;
 import com.privacity.core.model.Grupo;
 import com.privacity.core.model.GrupoUserConf;
 import com.privacity.core.model.GrupoUserConfId;
@@ -28,7 +28,7 @@ public class GrupoUserConfUtil{
 		Optional<GrupoUserConf> o = comps.repo().grupoUserConf().findById(new GrupoUserConfId(usuarioLogged, grupo));
 		
 		if ( o.isPresent() ) {
-			return comps.common().mapper().doit(o.get());
+			return comps.common().mapper().doitGrupoUserConf(o.get());
 		}
 		
 		GrupoUserConfDTO r = new GrupoUserConfDTO();
@@ -40,20 +40,20 @@ public class GrupoUserConfUtil{
 		GrupoUserConf conf = new GrupoUserConf();
 		
 		conf.setGrupoUserConfId(new GrupoUserConfId(u,g));; 
-
-		conf.setSecretKeyPersonalAlways(GrupoUserConfEnum.GRUPO_FALSE);
-		conf.setBlackMessageAlways(GrupoUserConfEnum.GRUPO_FALSE);
-		conf.setTimeMessageAlways(GrupoUserConfEnum.GRUPO_FALSE);
-		conf.setAnonimoAlways(GrupoUserConfEnum.GRUPO_FALSE);
-		conf.setPermitirReenvio(GrupoUserConfEnum.GRUPO_TRUE);
+		
+		conf.setSecretKeyPersonalAlways(RulesConfEnum.NULL);
+		conf.setBlackMessageAttachMandatory(RulesConfEnum.NULL);
+		conf.setTimeMessageAlways(RulesConfEnum.NULL);
+		conf.setAnonimoAlways(RulesConfEnum.NULL);
+		conf.setBlockResend(RulesConfEnum.NULL);
 		
 		conf.setTimeMessageSeconds(300);
 		
-		conf.setBlackMessageRecived(GrupoUserConfEnum.GRUPO_FALSE);
-		conf.setAnonimoRecived(GrupoUserConfEnum.GRUPO_FALSE);
-conf.setDownloadAllowAudio(GrupoUserConfEnum.GRUPO_FALSE);
-conf.setDownloadAllowVideo(GrupoUserConfEnum.GRUPO_FALSE);
-conf.setDownloadAllowImage(GrupoUserConfEnum.GRUPO_FALSE);
+		conf.setBlackMessageAttachMandatoryReceived(RulesConfEnum.NULL);
+		conf.setAnonimoRecived(false);
+		conf.setAnonimoRecivedMyMessage(false);
+		
+conf.setBlockMediaDownload(RulesConfEnum.NULL);
 		return conf;
 
 	}

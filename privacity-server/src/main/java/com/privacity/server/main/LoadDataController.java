@@ -5,7 +5,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.privacity.commonback.common.enumeration.ERole;
+import com.privacity.commonback.common.enumeration.RolesSecurityAccessToServerEnum;
 import com.privacity.core.model.Role;
 import com.privacity.core.model.Usuario;
 import com.privacity.core.repository.RoleRepository;
@@ -35,12 +35,12 @@ public class LoadDataController {
 		try {
 			Role role = new Role();
 			role.setId(1);
-			role.setName(ERole.ROLE_ADMIN);
+			role.setName(RolesSecurityAccessToServerEnum.ROLE_ADMIN);
 			roleRepository.save(role);
 
 			Role role2 = new Role();
 			role2.setId(2);
-			role2.setName(ERole.ROLE_USER);
+			role2.setName(RolesSecurityAccessToServerEnum.ROLE_USER);
 
 			roleRepository.save(role2);
 			
@@ -48,7 +48,14 @@ public class LoadDataController {
 			u.setIdUser(1L);
 			u.setNickname("INFO");
 			u.setUsername("SYSTEM");
-			usuarioRepository.save(u);
+	usuarioRepository.save(u);
+	
+	Usuario u2 = new Usuario();
+	u2.setIdUser(2L);
+	u2.setNickname("Anonimo");
+	u2.setUsername("Anonimo");
+usuarioRepository.save(u2);
+
 		} catch (Exception e) {
 
 		}

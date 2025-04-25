@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.privacity.sessionmanager.controller.ProtocoloEncryptControllerTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.548 s - in com.privacity.sessionmanager.controller.ProtocoloEncryptControllerTest

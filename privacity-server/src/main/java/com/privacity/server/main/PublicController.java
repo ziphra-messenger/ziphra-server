@@ -1,5 +1,6 @@
 package com.privacity.server.main;
 
+
 import org.bouncycastle.util.encoders.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -8,9 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.ProtocoloWrapperDTO;
-import com.privacity.commonback.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.ServerUrls;
+import com.privacity.commonback.common.utils.AESToUse;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 
@@ -41,8 +44,14 @@ public class PublicController extends ControllerBase{
 		String key = comps.common().privacityRSA().desencrypt(Base64.decode(protocoloWrapperDTO.getAesEncripted().getSecretKeyAES()));
 		String interationCount = comps.common().privacityRSA().desencrypt(Base64.decode(protocoloWrapperDTO.getAesEncripted().getIteration()));
 		
-		AESToUse aes = new AESToUse(bitsEncrypt,Integer.parseInt(interationCount) ,key,salt);	
-		String protocoloJson = aes.getAESDecrypt(protocoloWrapperDTO.protocoloDTO);
+		AESToUse aes = new AESToUse((new AESDTO()) 
+		.setBitsEncrypt(bitsEncrypt+"")
+		.setIteration(interationCount)
+		.setSecretKeyAES(key)
+		.setSaltAES(salt)); 
+				
+
+		String protocoloJson = aes.getAESDecrypt(protocoloWrapperDTO.getProtocoloDTO());
 		
         ProtocoloDTO retornoJson = comps.util().gson().fromJson(protocoloJson, ProtocoloDTO.class);
 		
@@ -63,7 +72,7 @@ public class PublicController extends ControllerBase{
 	}
 	
 	@Override
-	public Urls getUrl() {
-		return Urls.CONSTANT_URL_PATH_PUBLIC;
+	public ServerUrls getUrl() {
+		return ServerUrls.CONSTANT_URL_PATH_PUBLIC;
 	}
 }

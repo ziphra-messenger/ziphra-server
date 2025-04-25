@@ -17,7 +17,6 @@ import com.privacity.common.exceptions.PrivacityException;
 import com.privacity.commonback.common.enumeration.HealthCheckerServerType;
 import com.privacity.commonback.common.interfaces.HealthCheckerInterface;
 import com.privacity.commonback.constants.SessionManagerRestConstants;
-import com.privacity.commonback.pojo.HealthCheckerPojo;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -55,23 +54,21 @@ public abstract class JwtUtilsAbstract {
 			  //map.add("idGrupo", "idGrupo=");
 
 			  
-			String dtoS =rest.postForObject(getHealthChecker().getServerValidate(HealthCheckerServerType.SESSION_MANAGER)+
-					SessionManagerRestConstants.TOKEN+SessionManagerRestConstants.TOKEN_GET	, map, String.class);
-			
-			JWTDTO dto = gson.fromJson(dtoS, JWTDTO.class);
-			  
+			  JWTDTO dto =rest.postForObject(getHealthChecker().getServerValidate(HealthCheckerServerType.SESSION_MANAGER)+
+					SessionManagerRestConstants.TOKEN+SessionManagerRestConstants.TOKEN_GET	, map, JWTDTO.class);
+			 //log.trace("dtoS TOKEN obtenido: " + dtoS);
+			//JWTDTO dto = gson.fromJson(dtoS, JWTDTO.class);
+			log.trace("dto TOKEN obtenido: " + dto.toString());
 			  jwtSecret = dto.getJwtSecret();
 			  jwtExpirationMs= dto.getJwtExpirationMs();
-			  log.info("TOKEN obtenido");
+			  log.debug("TOKEN obtenido: " + jwtSecret);
 		} catch (RestClientException e) {
 			getHealthChecker().alertOffLine(HealthCheckerServerType.SESSION_MANAGER);
 			throw new PrivacityException(ExceptionReturnCode.AUTH_GETTING_TOKEN_FAIL.getToShow(e.getMessage()));		
 		} catch (JsonSyntaxException e) {
 			e.printStackTrace();
 			throw new PrivacityException(ExceptionReturnCode.AUTH_GETTING_TOKEN_FAIL.getToShow(e.getMessage()));
-		} catch (PrivacityException e) {
-			
-			getHealthChecker().alertOffLine(HealthCheckerServerType.SESSION_MANAGER);
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw new PrivacityException(ExceptionReturnCode.AUTH_GETTING_TOKEN_FAIL.getToShow(e.getMessage()));
 		}
@@ -79,7 +76,7 @@ public abstract class JwtUtilsAbstract {
 	public String generateJwtToken(String username) throws PrivacityException {
 		if (jwtSecret==null) pc();
 
-
+		log.debug("Generate token con jwtSecret " + jwtSecret);
 
 		return Jwts.builder()
 				.setSubject((username))
@@ -89,7 +86,8 @@ public abstract class JwtUtilsAbstract {
 				.compact();
 	}
 	
-	public String getUserNameFromJwtToken(String token) {
+	public String getUserNameFromJwtToken(String token) throws PrivacityException {
+		if (jwtSecret==null) pc();
 		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
 	}
 

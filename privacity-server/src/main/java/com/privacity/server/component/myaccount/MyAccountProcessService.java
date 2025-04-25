@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.privacity.common.exceptions.ValidationException;
 import com.privacity.core.model.EncryptKeys;
 import com.privacity.core.model.UserInvitationCode;
 import com.privacity.core.model.Usuario;
@@ -29,30 +30,31 @@ public class MyAccountProcessService {
 	@Autowired
 	private UtilService utilService;
 
-	public void saveNickname(Usuario u){
-
-		comps.repo().user().save(u);
+	public void saveNickname(String newNickname) throws ValidationException{
+		Usuario usuarioLogged = comps.requestHelper().getUsuarioLogged();
+		usuarioLogged.setNickname(newNickname);
+		comps.repo().user().save(usuarioLogged);
 		
 	}
 	
 	public String invitationCodeGenerator(Usuario u, EncryptKeys encryptKeys, String code){
 
 		
-		UserInvitationCode uic;
 
-		long oldEncryptKeysId = u.getUserInvitationCode().getEncryptKeys().getId();
+
+		 u.getUserInvitationCode().getEncryptKeys().setPrivateKey(encryptKeys.getPrivateKey());
+		 u.getUserInvitationCode().getEncryptKeys().setPublicKey(encryptKeys.getPublicKey());
+		 u.getUserInvitationCode().getEncryptKeys().setPublicKeyNoEncrypt(encryptKeys.getPublicKeyNoEncrypt());
+		 
 		
-		uic = u.getUserInvitationCode();
-		
-		uic.setEncryptKeys(encryptKeys);
-		uic.setInvitationCode(code);
+		 u.getUserInvitationCode().setInvitationCode(code);
 		//UserInvitationCodeRepository.save(uic);
 		
-		u.setUserInvitationCode(uic);
+		//u.setUserInvitationCode(uic);
 
 		comps.repo().user().save(u);
 		
-		encryptKeysRepository.deleteById(oldEncryptKeysId);
+//		encryptKeysRepository.deleteById(oldEncryptKeysId);
 		
 		return code;
 	}

@@ -9,12 +9,14 @@ import com.privacity.common.enumeration.MessageState;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Entity
 @Getter
 @Setter
+@Accessors(chain = true)
 public class MessageDetail implements Serializable{
-
+	private boolean hideRead;
     private boolean deleted;
 
 	public MessageDetailId getMessageDetailId() {

@@ -3,26 +3,40 @@ package com.privacity;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import com.privacity.core.services.GrupoIdGeneratorService;
-import com.privacity.core.services.MessageIdGeneratorService;
+import com.privacity.commonback.annotations.SpringIgnoreThisComponent;
 
 
 @SpringBootApplication
+
+@ComponentScan(basePackages = "com.privacity.idsprovider.components")
+@ComponentScan(basePackages = "com.privacity.idsprovider.controller")
 @ComponentScan(basePackages = "com.privacity.core.model")
 @ComponentScan(basePackages = "com.privacity.core.util")
 @ComponentScan(basePackages = "com.privacity.commonback.controller")
 @ComponentScan(basePackages = "com.privacity.idsprovider")
-@ComponentScan(basePackages = "com.privacity.core.services")
-
+@ComponentScan(basePackages = "com.privacity.core.idsprovider")
+@ComponentScan(basePackages = "com.privacity.idsprovider.security")
+@EnableJpaRepositories(excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = {
+        		SpringIgnoreThisComponent.class})
+        
+})
+//@ComponentScan(excludeFilters = @Filter(SpringIgnoreThisComponent.class))
 //@EnableJpaRepositories(basePackages = "com.privacity.core.repository")
 //@ComponentScan(basePackages = "com.privacity.server.security")
 //@ComponentScan(basePackages = "com.privacity.server")
+@SpringIgnoreThisComponent
 public class PrivacityIdsProviderApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PrivacityIdsProviderApplication.class, args);
+		
 	}
+	
+
 
 //	  @Bean
 //	  EntityManagerFactory entityManagerFactory() {

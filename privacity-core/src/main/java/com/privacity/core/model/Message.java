@@ -13,17 +13,22 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 
-@Getter
-@Setter
+@Data
 @Entity
-
-
+@Accessors(chain = true)
 public class Message implements Serializable {
 	
+
+
+
+	private boolean blockResend;
+	public static final Long  CONSTANT_ID_STARTS_AT=10000L;
 	private static final long serialVersionUID = 2473293848377594179L;
 
 		@EmbeddedId
@@ -72,7 +77,7 @@ public class Message implements Serializable {
     @Column(length=14000)
     private String text;
     
-	private boolean permitirReenvio;
+
 	
 	private boolean changeNicknameToRandom;
 	private boolean hideMessageDetails;

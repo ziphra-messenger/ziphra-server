@@ -9,9 +9,11 @@ import javax.persistence.OneToOne;
 
 import lombok.Data;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Data
 @Embeddable
+@Accessors(chain = true)
 public class GrupoUserConfId implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -5,44 +5,42 @@ import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SequenceGenerator;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 @Setter
 @Entity
 @AllArgsConstructor
-@SequenceGenerator(name = "grupo_secuencia", initialValue = 27011, allocationSize = 1)
+@Accessors(chain = true)
 public class Grupo implements Serializable{
 
 	private static final long serialVersionUID = -7302453059053458970L;
 	
-	
+	public static final Long  CONSTANT_ID_STARTS_AT=20000L;
 
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "grupo_secuencia")
+
     private Long idGrupo;
     private String name;
     
-    @OneToOne(mappedBy = "grupo", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "grupo", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private GrupoGralConf gralConf;
     
-    @OneToOne(mappedBy = "grupo", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
+    
+    @OneToOne(mappedBy = "grupo", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private GrupoGralConfPassword password;	
     
-    @OneToOne(mappedBy = "grupo", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "grupo", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private GrupoGralConfLock lock;      
 
@@ -50,7 +48,7 @@ public class Grupo implements Serializable{
     
 	public Grupo() {
 		super();
-		this.gralConf = new GrupoGralConf(this);;
+		//this.gralConf = new GrupoGralConf(this);;
 	}
 
 	@Override

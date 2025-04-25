@@ -3,7 +3,6 @@ package com.privacity.core.model;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
@@ -18,11 +17,11 @@ public class EncryptKeys implements Serializable{
 	
 	private static final long serialVersionUID = -4076483467987157286L;
 
+	public static final Long  CONSTANT_ID_STARTS_AT=40000L;
    
 
 	@Id
-	@GeneratedValue
-    private Long id;
+    private Long idEncryptKeys;
 	
 	@Lob
 	@ToString.Exclude	

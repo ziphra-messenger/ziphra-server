@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GrupoRemoveMeResponseDTO{
-	
-	public GrupoDTO grupoDTO;
-	public UsuarioDTO usuariosDTO;
+public class GrupoRemoveMeResponseDTO {
+
+	private GrupoDTO grupoDTO;
+	private UsuarioDTO usuariosDTO;
 
 }

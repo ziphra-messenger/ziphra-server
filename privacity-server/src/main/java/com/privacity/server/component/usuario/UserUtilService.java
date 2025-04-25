@@ -23,10 +23,11 @@ public class UserUtilService {
 	@Autowired @Lazy
 	private FacadeComponent comps;
 
-
+	
 
 	private Usuario usuarioSystem;
 
+	private Usuario usuarioAnonimo;
 	
 	public UserUtilService() throws Exception {
 		super();
@@ -54,6 +55,15 @@ public class UserUtilService {
 		}
 		return uSystemO.get();
 	}
+	
+	private Usuario getUsuarioAnonimoPrivate () throws ProcessException {
+		Optional<Usuario> uAnonimoO = comps.repo().user().findByUsername("Anonimo");
+		
+		if ( uAnonimoO == null || uAnonimoO.get() == null) {
+			throw new ProcessException(ExceptionReturnCode.USER_USER_SYSTEM_NOT_EXISTS); 
+		}
+		return uAnonimoO.get();
+	}
 	public Usuario getUsuarioSystem() throws ProcessException {
 		
 		if (usuarioSystem == null) {
@@ -62,10 +72,18 @@ public class UserUtilService {
 		return usuarioSystem;
 	}
 
+	public Usuario getUsuarioAnonimo() throws ProcessException {
+		
+		if (usuarioAnonimo == null) {
+			usuarioAnonimo=getUsuarioAnonimoPrivate();
+		}
+		return usuarioAnonimo;
+	}
+	
 	public UsuarioDTO getUsuarioSystemDTO() throws ProcessException {
 		
 
-		return comps.common().mapper().doit(getUsuarioSystemPrivate ());
+		return comps.common().mapper().doitForGrupo(getUsuarioSystemPrivate ());
 	
 	
 	}

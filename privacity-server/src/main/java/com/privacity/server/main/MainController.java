@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.privacity.commonback.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.ServerUrls;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,14 +28,14 @@ public class MainController {
 		
 		log.debug("************* EN ENTRADA UNICA: controller: " + controller);
 		
-		log.trace("forward:"+Enum.valueOf(Urls.class, controller));
+		log.trace("forward:"+Enum.valueOf(ServerUrls.class, controller));
 		
 		log.trace("Header count:" + headers.size());
 		for (Map.Entry<String, String> entry : headers.entrySet()) {
 		    log.trace("Header: " + entry.getKey() + " - value: " + entry.getValue());
 		}
 	        
-			return new ModelAndView("forward:"+Enum.valueOf(Urls.class, controller));
+			return new ModelAndView("forward:"+Enum.valueOf(ServerUrls.class, controller));
 
 	}
 }

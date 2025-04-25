@@ -12,9 +12,11 @@ import javax.persistence.Lob;
 import com.privacity.common.enumeration.MediaTypeEnum;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Entity
 @Data
+@Accessors(chain = true)
 public class Media implements Serializable{
 
 

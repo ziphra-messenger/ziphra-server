@@ -5,21 +5,25 @@ import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.interfaces.IdGrupoInterface;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class GrupoInvitationAcceptRequestDTO implements IdGrupoInterface{
 	@PrivacityId
 	@PrivacityIdOrder
-	public String idGrupo;
+	private String idGrupo;
 	
 	@PrivacityId
 	@PrivacityIdOrder
-	public String idUsuarioInvitante;
+	private String idUsuarioInvitante;
 	
 	@PrivacityId
 	@PrivacityIdOrder
-	public String idUsuarioInvitado;
+	private String idUsuarioInvitado;
 	
-	public AESDTO aesDTO;
+	private AESDTO aesDTO;
 }

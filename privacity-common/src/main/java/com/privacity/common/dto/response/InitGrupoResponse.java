@@ -4,13 +4,17 @@ import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.MessageDetailDTO;
 import com.privacity.common.dto.UsuarioDTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class InitGrupoResponse {
 
-	public UsuarioDTO[] usersDTO;
-	public MessageDTO[] messagesDTO;
-	public MessageDetailDTO[] messagesDetailState;
+	private UsuarioDTO[] usersDTO;
+	private MessageDTO[] messagesDTO;
+	private MessageDetailDTO[] messagesDetailState;
 	
 }

@@ -1,10 +1,15 @@
 package com.privacity.common.dto.servergralconf;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SystemGralConf {
 
+	
 	private SGCAsymEncrypt AsymEncrypt;
 	private SGCAuth auth;
 	private MinMaxLenghtDTO requestId;
@@ -18,7 +23,7 @@ public class SystemGralConf {
 	private boolean privacityIdAESOn;
 	private SGCAESDTO privacityIdAES;
 	
-	private SGCAESSimple personalAES = new SGCAESSimple();
+	private SGCAESSimple personalAES;
 	
 	// encriptacion personalidad extra por grupo
 	private SGCAESSimple extraAES = new SGCAESSimple();
@@ -32,4 +37,6 @@ public class SystemGralConf {
 	private SGCExtrasDTO extras;
 	
 	private boolean messagingWritingMessage;
+	
+	private PasswordConfigDTO passwordConfig;
 }

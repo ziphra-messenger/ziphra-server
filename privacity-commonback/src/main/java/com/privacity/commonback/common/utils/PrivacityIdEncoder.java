@@ -1,28 +1,20 @@
 package com.privacity.commonback.common.utils;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
+import org.apache.commons.lang3.StringUtils;
 
-import com.privacity.common.annotations.PrivacityId;
-import com.privacity.common.annotations.PrivacityIdOrder;
-import com.privacity.common.dto.AESDTO;
+import com.privacity.common.annotations.PrivacityIdExclude;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.exceptions.PrivacityException;
 import com.privacity.common.util.RandomGenerator;
+import com.privacity.commonback.common.interfaces.PrivacityIdEncoderActionInterface;
+import com.privacity.commonback.common.interfaces.impl.PrivacityIdDecryptEncoderActionInterfaceImpl;
+import com.privacity.commonback.common.interfaces.impl.PrivacityIdEncryptEncoderActionInterfaceImpl;
 
 import lombok.Data;
 import lombok.Getter;
@@ -33,8 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PrivacityIdEncoder {
 
-	private Cipher decrypt;
-	private Cipher encrypt;
+
+	private static final String METHOD_PREFIX_GET = "get";
+
+	private static final String METHOD_PREFIX_SET = "set";
 
 	@Getter
 	private long privacityIdOrderSeed;
@@ -51,17 +45,17 @@ public class PrivacityIdEncoder {
 
 	private final boolean encryptIds;
 
-	private String aesKey;
-	private String aesSalt;
-	private int aesIteration;
-	private int base;
-	private AESDTO AESDTO;
 
-	public PrivacityIdEncoder(boolean encryptIds, AESDTO aesDTO,  long privacityIdOrderSeed,long orderRamdomNumber,int base,
+	private int base;
+
+	private AESToUse aesToUse;
+
+
+	public PrivacityIdEncoder(boolean encryptIds, AESToUse aesToUse,  long privacityIdOrderSeed,long orderRamdomNumber,int base,
 			Map<String, String> porLetra ,  Map<String, String> porNro
 			) throws PrivacityException {
 		{
-			this.AESDTO = aesDTO;
+			this.aesToUse = aesToUse;
 			this.encryptIds=encryptIds;
 			mixBytesUtil = new MixBytesUtil();
 			this.base=base;
@@ -72,419 +66,198 @@ public class PrivacityIdEncoder {
 			mathBaseConverter = new MathBaseConverter();
 			this.privacityIdOrderSeed = privacityIdOrderSeed;
 			this.orderRamdomNumber=orderRamdomNumber;
-			this.aesKey = aesDTO.getSecretKeyAES();
-			this.aesSalt = aesDTO.getSaltAES();
-			this.aesIteration = Integer.parseInt( aesDTO.getIteration());
 
-			build();
+			
 		}
 	}
+	
+	public PrivacityIdEncoder(AESToUse aesToUse) throws PrivacityException {
+		this(true, aesToUse);
+	}
 
-	public PrivacityIdEncoder(boolean encryptIds, AESDTO aesDTO) throws PrivacityException {
+	public PrivacityIdEncoder(boolean encryptIds, AESToUse aesToUse) throws PrivacityException {
 		{
-			this.AESDTO = aesDTO;
+			this.aesToUse = aesToUse;
 			this.encryptIds=encryptIds;
 			mixBytesUtil = new MixBytesUtil();
 			mutateDigitUtil = new MutateDigitUtil();
 			mathBaseConverter = new MathBaseConverter();
 			privacityIdOrderSeed = RandomGenerator.betweenTwoNumber(1483647,7483647);
-
-			aesKey = aesDTO.getSecretKeyAES();
-			aesSalt = aesDTO.getSaltAES();
-			aesIteration = Integer.parseInt( aesDTO.getIteration());
 			base= mutateDigitUtil.getBase();
-			build();
+			
 		}
-	}
-
-	public void build() throws PrivacityException {
-		try {
-			{
-				byte[] iv = new byte[16];
-				IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-				SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-				KeySpec keySpec = new PBEKeySpec((aesKey).toCharArray(), (aesSalt).getBytes(), aesIteration, Integer.parseInt( AESDTO.getBitsEncrypt()));
-				SecretKey secretKeyTemp = secretKeyFactory.generateSecret(keySpec);
-				SecretKeySpec secretKey = new SecretKeySpec(secretKeyTemp.getEncoded(), "AES");
-				Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-				cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
-				decrypt = cipher;
-
-			}
-			{
-				byte[] iv = new byte[16];
-				IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-				SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-				KeySpec keySpec = new PBEKeySpec((aesKey).toCharArray(), (aesSalt).getBytes(), aesIteration, Integer.parseInt( AESDTO.getBitsEncrypt()));
-				SecretKey secretKeyTemp = secretKeyFactory.generateSecret(keySpec);
-				SecretKeySpec secretKey = new SecretKeySpec(secretKeyTemp.getEncoded(), "AES");
-				Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-				cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
-				encrypt=cipher;
-			}
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.ENCRYPT_AES_CREATION_FAIL, e);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.ENCRYPT_AES_CREATION_FAIL, e);
-		} catch (InvalidKeySpecException e) {
-			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.ENCRYPT_AES_CREATION_FAIL, e);
-		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.ENCRYPT_AES_CREATION_FAIL, e);
-		} catch (InvalidAlgorithmParameterException e) {
-			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.ENCRYPT_AES_CREATION_FAIL, e);
-		}
-
 	}
 
 	public Object encryptIds(Object g) throws PrivacityException  {
+		separadorLog();
+		log.debug("encryptIds");
 		if (!encryptIds) return g;
+
 		try {
 
-			transformarEncriptarOut(g);
-		} catch (IllegalAccessException e) {
+			transformarEncriptarOut(null,null, g,new PrivacityIdEncryptEncoderActionInterfaceImpl());
+			separadorLog();
+			return g;
+		} catch (Exception e) {
 			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.ENCRYPT_ID_PROCESS_FAIL, e);
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.ENCRYPT_ID_PROCESS_FAIL, e);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.ENCRYPT_ID_PROCESS_FAIL, e);
+			log.error("getAES obj: " + g + " salida: " + null + " error: " + e.getMessage() );
+			throw new PrivacityException(ExceptionReturnCode.ENCRYPT_ID_PROCESS_FAIL);
 		}
+	}
 
-		return g;
+	private void separadorLog() {
+		log.debug("************************************");
 	}
 
 	public Object decryptIds(Object g) throws PrivacityException {
+		separadorLog();
+		log.debug("decryptIds");
 		if (!encryptIds) return g;
 
 		try {
-			transformarDesencriptarOut(g);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.DECRYPT_ID_PROCESS_FAIL, e);
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.DECRYPT_ID_PROCESS_FAIL, e);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			throw new PrivacityException(ExceptionReturnCode.DECRYPT_ID_PROCESS_FAIL, e);
-		}
+			transformarEncriptarOut(null,null,g,new PrivacityIdDecryptEncoderActionInterfaceImpl());
+			separadorLog();
 			return g;
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("getAES obj: " + g + " salida: " + null + " error: " + e.getMessage() );
+			throw new PrivacityException(ExceptionReturnCode.DECRYPT_ID_PROCESS_FAIL);
+		}
 	}
 
-	private String getAES(String obj, String data) {
-		log.trace("Encr obj: " + obj + " entrada: " + data );
+
+
+	public String getAES(String nivelTabs, String obj, String data) throws PrivacityException {
+		log.debug(nivelTabs + "getAES obj: " + obj + " entrada: " + data );
 
 
 		try {
-			byte[] encriptado = encrypt.doFinal(data.getBytes());
+			byte[] encriptado = aesToUse.getAESData(data.getBytes());
 			String r = Base64.getEncoder().encodeToString(mixBytesUtil.mix(encriptado));
-			log.trace("Encr obj: " + obj + " salida: " + r );
+			log.debug(nivelTabs + "getAES obj: " + obj + " salida: " + r );
 			return r; 
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.trace("Encr obj: " + obj + " salida: " + null + " error: " + e.getMessage() );
+			log.error(nivelTabs + "getAES obj: " + obj + " salida: " + null + " error: " + e.getMessage() );
+			throw new PrivacityException(ExceptionReturnCode.DECRYPT_ID_PROCESS_FAIL);
 		}
-
-		return null;
 	}
 
-	private String getAESDecrypt(String obj, String data) {
+	public String getAESDecrypt(String nivelTabs, String obj, String data) {
 
-		log.trace("Decr obj: " + obj + " entrada: " + data );
+		log.trace("nivelTabs + getAESDecrypt obj: " + obj + " entrada: " + data );
 
 		if (data == null) return null;
 		if (data == "") return "";
 		////////log.trace(data);
 
 		try {
-			String r = new String(decrypt.doFinal(mixBytesUtil.unmix(Base64.getDecoder().decode(data))));
-			log.trace("Decr obj: " + obj + " salida: " + r );
+			String r = new String(aesToUse.getAESDecryptData(mixBytesUtil.unmix(Base64.getDecoder().decode(data))));
+			log.trace(nivelTabs + "getAESDecrypt obj: " + obj + " salida: " + r );
 			return r;
 		} catch (Exception e) {
-			e.printStackTrace();
-			log.trace("Decr obj: " + obj + " salida: " + null + " error: " + e.getMessage() );
+			
+			log.trace(nivelTabs + "getAESDecrypt obj: " + obj + " salida: " + null + " error: " + e.getMessage() );
 		}
 		return null;
 	}
 
 
-	private Object transformarEncriptarOut(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
-
-
-		if (g == null) return null;
-		//log.trace(g.getClass().getName());
-		if ( g.getClass().getEnumConstants() != null) return null;
-
-		if ("com.privacity.common.enumeration.ConfigurationStateEnum".equals(g.getClass().getName())){
-			////////log.trace(g.getClass().getName());
+	private Object transformarEncriptarOut(String path,String nivelTabs, Object objectEntrada,PrivacityIdEncoderActionInterface action) throws RuntimeException, ReflectiveOperationException, PrivacityException{
+		if (path == null) {
+			path="";
+			nivelTabs="\t";
 		}
-		///////
+		path= path + objectEntrada.getClass().getSimpleName();
+		
+		log.debug("**** " + path);
+		log.debug(nivelTabs + "entrada objectEntrada: " + objectEntrada.getClass().getSimpleName() + " - " + objectEntrada);
 
+		if (objectEntrada == null) return null;
 
-		if(
-				(g.getClass().getName().equals("java.util.List"))
-				|| 
-				(g.getClass().getName().equals("java.util.ArrayList"))
-				)
-		{
+		if ( objectEntrada.getClass().getEnumConstants() != null) return null;
+		
+		if (objectEntrada.getClass().isAnnotationPresent(PrivacityIdExclude.class)) {
+			log.trace(nivelTabs + "PrivacityIdExclude por CLASE objectEntrada"  + objectEntrada);
+			return objectEntrada;
+		}
+		
+		if((objectEntrada.getClass().getName().equals("java.util.List"))|| 
+				(objectEntrada.getClass().getName().equals("java.util.ArrayList"))){
 
-			List list = (List)g;
+			List list = (List)objectEntrada;
 			for ( int k = 0 ; k < list.size() ; k++) {
-				transformarEncriptarOut(list.get(k));
+				transformarEncriptarOut(path + ".("+ k+ ")",nivelTabs + "\t", list.get(k),action);
 			}
 
-		} else if ( g.getClass().isArray()){
-			Object[] lista = (Object[])g;
+		} else if ( objectEntrada.getClass().isArray()){
+			Object[] lista = (Object[])objectEntrada;
 			for ( int k = 0 ; k < lista.length ; k++) {
-				transformarEncriptarOut(lista[k]);
+				transformarEncriptarOut(path + ".("+ k+ ")",nivelTabs + "\t", lista[k],action);
 			}				
 		}
 		else  {
-			for ( int i = 0 ; i < g.getClass().getDeclaredFields().length ; i++) {
+			for ( int i = 0 ; i < objectEntrada.getClass().getDeclaredFields().length ; i++) {
+				Field field = objectEntrada.getClass().getDeclaredFields()[i];
+				
+				if (!field.isAnnotationPresent(PrivacityIdExclude.class)) {
+				String fieldString = objectEntrada.getClass().getDeclaredFields()[i].toString();
+				
+				String fieldTypeName=  objectEntrada.getClass().getDeclaredFields()[i].getType().getName();
+				String fieldName = objectEntrada.getClass().getDeclaredFields()[i].getName();
 
-				if ( g.getClass().getDeclaredFields()[i].toString().contains("[]") && !g.getClass().getDeclaredFields()[i].toString().contains("byte[]")){
-					Object[] lista = (Object[])g.getClass().getDeclaredFields()[i].get(g);
+				log.trace("fieldTypeName: " + fieldTypeName);
+				Method getMethod = null;
+				String getMethodName= METHOD_PREFIX_GET + StringUtils.capitalize(fieldName);
+				String getMethodReturnTypeName=null;
+				try {
+					getMethod = objectEntrada.getClass().getMethod(getMethodName);
+					getMethodReturnTypeName=getMethod.getReturnType().getClass().getName();
+				} catch (NoSuchMethodException e) {
+					log.trace("getMethodName not exist: " + getMethodName);
+				} 
+
+				Method setMethod = null;
+				String fieldValue=null;
+
+
+
+				if( getMethod != null && String.class.equals( getMethod.getReturnType() )){
+					setMethod = objectEntrada.getClass().getMethod(METHOD_PREFIX_SET + StringUtils.capitalize(fieldName),String.class);
+					fieldValue=(String)getMethod.invoke(objectEntrada);
+
+				}
+				
+				if ( getMethod != null && fieldString.contains("[]") && !fieldString.contains("byte[]")){
+					Object[] lista = (Object[])getMethod.invoke(objectEntrada);
 					if (lista == null) return null;
 					for ( int k = 0 ; k < lista.length ; k++) {
-						transformarEncriptarOut(lista[k]);
+						transformarEncriptarOut(path + ".("+ k+ ")",nivelTabs + "\t", lista[k],action);
 					}	
-				} else if ((g.getClass().getDeclaredFields()[i].getType().getName().contains("com.privacity.common"))) {
+				
+				} else if (getMethod != null && (fieldTypeName.contains("com.privacity.common"))) {
 
-					if (g.getClass().getDeclaredFields()[i].get(g) != null &&  !g.getClass().getDeclaredFields()[i].toString().contains("byte[]")){
-						transformarEncriptarOut(g.getClass().getDeclaredFields()[i].get(g));	
+
+
+					Object oget =  getMethod.invoke(objectEntrada);
+					log.trace("Valor Object " + " " +oget );
+					if (oget != null &&   !getMethodReturnTypeName.contains("byte")){
+						log.trace("transformarEncriptarOut " + " " +oget );
+						transformarEncriptarOut(path + ".", nivelTabs + "\t",oget,action);	
 					}
 
+				}else if (getMethod != null) {
+					action.objectEntradaEncrypt(this,nivelTabs, objectEntrada, field, fieldName, setMethod, fieldValue);
+	
+					}
 				}else {
-					if ( g.getClass().getDeclaredFields()[i].isAnnotationPresent(PrivacityIdOrder.class)) {
-						////log.trace(g.getClass().getDeclaredFields()[i]); 
-						////log.trace(g.getClass().getDeclaredFields()[i].getName());
-						if (g.getClass().getDeclaredFields()[i].get(g) != null){
-							try {
-								/*
-								 * 
-
-								String newIdS = this.mutateDigitUtil.unmutate(newId);
-								log.trace("Desc Order obj: " + obj + " unmutate: " + newIdS );
-								long newIdL = mathBaseConverter.convertirBase10(base, newIdS);
-								log.trace("Desc Order obj: " + obj + " convertirBase10: " + newIdL );
-								newIdL = newIdL - privacityIdOrderSeed - this.orderRamdomNumber;
-								log.trace("Desc Order obj: " + obj + " seed-ramdom: " + newIdL );
-								g.getClass().getDeclaredFields()[i].set(g, newIdL+"" );
-								log.trace("Desc Order obj: " + obj + " salida: " + newIdL );
-
-								 */
-								String obj = g.getClass().getDeclaredFields()[i].getName();
-
-								log.trace("Encr Order obj: " + obj + " entrada: " + g.getClass().getDeclaredFields()[i].get(g).toString() );
-
-								Long newId = Long.parseLong(g.getClass().getDeclaredFields()[i].get(g).toString()) +privacityIdOrderSeed;
-								newId = newId + this.orderRamdomNumber;
-								log.trace("Encr Order obj: " + obj + " seed+ramdom: " + newId );
-								String newIdS = mathBaseConverter.convertirBaseN(base, newId);
-								log.trace("Encr Order obj: " + obj + " convertirBase "+ base + ": " + newIdS );
-								newIdS = this.mutateDigitUtil.mutate(newIdS);
-								log.trace("Encr Order obj: " + obj + " mutate: " + newIdS );
-								g.getClass().getDeclaredFields()[i].set(g, newIdS );
-								log.trace("Encr Order obj: " + obj + " salida: " + newIdS );
-								//g.getClass().getDeclaredFields()[i].set(g,"xxxxxxxxx");
-							} catch (Exception e) {
-								////log.trace(g.getClass().getDeclaredFields()[i]); 
-								////log.trace(g.getClass().getDeclaredFields()[i].getName());
-
-								////log.trace(g.getClass().getDeclaredFields()[i].get(g));
-
-								e.printStackTrace();
-							} 
-
-
-
-							////////log.trace(g.getClass().getDeclaredFields()[i]); 
-
-
-						}
-					}
-					if ( g.getClass().getDeclaredFields()[i].isAnnotationPresent(PrivacityId.class)) {
-
-						//log.trace(g.getClass().getDeclaredFields()[i].getName());
-
-
-
-						if (g.getClass().getDeclaredFields()[i].get(g) != null){
-							//								try {
-							//									Long.parseLong(g.getClass().getDeclaredFields()[i].get(g)+"");
-
-							g.getClass().getDeclaredFields()[i].set(g, this.getAES(g.getClass().getDeclaredFields()[i].getName(), 
-									g.getClass().getDeclaredFields()[i].get(g)+""));
-							//g.getClass().getDeclaredFields()[i].set(g,"xxxxxxxxx");
-							//				        } catch (NumberFormatException e) {
-							//				         
-							//				        	System.out.println ("YA ESTA ENCRIPTADO");
-							//						} catch (Exception e) {
-							//							// TODO Auto-generated catch block
-							//							e.printStackTrace();
-							//						} 
-
-							////////log.trace(g.getClass().getDeclaredFields()[i]); 
-
-
-						}
-					}
-
-
-
-				} 
-
-
-
-			}	
-		}
-
-		return g;
-	}
-	private Object transformarDesencriptarOut(Object g) throws IllegalAccessException,  NoSuchFieldException, SecurityException {
-
-
-
-		if (g == null) return null;
-		log.trace(g.getClass().getName());
-		if ( g.getClass().getEnumConstants() != null){
-			return null;
-		}
-
-		if(
-				(g.getClass().getName().equals("java.util.List"))
-				|| 
-				(g.getClass().getName().equals("java.util.ArrayList"))
-				)
-		{
-			List list = (List)g;
-			for ( int k = 0 ; k < list.size() ; k++) {
-				transformarDesencriptarOut(list.get(k));
+					log.trace("PrivacityIdExclude por FIELD:"  + field.getName());
+				}
+				}
 			}
-
-		} else if ( g.getClass().isArray()){
-			Object[] lista = (Object[])g;
-			for ( int k = 0 ; k < lista.length ; k++) {
-				transformarDesencriptarOut(lista[k]);
-			}				
-		}
-		else  {
-			for ( int i = 0 ; i < g.getClass().getDeclaredFields().length ; i++) {
-
-				if ( g.getClass().getDeclaredFields()[i].toString().contains("[]") && !g.getClass().getDeclaredFields()[i].toString().contains("byte[]")){					Object[] lista = (Object[])g.getClass().getDeclaredFields()[i].get(g);
-				if (lista == null) return null;
-				for ( int k = 0 ; k < lista.length ; k++) {
-					transformarDesencriptarOut(lista[k]);
-				}	
-				} else if ((g.getClass().getDeclaredFields()[i].getType().getName().contains("com.privacity.common"))) {
-
-					if (g.getClass().getDeclaredFields()[i].get(g) != null &&  !g.getClass().getDeclaredFields()[i].toString().contains("byte[]")){
-						transformarDesencriptarOut(g.getClass().getDeclaredFields()[i].get(g));
-					}
-
-				}else {
-
-					if ( g.getClass().getDeclaredFields()[i].isAnnotationPresent(PrivacityId.class)) {
-						////////log.trace(g.getClass().getDeclaredFields()[i]); 
-
-
-
-						if (g.getClass().getDeclaredFields()[i].get(g) != null){
-
-							//							try {
-							g.getClass().getDeclaredFields()[i].set(g, this.getAESDecrypt(g.getClass().getDeclaredFields()[i].getName(), g.getClass().getDeclaredFields()[i].get(g)+""));
-							//							} catch (Exception e) {
-							//								// TODO Auto-generated catch block
-							//								e.printStackTrace();
-							//							} 
-							//g.getClass().getDeclaredFields()[i].set(g,"xxxxxxxxx");
-
-						}
-
-
-
-					}
-					if ( g.getClass().getDeclaredFields()[i].isAnnotationPresent(PrivacityIdOrder.class)) {
-
-
-						if (g.getClass().getDeclaredFields()[i].get(g) != null){
-
-							try {
-								String obj = g.getClass().getDeclaredFields()[i].getName();
-
-
-								String newId = g.getClass().getDeclaredFields()[i].get(g).toString() ;
-								log.trace("Desc Order obj: " + obj + " entrada: " + newId );
-								String newIdS = this.mutateDigitUtil.unmutate(newId);
-								log.trace("Desc Order obj: " + obj + " unmutate: " + newIdS );
-								long newIdL = mathBaseConverter.convertirBase10(base, newIdS);
-								log.trace("Desc Order obj: " + obj + " convertirBase10: " + newIdL );
-								newIdL = newIdL - privacityIdOrderSeed - this.orderRamdomNumber;
-								log.trace("Desc Order obj: " + obj + " seed-ramdom: " + newIdL );
-								g.getClass().getDeclaredFields()[i].set(g, newIdL+"" );
-								log.trace("Desc Order obj: " + obj + " salida: " + newIdL );
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								////log.trace(g.getClass().getDeclaredFields()[i].get(g));
-								e.printStackTrace();
-							} 
-							//g.getClass().getDeclaredFields()[i].set(g,"xxxxxxxxx");
-
-						}
-
-					}
-
-
-
-				} 
-
-
-
-			}	
-		}
-		return g;
+		return objectEntrada;
 	}
 
 
-
-	//
-	//	public static void main(String...strings ) throws Exception {
-	//		//PrivacityIdServices p = new PrivacityIdServices();
-	//	/*
-	//		GrupoDTO[] arr = new GrupoDTO[1];
-	//		
-	//		GrupoDTO o = new GrupoDTO();
-	//		o.setIdGrupo("1");
-	//		o.setName("name232");
-	//
-	//
-	//		o.setUsersForGrupoDTO(new UserForGrupoDTO[1]);
-	//		o.getUsersForGrupoDTO()[0]= new UserForGrupoDTO();
-	//		o.getUsersForGrupoDTO()[0].setIdGrupo("323312");
-	//		o.getUsersForGrupoDTO()[0].setRole("ROLE");
-	//		o.getUsersForGrupoDTO()[0].setUsuario(new UsuarioDTO());
-	//		o.getUsersForGrupoDTO()[0].getUsuario().setIdUsuario("21313");
-	//		o.getUsersForGrupoDTO()[0].getUsuario().setNickname("feewfew");
-	//
-	//		arr[0]=o;
-	//		p.transformarEncriptarOut(arr);
-	//		
-	//		log.trace(o.toString());
-	//		p.transformarDesencriptarOut(arr);
-	//		log.trace(o.toString());
-	//		*/
-	//		//////log.trace(p.getAES("hola"));
-	////		
-	////		////////log.trace(p.getAESDecrypt("CjDTyilsYWIPtzZ7k6dE9w=="));
-	////		
-	//		
-	//	}
 }    
 

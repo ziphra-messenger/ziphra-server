@@ -19,7 +19,8 @@ import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.request.RequestEncryptDTO;
-import com.privacity.commonback.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.ServerUrls;
+import com.privacity.commonback.common.utils.AESToUse;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
 import com.privacity.server.component.message.MessageValidationService;
 
@@ -63,12 +64,9 @@ public class DownloadDataPrivateController {
 		
 		 AESAllDTO aess = comps.service().usuarioSessionInfo().getAesDtoAll(comps.requestHelper().getUsuarioUsername());
 			AESDTO aesdto =aess.getSessionAESDTOServerOut();
-			AESToUse c = new AESToUse(Integer.parseInt(aesdto.getBitsEncrypt()),
-Integer.parseInt(	 aesdto.iteration),
-					aesdto.getSecretKeyAES(),
-					aesdto.getSaltAES());
+			AESToUse c = new AESToUse(aesdto);
 		 
-		 byte[] retorno = c.getAESData(retornoFuncion.getMediaDTO().getData());
+		 byte[] retorno = c.getAESData(retornoFuncion.getMedia().getData());
 
 		return ResponseEntity.status(HttpStatus.OK).body(retorno);
 
@@ -84,7 +82,7 @@ Integer.parseInt(	 aesdto.iteration),
 
 		MessageDTO objetoRetorno=null;
 			
-				MessageDTO dtoObject =  request.getMessageDTO();
+				MessageDTO dtoObject =  request.getMessage();
 				dtoObject = (MessageDTO) comps.service().usuarioSessionInfo().privacityIdServiceDecrypt(
 						comps.requestHelper().getUsuarioUsername()
 						,dtoObject, MessageDTO.class.getName());
@@ -112,8 +110,8 @@ Integer.parseInt(	 aesdto.iteration),
 
 
 
-	   public Urls getUrl() {
-			return Urls.CONSTANT_URL_PATH_PRIVATE_DOWNLOAD_DATA;
+	   public ServerUrls getUrl() {
+			return ServerUrls.CONSTANT_URL_PATH_PRIVATE_DOWNLOAD_DATA;
 					 
 		}	 
 }
