@@ -1,0 +1,5 @@
+ar\ziphra\idsprovider\controller\GeneratorController.class
+ar\ziphra\ZiphraIdsProviderApplication.class
+ar\ziphra\idsprovider\components\RandomNicknameComponent.class
+ar\ziphra\idsprovider\controller\RandomNicknameController.class
+ar\ziphra\idsprovider\components\HealthCheckerPingAction.class

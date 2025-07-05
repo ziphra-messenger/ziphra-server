@@ -7,25 +7,25 @@
 		<relativePath />
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.privacity</groupId>
-	<artifactId>privacity</artifactId>
+	<groupId>ar.ziphra</groupId>
+	<artifactId>ziphra</artifactId>
 	<version>2.3.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>privacity</name>
+	<name>ziphra</name>
 	<properties>
 		<java.version>11</java.version>
-		<privacity.version>2.3.2-SNAPSHOT</privacity.version>
-		<privacity.root.name>privacity</privacity.root.name>
-		<privacity.concatenate>-</privacity.concatenate>
-		<privacity.groupId>com.privacity</privacity.groupId>
-		<privacity.module.server>${privacity.root.name}${privacity.concatenate}server</privacity.module.server>
-		<privacity.module.messaging>${privacity.root.name}${privacity.concatenate}messaging</privacity.module.messaging>
-		<privacity.module.common>${privacity.root.name}${privacity.concatenate}common</privacity.module.common>
-		<privacity.module.idsprovider>${privacity.root.name}${privacity.concatenate}idsprovider</privacity.module.idsprovider>
-		<privacity.module.sessionmanager>${privacity.root.name}${privacity.concatenate}sessionmanager</privacity.module.sessionmanager>
-		<privacity.module.commonback>${privacity.root.name}${privacity.concatenate}commonback</privacity.module.commonback>
-		<privacity.module.core>${privacity.root.name}${privacity.concatenate}core</privacity.module.core>
-		<privacity.module.security>${privacity.root.name}${privacity.concatenate}security</privacity.module.security>
+		<ziphra.version>2.3.2-SNAPSHOT</ziphra.version>
+		<ziphra.root.name>ziphra</ziphra.root.name>
+		<ziphra.concatenate>-</ziphra.concatenate>
+		<ziphra.groupId>ar.ziphra</ziphra.groupId>
+		<ziphra.module.server>${ziphra.root.name}${ziphra.concatenate}server</ziphra.module.server>
+		<ziphra.module.messaging>${ziphra.root.name}${ziphra.concatenate}messaging</ziphra.module.messaging>
+		<ziphra.module.common>${ziphra.root.name}${ziphra.concatenate}common</ziphra.module.common>
+		<ziphra.module.idsprovider>${ziphra.root.name}${ziphra.concatenate}idsprovider</ziphra.module.idsprovider>
+		<ziphra.module.sessionmanager>${ziphra.root.name}${ziphra.concatenate}sessionmanager</ziphra.module.sessionmanager>
+		<ziphra.module.commonback>${ziphra.root.name}${ziphra.concatenate}commonback</ziphra.module.commonback>
+		<ziphra.module.core>${ziphra.root.name}${ziphra.concatenate}core</ziphra.module.core>
+		<ziphra.module.security>${ziphra.root.name}${ziphra.concatenate}security</ziphra.module.security>
 	</properties>
 	
 	<dependencies>
@@ -46,13 +46,13 @@
 		</dependency>
 	</dependencies>
 	<modules>
-		<module>${privacity.module.server}</module>
-		<module>${privacity.module.messaging}</module>
-		<module>${privacity.module.common}</module>
-		<module>${privacity.module.idsprovider}</module>
-		<module>${privacity.module.sessionmanager}</module>
-		<module>${privacity.module.commonback}</module>
-		<module>${privacity.module.core}</module>
-		<module>${privacity.module.security}</module>
+		<module>${ziphra.module.server}</module>
+		<module>${ziphra.module.messaging}</module>
+		<module>${ziphra.module.common}</module>
+		<module>${ziphra.module.idsprovider}</module>
+		<module>${ziphra.module.sessionmanager}</module>
+		<module>${ziphra.module.commonback}</module>
+		<module>${ziphra.module.core}</module>
+		<module>${ziphra.module.security}</module>
 	</modules>
 </project>
