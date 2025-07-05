@@ -1,18 +1,13 @@
 package com.privacity.server.component.grupouserconf;
 
-import java.util.List;
-import java.util.Optional;
-
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoUserConf;
-import com.privacity.server.model.GrupoUserConfId;
-import com.privacity.server.security.Usuario;
+import com.privacity.core.model.GrupoUserConf;
+import com.privacity.core.model.GrupoUserConfId;
 
 
 

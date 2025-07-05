@@ -1,7 +1,11 @@
 package com.privacity.server.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -25,39 +29,39 @@ import com.privacity.common.dto.UserForGrupoDTO;
 import com.privacity.common.dto.UsuarioDTO;
 import com.privacity.common.dto.response.SaveGrupoGralConfLockResponseDTO;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
-import com.privacity.common.enumeration.GrupoUserConfEnum;
+import com.privacity.common.enumeration.RulesConfEnum;
 import com.privacity.common.enumeration.MessageState;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.common.exceptions.ProcessException;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.AES;
+import com.privacity.core.model.EncryptKeys;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.GrupoInvitation;
+import com.privacity.core.model.GrupoUserConf;
+import com.privacity.core.model.GrupoUserConfId;
+import com.privacity.core.model.Media;
+import com.privacity.core.model.MediaId;
+import com.privacity.core.model.Message;
+import com.privacity.core.model.MessageDetail;
+import com.privacity.core.model.MessageId;
+import com.privacity.core.model.MyAccountConf;
+import com.privacity.core.model.UserForGrupo;
+import com.privacity.core.model.UserForGrupoId;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.dao.factory.MessageIdSequenceFactory;
-import com.privacity.server.exceptions.ProcessException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.AES;
-import com.privacity.server.model.EncryptKeys;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoInvitation;
-import com.privacity.server.model.GrupoUserConf;
-import com.privacity.server.model.GrupoUserConfId;
-import com.privacity.server.model.Media;
-import com.privacity.server.model.MediaId;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageDetail;
-import com.privacity.server.model.MessageId;
-import com.privacity.server.model.MyAccountConf;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.model.UserForGrupoId;
-import com.privacity.server.security.Usuario;
 
 import lombok.extern.java.Log;
 
 @Service
 @Log
 public class MapperService {
-	
+	private static final Logger log = Logger.getLogger(MapperService.class.getCanonicalName());
 	@Autowired
 	@Lazy
 	private FacadeComponent comps;
 	@Autowired @Lazy
-	private MessageIdSequenceFactory messageIdSequenceFactory;
+	private com.privacity.server.factory.IdsGeneratorFactory idGeneratorFactory;
 
 	public UserForGrupoDTO getUserForGrupoDTOPropio(UserForGrupo userForGrupo) {
 		UserForGrupoDTO ufgDTO = new UserForGrupoDTO();
@@ -71,11 +75,11 @@ public class MapperService {
 		
 		return ufgDTO;
 	}	
-	public UserForGrupoDTO getUserForGrupoDTO(UserForGrupo userForGrupo) {
+	public UserForGrupoDTO getUserForGrupoDTO(UserForGrupo userForGrupo) throws PrivacityException {
 		UserForGrupoDTO ufgDTO = new UserForGrupoDTO();
 		ufgDTO.setIdGrupo(userForGrupo.getUserForGrupoId().getGrupo().getIdGrupo()+"");
-		ufgDTO.setUsuario(doitForGrupo(userForGrupo.getUserForGrupoId().getGrupo(),userForGrupo.getUserForGrupoId().getUser()));
-		ufgDTO.setRole(userForGrupo.getRole());
+		ufgDTO.setUsuario(doitForGrupo(userForGrupo.getUserForGrupoId().getGrupo(),userForGrupo.getUserForGrupoId().getUser(),false));
+ 		ufgDTO.setRole(userForGrupo.getRole());
 		//ufgDTO.setAesDTO( doit(userForGrupo.getAes()));
 		
 		ufgDTO.setAlias(userForGrupo.getAlias());
@@ -98,18 +102,18 @@ public class MapperService {
 		
 		g.setGralConfDTO(new GrupoGralConfDTO());
 		g.getGralConfDTO().setAnonimo(grupo.getGralConf().getAnonimo());
-		g.getGralConfDTO().setAudiochat(grupo.getGralConf().getAudiochat());
+		g.getGralConfDTO().setBlockAudioMessages(grupo.getGralConf().isBlockAudioMessages());
 		g.getGralConfDTO().setAudiochatMaxTime(grupo.getGralConf().getAudiochatMaxTime());
 		g.getGralConfDTO().setBlackMessageAttachMandatory(grupo.getGralConf().isBlackMessageAttachMandatory());
-		g.getGralConfDTO().setChangeNicknameToNumber(grupo.getGralConf().isChangeNicknameToNumber());
-		g.getGralConfDTO().setDownloadAllowAudio(ConfigurationStateEnum.ALLOW);
-		g.getGralConfDTO().setDownloadAllowImage(grupo.getGralConf().getDownloadAllowImage());
-		g.getGralConfDTO().setDownloadAllowVideo(ConfigurationStateEnum.ALLOW);
+		g.getGralConfDTO().setRandomNickname(grupo.getGralConf().isRandomNickname());
+		
+		g.getGralConfDTO().setBlockMediaDownload(grupo.getGralConf().isBlockMediaDownload());
+
 		g.getGralConfDTO().setExtraEncrypt(grupo.getGralConf().getExtraEncrypt());
 		g.getGralConfDTO().setHideMessageDetails(grupo.getGralConf().isHideMessageDetails());
-		g.getGralConfDTO().setHideMessageState(grupo.getGralConf().isHideMessageState());
+		g.getGralConfDTO().setHideMessageReadState(grupo.getGralConf().isHideMessageReadState());
 		g.getGralConfDTO().setHideMemberList(grupo.getGralConf().isHideMemberList());
-		g.getGralConfDTO().setResend(grupo.getGralConf().isResend());
+		g.getGralConfDTO().setBlockResend(grupo.getGralConf().isBlockResend());
 		g.getGralConfDTO().setTimeMessageMandatory(grupo.getGralConf().isTimeMessageMandatory());
 		g.getGralConfDTO().setTimeMessageMaxTimeAllow(grupo.getGralConf().getTimeMessageMaxTimeAllow());
 	
@@ -130,27 +134,27 @@ public class MapperService {
 	public GrupoInvitationDTO getGrupoInvitationDTOPropio(GrupoInvitation gi) {
 	 return new GrupoInvitationDTO(
 				comps.common().mapper().getUsuarioDTOOtro(gi.getGrupoInvitationId().getUsuarioInvitante()), 
-				gi.getRole(),
+				gi.getRole(),gi.getInvitationMessage(),
 				comps.common().mapper().doit(gi.getAes()),
 				gi.getPrivateKey()
 				);
 	}
-	public GrupoUserConfDTO doit(GrupoUserConf d) {
+	public GrupoUserConfDTO doitGrupoUserConf(GrupoUserConf d) {
 		
 		GrupoUserConfDTO r = new GrupoUserConfDTO();
 		
 		r.setAnonimoAlways(d.getAnonimoAlways());
-		r.setAnonimoRecived(d.getAnonimoRecived());
-		r.setBlackMessageAlways(d.getBlackMessageAlways());
-		r.setBlackMessageRecived(d.getBlackMessageRecived());
-		r.setPermitirReenvio(d.getPermitirReenvio());
+		r.setAnonimoRecived(d.isAnonimoRecived());
+		r.setAnonimoRecivedMyMessage(d.isAnonimoRecivedMyMessage());
+		r.setBlackMessageAttachMandatory(d.getBlackMessageAttachMandatory());
+		r.setBlackMessageAttachMandatoryReceived(d.getBlackMessageAttachMandatoryReceived());
+		r.setBlockResend(d.getBlockResend());
 		r.setExtraAesAlways(d.getSecretKeyPersonalAlways());
 		r.setTimeMessageAlways(d.getTimeMessageAlways());
 		r.setTimeMessageSeconds(d.getTimeMessageSeconds());
+
+		r.setBlockMediaDownload(d.getBlockMediaDownload());
 		
-		r.setDownloadAllowAudio(d.getDownloadAllowAudio());
-		r.setDownloadAllowImage(d.getDownloadAllowImage());
-		r.setDownloadAllowVideo(d.getDownloadAllowVideo());
 		//r.setIdGrupo(d.getGrupoUserConfId().getGrupo().getIdGrupo()+"");
 		//r.setChangeNicknameToNumber(d.getChangeNicknameToNumber());
 		return r;
@@ -195,19 +199,21 @@ public class MapperService {
 		g.setAlias(ufg.getAlias());	
 		g.setGralConfDTO(new GrupoGralConfDTO());
 		
-		g.getGralConfDTO().setAnonimo(grupo.getGralConf().getAnonimo());
-		g.getGralConfDTO().setAudiochat(grupo.getGralConf().getAudiochat());
+	
+
+
+		g.getGralConfDTO().setBlockAudioMessages(grupo.getGralConf().isBlockAudioMessages());
 		g.getGralConfDTO().setAudiochatMaxTime(grupo.getGralConf().getAudiochatMaxTime());
 		g.getGralConfDTO().setBlackMessageAttachMandatory(grupo.getGralConf().isBlackMessageAttachMandatory());
-		g.getGralConfDTO().setChangeNicknameToNumber(grupo.getGralConf().isChangeNicknameToNumber());
-		g.getGralConfDTO().setDownloadAllowAudio(ConfigurationStateEnum.ALLOW);
-		g.getGralConfDTO().setDownloadAllowImage(grupo.getGralConf().getDownloadAllowImage());
-		g.getGralConfDTO().setDownloadAllowVideo(ConfigurationStateEnum.ALLOW);
+		g.getGralConfDTO().setRandomNickname(grupo.getGralConf().isRandomNickname());
+
+		g.getGralConfDTO().setBlockMediaDownload(grupo.getGralConf().isBlockMediaDownload());
+
 		g.getGralConfDTO().setExtraEncrypt(grupo.getGralConf().getExtraEncrypt());
 		g.getGralConfDTO().setHideMessageDetails(grupo.getGralConf().isHideMessageDetails());
-		g.getGralConfDTO().setHideMessageState(grupo.getGralConf().isHideMessageState());
+		g.getGralConfDTO().setHideMessageReadState(grupo.getGralConf().isHideMessageReadState());
 		g.getGralConfDTO().setHideMemberList(grupo.getGralConf().isHideMemberList());
-		g.getGralConfDTO().setResend(grupo.getGralConf().isResend());
+		g.getGralConfDTO().setBlockResend(grupo.getGralConf().isBlockResend());
 		g.getGralConfDTO().setTimeMessageMandatory(grupo.getGralConf().isTimeMessageMandatory());
 		g.getGralConfDTO().setTimeMessageMaxTimeAllow(grupo.getGralConf().getTimeMessageMaxTimeAllow());
 	
@@ -239,16 +245,18 @@ public class MapperService {
 	}
 
 
-	public UsuarioDTO doitForGrupo(Grupo grupo, Usuario u) {
+	public UsuarioDTO doitForGrupo(Grupo grupo, Usuario u, boolean randomNickname) throws PrivacityException {
 
 		
-		if (u.getUsername().equals("SYSTEM")){
+		if (u.getUsername().equals("SYSTEM") || u.getUsername().equals("Anonimo") ){
 			UsuarioDTO usuarioDTO = new UsuarioDTO();
 			usuarioDTO.setIdUsuario(u.getIdUser()+"");
 			usuarioDTO.setNickname(u.getNickname()+"");
 			
 			return usuarioDTO;
 		}
+		
+		
 		UserForGrupo ugr = comps.repo().userForGrupo().findById(new UserForGrupoId(u, grupo)).get();
 		String nicknameForGrupo = ""; 
 		
@@ -257,16 +265,290 @@ public class MapperService {
 		}else {
 			nicknameForGrupo= u.getNickname();
 		}
-
+		if (grupo.getGralConf().isRandomNickname() || randomNickname) {
+			nicknameForGrupo=comps.requestHelper().getRandomNicknameByGrupo(grupo.getIdGrupo(),u.getIdUser());
+		}
 		UsuarioDTO usuarioDTO = new UsuarioDTO();
 		usuarioDTO.setIdUsuario(u.getIdUser()+"");
-		usuarioDTO.setNickname(nicknameForGrupo);
+		usuarioDTO.setNickname(
+				
+				nicknameForGrupo);
 
 
 		return usuarioDTO;
 	}
+	public static List<String> getList(){
+		ArrayList<String> words = new ArrayList<String>();
+		ArrayList<String> emojis = new ArrayList<String>();
+		words.add("And");
+		words.add("Are");
+		words.add("Ape");
+		words.add("Ace");
+		words.add("Act");
+		words.add("Ask");
+		words.add("Arm");
+		words.add("Age");
+		words.add("Ago");
+		words.add("Air");
+		words.add("Ate");
+		words.add("All");
+		words.add("But");
+		words.add("Bye");
+		words.add("Bad");
+		words.add("Big");
+		words.add("Bed");
+		words.add("Bat");
+		words.add("Boy");
+		words.add("Bus");
+		words.add("Bag");
+		words.add("Box");
+		words.add("Bit");
+		words.add("Bee");
+		words.add("Buy");
+		words.add("Bun");
+		words.add("Cub");
+		words.add("Cat");
+		words.add("Car");
+		words.add("Cut");
+		words.add("Cow");
+		words.add("Cry");
+		words.add("Cab");
+		words.add("Can");
+		words.add("Dad");
+		words.add("Dab");
+		words.add("Dam");
+		words.add("Did");
+		words.add("Dug");
+		words.add("Den");
+		words.add("Dot");
+		words.add("Dip");
+		words.add("Day");
+		words.add("Ear");
+		words.add("Eye");
+		words.add("Eat");
+		words.add("End");
+		words.add("Elf");
+		words.add("Egg");
+		words.add("Far");
+		words.add("Fat");
+		words.add("Few");
+		words.add("Fan");
+		words.add("Fun");
+		words.add("Fit");
+		words.add("Fin");
+		words.add("Fox");
+		words.add("Own");
+		words.add("Odd");
+		words.add("Our");
+		words.add("Pet");
+		words.add("Pat");
+		words.add("Peg");
+		words.add("Paw");
+		words.add("Pup");
+		words.add("Pit");
+		words.add("Put");
+		words.add("Pot");
+		words.add("Pop");
+		words.add("Pin");
+		words.add("Rat");
+		words.add("Rag");
+		words.add("Rub");
+		words.add("Row");
+		words.add("Rug");
+		words.add("Run");
+		words.add("Rap");
+		words.add("Ram");
+		words.add("Sow");
+		words.add("See");
+		words.add("Saw");
+		/*words.add("Set");
+		words.add("Sit");
+		words.add("Sir");
+		words.add("Sat");
+		words.add("Sob");
+		words.add("Tap");
+		words.add("Tip");
+		words.add("Top");
+		words.add("Tug");
+		words.add("Tow");
+		words.add("Toe");
+		words.add("Tan");
+		words.add("Ten");
+		words.add("Two");
+		words.add("Use");
+		words.add("Van");
+		words.add("Vet");
+		words.add("Was");
+		words.add("Wet");
+		words.add("Win");
+		words.add("Won");
+		words.add("Wig");
+		words.add("War");
+		words.add("Why");
+		words.add("Who");
+		words.add("Way");
+		words.add("Wow");
+		words.add("You");
+		words.add("Yes");
+		words.add("Yak");
+		words.add("Yet");
+		words.add("Zip");
+		words.add("Zap");
+		words.add("Fix");
+		words.add("Fly");
+		words.add("Fry");
+		words.add("For");
+		words.add("Got");
+		words.add("Get");
+		words.add("God");
+		words.add("Gel");
+		words.add("Gas");
+		words.add("Hat");
+		words.add("Hit");
+		words.add("Has");
+		words.add("Had");
+		words.add("How");
+		words.add("Her");
+		words.add("His");
+		words.add("Hen");
+		words.add("Ink");
+		words.add("Ice");
+		words.add("Ill");
+		words.add("Jab");
+		words.add("Jug");
+		words.add("Jet");
+		words.add("Jam");
+		words.add("Jar");
+		words.add("Job");
+		words.add("Jog");
+		words.add("Kit");
+		words.add("Key");
+		words.add("Lot");
+		words.add("Lit");
+		words.add("Let");
+		words.add("Lay");
+		words.add("Mat");
+		words.add("Man");
+		words.add("Mad");
+		words.add("Mug");
+		words.add("Mix");
+		words.add("Map");
+		words.add("Mum");
+		words.add("Mud");
+		words.add("Mom");
+		words.add("May");
+		words.add("Met");
+		words.add("Net");
+		words.add("New");
+		words.add("Nap");
+		words.add("Now");
+		words.add("Nod");
+		words.add("Net");
+		words.add("Not");
+		words.add("Nut");
+		words.add("Oar");
+		words.add("One");
+		words.add("Out");
+		words.add("Owl");
+		words.add("Old");*/
+		
+		emojis.add("😀");
+		emojis.add("😆");
+		emojis.add("🤣");
+		emojis.add("😇");
+		emojis.add("🙃");
+		emojis.add("😌");
+		emojis.add("🤪");
+		emojis.add("🧐");
+		emojis.add("😎");
+		emojis.add("🥸");
+		emojis.add("😖");
+		emojis.add("🥵");
+		emojis.add("🥶");
+		emojis.add("😨");
+		emojis.add("😰");
+		emojis.add("🤐");
+		emojis.add("🤠");
+		emojis.add("🤡");
+		emojis.add("💩");
+		emojis.add("👻");
+		emojis.add("☠️");
+		emojis.add("👽");
+		emojis.add("👾");
+		emojis.add("🤖");
+		emojis.add("🎃");
+		emojis.add("🐶");
+		emojis.add("🐱");
+		emojis.add("🐭");
+		emojis.add("🐹");
+		emojis.add("🐰");
+		emojis.add("🦊");
+		emojis.add("🐻");
+		emojis.add("🐼");
+		emojis.add("🐻‍");
+		emojis.add("❄️");
+		emojis.add("🐨");
+		emojis.add("🐯");
+		emojis.add("🦁");
+		emojis.add("🐮");
+		emojis.add("🐷");
+		emojis.add("🐽");
+		emojis.add("🐸");
+		emojis.add("🐵");
+		emojis.add("🍐");
+		emojis.add("🍊");
+		emojis.add("🍌");
+		emojis.add("🍉");
+		emojis.add("🍇");
+		emojis.add("🍓");
+		emojis.add("🫐");
+		emojis.add("🍈");
+		emojis.add("🍒");
+		emojis.add("🍑");
+		emojis.add("🥭");
+		emojis.add("🍍");
+		emojis.add("🥝");
+		emojis.add("🍅");
+		emojis.add("🍆");
+		emojis.add("🥑");
+		emojis.add("🫛");
+		emojis.add("🌶");
+		emojis.add("💪");
+		emojis.add("🐌");
+		emojis.add("🐜");
+		emojis.add("🪰");
+		emojis.add("🪲");
+		emojis.add("🪳");
+		emojis.add("🦟");
+		emojis.add("🦗");
+		emojis.add("🕷");
+		emojis.add("🦂");
+		emojis.add("🦝");
+		emojis.add("🍀");
+		emojis.add("🍫");
+		emojis.add("🌭");
+		emojis.add("🍔");
+		emojis.add("🍟");
+		emojis.add("🍕");
+		emojis.add("🥕");
+		emojis.add("🍩");
+		emojis.add("🍪");
+		Collections.shuffle(words, new Random((new Random()).nextLong(990)));
+		Collections.shuffle(words, new Random((new Random()).nextLong(9903)));
+		Collections.shuffle(emojis, new Random((new Random()).nextLong(90)));
+		Collections.shuffle(emojis, new Random((new Random()).nextLong(94830)));
+		int i = 0;
+		List<String> r = new ArrayList<>();
+		for (String w : words) {
+			
+			r.add(w.toUpperCase() + "__" + emojis.get(i));
+			i++;
+		}
 	
-	public UsuarioDTO doit(Usuario u) {
+		return r;
+
+	}
+	public UsuarioDTO doitForGrupo(Usuario u) {
 		
 		UsuarioDTO usuarioDTO = new UsuarioDTO();
 		usuarioDTO.setIdUsuario(u.getIdUser()+"");
@@ -275,29 +557,45 @@ public class MapperService {
 		return usuarioDTO;
 	}
 	
+//	public UsuarioDTO doitForGrupo(Long idGrupo, Usuario u) throws PrivacityException {
+//		
+//		UsuarioDTO usuarioDTO = new UsuarioDTO();
+//		usuarioDTO.setIdUsuario(u.getIdUser()+"");
+//		usuarioDTO.setNickname(comps.requestHelper().getRandomNicknameByGrupo(idGrupo, u.getIdUser()));
+//
+//		return usuarioDTO;
+//	}
+	
 
-
-	public Message doit(MessageDTO dto, Usuario usuarioCreacion, Grupo g) throws ValidationException, ProcessException {
+	public Message doit(MessageDTO dto, Usuario usuarioCreacion, Grupo g) throws PrivacityException {
 		List<UserForGrupo> usersForGrupo = comps.repo().userForGrupo().findByForGrupo(g.getIdGrupo());
 		return doit(dto, usuarioCreacion, g, usersForGrupo, false);
 	}
-	public Message doit(MessageDTO dto, Usuario usuarioCreacion, Grupo g, List<UserForGrupo> usersForGrupo,  boolean newId) throws ValidationException, ProcessException {
+	public Message doit(MessageDTO dto, Usuario usuarioCreacion, Grupo g, List<UserForGrupo> usersForGrupo,  boolean newId) throws PrivacityException {
 		
 		
 		
 	
-
+		if (comps.util().usuario().getUsuarioSystem().equals(usuarioCreacion)) {
+			dto.setSystemMessage(true);
+		}
 		
 		Message m = new Message();
 		//m.setDateCreation(new Date());
-		m.setUserCreation(usuarioCreacion);
+		
+		if (dto.isSystemMessage()) {
+			m.setUserCreation(comps.util().usuario().getUsuarioSystem());
+		}else {
+			m.setUserCreation(usuarioCreacion);	
+		}
 		m.setText(dto.getText());
 		m.setBlackMessage(dto.isBlackMessage());
 		m.setAnonimo(dto.isAnonimo());
 		m.setTimeMessage(dto.getTimeMessage());
 		m.setSystemMessage(dto.isSystemMessage());
 		m.setSecretKeyPersonal(dto.isSecretKeyPersonal());
-		m.setPermitirReenvio(dto.isPermitirReenvio());
+		m.setBlockResend(dto.isBlockResend());
+		m.setHideMessageState(dto.isHideMessageReadState());
 		
 		//Grupo g = comps.util().grupo().getGrupoByIdValidation(dto.getIdGrupo());
 		
@@ -305,18 +603,25 @@ public class MapperService {
 		idm.setGrupo(g);
 		
 		if (dto.getIdMessage() == null || newId) {
-			idm.setIdMessage(messageIdSequenceFactory.getMessgeIdInterfaceDAO().getNextMessageId(g.getIdGrupo()));
+			idm.setIdMessage(comps.factory().idsGenerator().getNextMessageId(g.getIdGrupo()));
 		}
 		
 		m.setMessageId(idm);
 		
-		m.setMedia(doit(dto.getMediaDTO(), m,true));
+		m.setMedia(doit(dto.getMedia(), m,true));
 		m.setMessagesDetail( comps.util().messageDetail().generateMessagesDetail(g.getIdGrupo(),m,usersForGrupo));
 		
 		if ( dto.getParentReply() != null) {
-			
+			log.fine("Procesando Reply idParentReply: grupo -> "  + dto.getParentReply().getIdGrupo() + " message: -> " + dto.getParentReply().getIdMessage() );
 			Message mr = comps.repo().message().findById( new MessageId (g, Long.parseLong(dto.getParentReply().getIdMessage()))).get();
 			m.setParentReply(mr);
+		}
+		
+		if ( dto.getParentResend() != null) {
+			Grupo grupoResend = comps.repo().grupo().findById((Long.parseLong(dto.getParentResend().getIdGrupo()))).get();
+			log.fine("Procesando Resend idParentResend: grupo -> "  + dto.getParentResend().getIdGrupo() + " message: -> " + dto.getParentResend().getIdMessage() );
+			Message mr = comps.repo().message().findById( new MessageId( grupoResend, Long.parseLong(dto.getParentResend().getIdMessage()))).get();
+			m.setParentResend(mr);
 		}
 		return m;
 	}
@@ -344,47 +649,54 @@ public class MapperService {
 		return media;
 	}
 	
-	public MessageDTO doitWithOutMediaData(Message m, String mediaReplace) throws ProcessException {
+	public MessageDTO doitWithOutMediaData(Message m, String mediaReplace) throws PrivacityException {
 		MessageDTO r = new MessageDTO();
 		r.setIdGrupo(m.getMessageId().getGrupo().getIdGrupo()+"");
 		r.setText(m.getText());
-		r.setUsuarioCreacion(doitForGrupo(m.getMessageId().getGrupo(), m.getUserCreation()));
+		r.setUsuarioCreacion(doitForGrupo(m.getMessageId().getGrupo(), m.getUserCreation(),m.isChangeNicknameToRandom()));
 		r.setIdMessage(m.getMessageId().getIdMessage()+"");
-		r.setMessagesDetailDTO(new MessageDetailDTO[1]);
+		r.setMessagesDetail(new MessageDetailDTO[1]);
 		r.setSecretKeyPersonal(m.isSecretKeyPersonal());
 		Set<MessageDetail> details = m.getMessagesDetail();
 		r.setBlackMessage(m.isBlackMessage());
 		r.setAnonimo(m.isAnonimo());
 		r.setTimeMessage(m.getTimeMessage());
+		r.setHideMessageReadState(m.isHideMessageState());
 		r.setSystemMessage(m.isSystemMessage());
-		r.setPermitirReenvio(m.isPermitirReenvio());
-		r.setMessagesDetailDTO(new MessageDetailDTO[details.size()]);
+		r.setBlockResend(m.isBlockResend());
+		r.setMessagesDetail(new MessageDetailDTO[details.size()]);
+		
+		if (m.getParentResend() != null) {
+			r.setParentResend(new IdMessageDTO());
+			r.getParentResend().setIdGrupo(m.getParentResend().getMessageId().getGrupo().getIdGrupo()+"");
+			r.getParentResend().setIdMessage(m.getParentResend().getMessageId().getIdMessage()+"");
+		}
 		
 		Media media = m.getMedia();
 		MediaDTO mediaDTO = doit(media);
-		r.setMediaDTO(mediaDTO);
+		r.setMedia(mediaDTO);
 		
 		
 
 		int i=0;
 		for ( MessageDetail d : details) {
 			
-			r.getMessagesDetailDTO()[i] = new MessageDetailDTO();
+			r.getMessagesDetail()[i] = new MessageDetailDTO();
 			
-			r.getMessagesDetailDTO()[i].setIdGrupo(m.getMessageId().getGrupo().getIdGrupo()+"");
-			r.getMessagesDetailDTO()[i].setIdMessage(m.getMessageId().getIdMessage()+"");
+			r.getMessagesDetail()[i].setIdGrupo(m.getMessageId().getGrupo().getIdGrupo()+"");
+			r.getMessagesDetail()[i].setIdMessage(m.getMessageId().getIdMessage()+"");
 			//			r.getMessagesDetailDTO()[i].setIdMessageDetail(d.getMessageDetailId().getIdMessageDetail()+"");
 			
 			
 			if (d.getMessageDetailId().getUserDestino().getIdUser() == m.getUserCreation().getIdUser()) {
-				r.getMessagesDetailDTO()[i].setUsuarioDestino(r.getUsuarioCreacion());
+				r.getMessagesDetail()[i].setUsuarioDestino(r.getUsuarioCreacion());
 			}else {
-				r.getMessagesDetailDTO()[i].setUsuarioDestino( doitForGrupo(m.getMessageId().getGrupo(),d.getMessageDetailId().getUserDestino()));
+				r.getMessagesDetail()[i].setUsuarioDestino( doitForGrupo(m.getMessageId().getGrupo(),d.getMessageDetailId().getUserDestino(),m.isChangeNicknameToRandom()));
 			}
 			
 			//response.getMessagesDetailDTO()[i].setUserDestino(d.getMessageDetailId().getUserDestino().getUsername());
 			
-			r.getMessagesDetailDTO()[i].setEstado(d.getState());
+			r.getMessagesDetail()[i].setEstado(d.getState());
 
 			i++;
 		}
@@ -393,6 +705,7 @@ public class MapperService {
 	
 	public MessageDTO doitWithOutTextAndMedia(MessageDTO m) throws ProcessException {
 		MessageDTO r = new MessageDTO();
+		if (m==null) return r;
 		r.setIdGrupo(m.getIdGrupo());
 		
 		r.setUsuarioCreacion(m.getUsuarioCreacion());
@@ -403,87 +716,102 @@ public class MapperService {
 		r.setBlackMessage(m.isBlackMessage());
 		r.setAnonimo(m.isAnonimo());
 		r.setTimeMessage(m.getTimeMessage());
+		r.setHideMessageReadState(m.isHideMessageReadState());
 		r.setSystemMessage(m.isSystemMessage());
-		r.setPermitirReenvio(m.isPermitirReenvio());
-		r.setMessagesDetailDTO(m.getMessagesDetailDTO());
+		r.setBlockResend(m.isBlockResend());
+		r.setChangeNicknameToRandom(m.isChangeNicknameToRandom());
+		r.setMessagesDetail(m.getMessagesDetail());
 		
-		
-		if (m.getMediaDTO() != null) {
+		if (m.getParentResend() != null) {
+			r.setParentResend(new IdMessageDTO());
+			r.getParentResend().setIdGrupo(m.getParentResend().getIdGrupo());
+			r.getParentResend().setIdMessage(m.getParentResend().getIdMessage());
+		}
+		if (m.getMedia() != null) {
 			MediaDTO media = new MediaDTO();
-			media.setDownloadable(m.getMediaDTO().isDownloadable());
+			media.setDownloadable(m.getMedia().isDownloadable());
 			media.setIdGrupo(m.getIdGrupo());
-			media.setIdMessage(m.getMediaDTO().getIdMessage());
-			media.setMediaType(m.getMediaDTO().getMediaType());
+			media.setIdMessage(m.getMedia().getIdMessage());
+			media.setMediaType(m.getMedia().getMediaType());
 			
-			r.setMediaDTO(media);
+			r.setMedia(media);
 		}
 
 		return r;
 	}
 	
-	public MessageDTO doitWithoutMediaData(Message m) throws ProcessException {
+	public MessageDTO doitWithoutMediaData(Message m) throws PrivacityException {
 		MessageDTO r = new MessageDTO();
 		r.setIdGrupo(m.getMessageId().getGrupo().getIdGrupo()+"");
 		r.setText(m.getText());
-		r.setUsuarioCreacion(doitForGrupo(m.getMessageId().getGrupo(), m.getUserCreation()));
+		r.setUsuarioCreacion(doitForGrupo(m.getMessageId().getGrupo(), m.getUserCreation(),m.isChangeNicknameToRandom()));
 		r.setIdMessage(m.getMessageId().getIdMessage()+"");
-		r.setMessagesDetailDTO(new MessageDetailDTO[1]);
+		r.setMessagesDetail(new MessageDetailDTO[1]);
 		r.setSecretKeyPersonal(m.isSecretKeyPersonal());
 		Set<MessageDetail> details = m.getMessagesDetail();
 		r.setBlackMessage(m.isBlackMessage());
 		r.setAnonimo(m.isAnonimo());
 		r.setTimeMessage(m.getTimeMessage());
+		r.setHideMessageReadState(m.isHideMessageState());
 		r.setSystemMessage(m.isSystemMessage());
-		r.setPermitirReenvio(m.isPermitirReenvio());
-		r.setMessagesDetailDTO(new MessageDetailDTO[details.size()]);
-		
+		r.setBlockResend(m.isBlockResend());
+		r.setMessagesDetail(new MessageDetailDTO[details.size()]);
+		if (m.getParentResend() != null) {
+			r.setParentResend(new IdMessageDTO());
+			r.getParentResend().setIdGrupo(m.getParentResend().getMessageId().getGrupo().getIdGrupo()+"");
+			r.getParentResend().setIdMessage(m.getParentResend().getMessageId().getIdMessage()+"");
+		}
 		Media media = m.getMedia();
 		MediaDTO mediaDTO = doit(media,false);
-		r.setMediaDTO(mediaDTO);
+		r.setMedia(mediaDTO);
 		
 
 		int i=0;
 		for ( MessageDetail d : details) {
 			
-			r.getMessagesDetailDTO()[i] = new MessageDetailDTO();
+			r.getMessagesDetail()[i] = new MessageDetailDTO();
 			
-			r.getMessagesDetailDTO()[i].setIdGrupo(m.getMessageId().getGrupo().getIdGrupo()+"");
-			r.getMessagesDetailDTO()[i].setIdMessage(m.getMessageId().getIdMessage()+"");
+			r.getMessagesDetail()[i].setIdGrupo(m.getMessageId().getGrupo().getIdGrupo()+"");
+			r.getMessagesDetail()[i].setIdMessage(m.getMessageId().getIdMessage()+"");
 			//			r.getMessagesDetailDTO()[i].setIdMessageDetail(d.getMessageDetailId().getIdMessageDetail()+"");
 			
 			
 			if (d.getMessageDetailId().getUserDestino().getIdUser() == m.getUserCreation().getIdUser()) {
-				r.getMessagesDetailDTO()[i].setUsuarioDestino(r.getUsuarioCreacion());
+				r.getMessagesDetail()[i].setUsuarioDestino(r.getUsuarioCreacion());
 			}else {
-				r.getMessagesDetailDTO()[i].setUsuarioDestino( doitForGrupo(m.getMessageId().getGrupo(),d.getMessageDetailId().getUserDestino()));
+				r.getMessagesDetail()[i].setUsuarioDestino( doitForGrupo(m.getMessageId().getGrupo(),d.getMessageDetailId().getUserDestino(),m.isChangeNicknameToRandom()));
 			}
 			
 			//response.getMessagesDetailDTO()[i].setUserDestino(d.getMessageDetailId().getUserDestino().getUsername());
 			
-			r.getMessagesDetailDTO()[i].setEstado(d.getState());
+			r.getMessagesDetail()[i].setEstado(d.getState());
 
 			i++;
 		}
 		return r;
 	}
 	
-	public MessageDTO doit(Message m) throws ProcessException {
+	
+	
+	public MessageDTO doit(Message m) throws PrivacityException {
 		String idGrupo = m.getMessageId().getGrupo().getIdGrupo()+"";
 		String idMessage = m.getMessageId().getIdMessage() +"";
 		
 		MessageDTO r = new MessageDTO();
 		r.setIdGrupo(idGrupo+"");
 		r.setText(m.getText()+"");
-		r.setUsuarioCreacion(doitForGrupo(m.getMessageId().getGrupo(), m.getUserCreation()));
+		r.setUsuarioCreacion(doitForGrupo(m.getMessageId().getGrupo(), m.getUserCreation(),m.isChangeNicknameToRandom()));
 		r.setIdMessage(idMessage+"");
-		r.setMessagesDetailDTO(new MessageDetailDTO[1]);
+		r.setMessagesDetail(new MessageDetailDTO[1]);
 		r.setSecretKeyPersonal(m.isSecretKeyPersonal());
 		Set<MessageDetail> details = m.getMessagesDetail();
 		r.setBlackMessage(m.isBlackMessage());
 		r.setAnonimo(m.isAnonimo());
 		r.setTimeMessage(m.getTimeMessage());
+		r.setHideMessageReadState(m.isHideMessageState());
 		r.setSystemMessage(m.isSystemMessage());
-		r.setPermitirReenvio(m.isPermitirReenvio());
+		r.setBlockResend(m.isBlockResend());
+		r.setChangeNicknameToRandom(m.isChangeNicknameToRandom());
 		
 		if (m.getParentReply() != null) {
 			r.setParentReply(new IdMessageDTO( 
@@ -493,31 +821,40 @@ public class MapperService {
 			
 		}
 
-		r.setMessagesDetailDTO(new MessageDetailDTO[details.size()]);
+		if (m.getParentResend() != null) {
+			r.setParentReply(new IdMessageDTO( 
+					m.getParentResend().getMessageId().getGrupo().getIdGrupo() +"",
+					m.getParentResend().getMessageId().getIdMessage() +""
+					));
+			
+		}
+
+		
+		r.setMessagesDetail(new MessageDetailDTO[details.size()]);
 		
 		Media media = m.getMedia();
 		MediaDTO mediaDTO = doit(media,false);
-		r.setMediaDTO(mediaDTO);
+		r.setMedia(mediaDTO);
 		
 
 		int i=0;
 		for ( MessageDetail d : details) {
 			
-			r.getMessagesDetailDTO()[i] = new MessageDetailDTO();
+			r.getMessagesDetail()[i] = new MessageDetailDTO();
 			
-			r.getMessagesDetailDTO()[i].setIdGrupo(idGrupo+"");
-			r.getMessagesDetailDTO()[i].setIdMessage(idMessage);
+			r.getMessagesDetail()[i].setIdGrupo(idGrupo+"");
+			r.getMessagesDetail()[i].setIdMessage(idMessage);
 			//			r.getMessagesDetailDTO()[i].setIdMessageDetail(d.getMessageDetailId().getIdMessageDetail()+"");
 			
 //			if (d.getMessageDetailId().getUserDestino().getIdUser() == m.getUserCreation().getIdUser()) {
 //				r.getMessagesDetailDTO()[i].setUsuarioDestino(r.getUsuarioCreacion());
 //			}else {
-				r.getMessagesDetailDTO()[i].setUsuarioDestino( doitForGrupo(m.getMessageId().getGrupo(),d.getMessageDetailId().getUserDestino()));
+				r.getMessagesDetail()[i].setUsuarioDestino( doitForGrupo(m.getMessageId().getGrupo(),d.getMessageDetailId().getUserDestino(),m.isChangeNicknameToRandom()));
 //			}
 			
 			//response.getMessagesDetailDTO()[i].setUserDestino(d.getMessageDetailId().getUserDestino().getUsername());
 			
-			r.getMessagesDetailDTO()[i].setEstado(d.getState());
+			r.getMessagesDetail()[i].setEstado(d.getState());
 
 			i++;
 		}
@@ -532,37 +869,38 @@ public class MapperService {
 		r.setText(m.getText());
 		//r.setUserDTOCreation();
 		r.setIdMessage(m.getMessageId().getIdMessage()+"");
-		r.setMessagesDetailDTO(new MessageDetailDTO[1]);
+		r.setMessagesDetail(new MessageDetailDTO[1]);
 		Set<MessageDetail> details = m.getMessagesDetail();
 		r.setBlackMessage(m.isBlackMessage());
 		r.setAnonimo(m.isAnonimo());
 		r.setTimeMessage(m.getTimeMessage());
+		r.setHideMessageReadState(m.isHideMessageState());
 		r.setSystemMessage(m.isSystemMessage());
 		r.setSecretKeyPersonal(m.isSecretKeyPersonal());
-		r.setPermitirReenvio(m.isPermitirReenvio());
-		r.setMessagesDetailDTO(new MessageDetailDTO[1]);
+		r.setBlockResend(m.isBlockResend());
+		r.setMessagesDetail(new MessageDetailDTO[1]);
 		
 		Media media = m.getMedia();
 		MediaDTO mediaDTO = doit(media,true);
-		r.setMediaDTO(mediaDTO);
+		r.setMedia(mediaDTO);
 		
 
 		int i=0;
 		for ( MessageDetail d : details) {
 			
 			if (d.getMessageDetailId().getUserDestino().getIdUser().equals(idUser)){
-				r.getMessagesDetailDTO()[i] = new MessageDetailDTO();
+				r.getMessagesDetail()[i] = new MessageDetailDTO();
 				
-				r.getMessagesDetailDTO()[i].setIdGrupo(m.getMessageId().getGrupo().getIdGrupo()+"");
-				r.getMessagesDetailDTO()[i].setIdMessage(m.getMessageId().getIdMessage()+"");
+				r.getMessagesDetail()[i].setIdGrupo(m.getMessageId().getGrupo().getIdGrupo()+"");
+				r.getMessagesDetail()[i].setIdMessage(m.getMessageId().getIdMessage()+"");
 				//r.getMessagesDetailDTO()[i].setIdMessageDetail(d.getMessageDetailId().getIdMessageDetail()+"");
 				
 
-				r.getMessagesDetailDTO()[i].setUsuarioDestino( doit(d.getMessageDetailId().getUserDestino()));
+				r.getMessagesDetail()[i].setUsuarioDestino( doitForGrupo(d.getMessageDetailId().getUserDestino()));
 				
 				//response.getMessagesDetailDTO()[i].setUserDestino(d.getMessageDetailId().getUserDestino().getUsername());
 				
-				r.getMessagesDetailDTO()[i].setEstado(d.getState());
+				r.getMessagesDetail()[i].setEstado(d.getState());
 			}
 			
 		}
@@ -599,41 +937,60 @@ public class MapperService {
 	}
 
 
-	public MessageDetailDTO doit(MessageDetail md) {
+	public MessageDetailDTO doit(MessageDetail md) throws PrivacityException {
 		MessageDetailDTO r = new MessageDetailDTO();
-		r.setEstado(md.getState());
+		
 		r.setIdGrupo(md.getMessageDetailId().getMessage().getMessageId().getGrupo().getIdGrupo()+"");
 		r.setIdMessage(md.getMessageDetailId().getMessage().getMessageId().getIdMessage()+"");
-		r.setUsuarioDestino( doit(md.getMessageDetailId().getUserDestino()));
+		r.setUsuarioDestino( doitForGrupo(md.getMessageDetailId().getMessage().getMessageId().getGrupo(), md.getMessageDetailId().getUserDestino(),md.getMessageDetailId().getMessage().isChangeNicknameToRandom()));
+		
+		
+		
+		if (md.isHideRead() && md.getState().equals(MessageState.DESTINY_READ) && md.getMessageDetailId().getUserDestino().getIdUser().equals(comps.requestHelper().getUsuarioId())) {
+			r.setEstado( MessageState.DESTINY_DELIVERED);
+			r.setHideRead(false);
+		}else {
+			r.setEstado(md.getState());
+			r.setHideRead(md.isHideRead());
+		}
+		
 		return r;
 	}
 	
-	public MessageDetailDTO doitChangeState(MessageState state, String idGrupo, String idMessage, UsuarioDTO destino) {
+	public MessageDetailDTO doitChangeState(MessageState state, boolean hideRead, String idGrupo, String idMessage, UsuarioDTO destino) throws NumberFormatException, ValidationException {
 		MessageDetailDTO r = new MessageDetailDTO();
-		r.setEstado(state);
+		
 		r.setIdGrupo(idGrupo);
 		r.setIdMessage(idMessage);
 		r.setUsuarioDestino(destino);
+		
+		
+		if (hideRead && state.equals(MessageState.DESTINY_READ) && Long.parseLong( destino.getIdUsuario()) != comps.requestHelper().getUsuarioId().longValue()) {
+			r.setEstado( MessageState.DESTINY_DELIVERED);
+			r.setHideRead(false);
+		}else {
+			r.setEstado(state);
+			r.setHideRead(hideRead);
+		}
 		return r;
 	}	
 	public GrupoUserConf doit(GrupoUserConfDTO d) {
 
 		GrupoUserConf r = new GrupoUserConf();
 		r.setAnonimoAlways(d.getAnonimoAlways());
-		r.setAnonimoRecived(d.getAnonimoRecived());
-		r.setBlackMessageAlways(d.getBlackMessageAlways());
-		r.setBlackMessageRecived(d.getBlackMessageRecived());
-		r.setPermitirReenvio(d.getPermitirReenvio());
+		r.setAnonimoRecived(d.isAnonimoRecived());
+		r.setAnonimoRecivedMyMessage(d.isAnonimoRecivedMyMessage());
+		r.setBlackMessageAttachMandatory(d.getBlackMessageAttachMandatory());
+		r.setBlackMessageAttachMandatoryReceived(d.getBlackMessageAttachMandatoryReceived());
+		r.setBlockResend(d.getBlockResend());
 		r.setSecretKeyPersonalAlways(d.getExtraAesAlways());
 		r.setTimeMessageAlways(d.getTimeMessageAlways());
 		r.setTimeMessageSeconds(d.getTimeMessageSeconds());
 		r.setGrupoUserConfId(new GrupoUserConfId());
 		
-		r.setDownloadAllowAudio(d.getDownloadAllowAudio());
-		r.setDownloadAllowImage(d.getDownloadAllowImage());
-		r.setDownloadAllowVideo(d.getDownloadAllowVideo());
-		r.setDownloadAllowAudio(GrupoUserConfEnum.GENERAL_VALUE);
-		r.setDownloadAllowVideo(GrupoUserConfEnum.GENERAL_VALUE);
+
+		r.setBlockMediaDownload(d.getBlockMediaDownload());
+
 		return r;
 	}
 
@@ -642,18 +999,20 @@ public class MapperService {
 	public void doit(Grupo grupo, GrupoGralConfDTO d) {
 		
 		grupo.getGralConf().setAnonimo(d.getAnonimo());
-		grupo.getGralConf().setAudiochat(d.getAudiochat());
+
+
+		grupo.getGralConf().setBlockAudioMessages(d.isBlockAudioMessages());
 		grupo.getGralConf().setAudiochatMaxTime(d.getAudiochatMaxTime());
 		grupo.getGralConf().setBlackMessageAttachMandatory(d.isBlackMessageAttachMandatory());
-		grupo.getGralConf().setChangeNicknameToNumber(d.isChangeNicknameToNumber());
-		grupo.getGralConf().setDownloadAllowAudio(ConfigurationStateEnum.ALLOW);
-		grupo.getGralConf().setDownloadAllowImage(d.getDownloadAllowImage());
-		grupo.getGralConf().setDownloadAllowVideo(ConfigurationStateEnum.ALLOW);
+		grupo.getGralConf().setRandomNickname(d.isRandomNickname());
+
+		grupo.getGralConf().setBlockMediaDownload(d.isBlockMediaDownload());
+
 		grupo.getGralConf().setExtraEncrypt(d.getExtraEncrypt());
 		grupo.getGralConf().setHideMessageDetails(d.isHideMessageDetails());
-		grupo.getGralConf().setHideMessageState(d.isHideMessageState());
+		grupo.getGralConf().setHideMessageReadState(d.isHideMessageReadState());
 		grupo.getGralConf().setHideMemberList(d.isHideMemberList());
-		grupo.getGralConf().setResend(d.isResend());
+		grupo.getGralConf().setBlockResend(d.isBlockResend());
 		grupo.getGralConf().setTimeMessageMandatory(d.isTimeMessageMandatory());
 		grupo.getGralConf().setTimeMessageMaxTimeAllow(d.getTimeMessageMaxTimeAllow());
 		
@@ -664,10 +1023,11 @@ public class MapperService {
 	public void doit(Usuario usuario, MyAccountConfDTO d) {
 		
 		usuario.getMyAccountConf().setBlackMessageAttachMandatory(d.isBlackMessageAttachMandatory());
+		usuario.getMyAccountConf().setBlackMessageAttachMandatoryReceived(d.isBlackMessageAttachMandatoryReceived());
 
-		usuario.getMyAccountConf().setDownloadAttachAllowImage(d.isDownloadAttachAllowImage());
+		usuario.getMyAccountConf().setBlockMediaDownload(d.isBlockMediaDownload());
 		usuario.getMyAccountConf().setHideMyMessageState(d.isHideMyMessageState());
-		usuario.getMyAccountConf().setResend(d.isResend());
+		usuario.getMyAccountConf().setResend(d.isBlockResend());
 		usuario.getMyAccountConf().setTimeMessageAlways(d.isTimeMessageAlways());
 		usuario.getMyAccountConf().setTimeMessageDefaultTime(d.getTimeMessageDefaultTime());
 		usuario.getMyAccountConf().setLoginSkip(d.isLoginSkip());	
@@ -675,10 +1035,11 @@ public class MapperService {
 	public MyAccountConfDTO doit(MyAccountConf d) {
 		MyAccountConfDTO r = new MyAccountConfDTO();
 		r.setBlackMessageAttachMandatory(d.isBlackMessageAttachMandatory());
+		r.setBlackMessageAttachMandatoryReceived (d.isBlackMessageAttachMandatoryReceived());
 
-		r.setDownloadAttachAllowImage(d.isDownloadAttachAllowImage());
+		r.setBlockMediaDownload(d.isBlockMediaDownload());
 		r.setHideMyMessageState(d.isHideMyMessageState());
-		r.setResend(d.isResend());
+		r.setBlockResend(d.isResend());
 		r.setTimeMessageAlways(d.isTimeMessageAlways());
 		r.setTimeMessageDefaultTime(d.getTimeMessageDefaultTime());
 		

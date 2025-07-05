@@ -1,7 +1,6 @@
 package com.privacity.server.component.requestid;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,14 +9,16 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.dto.servergralconf.MinMaxLenghtDTO;
-import com.privacity.common.dto.servergralconf.SystemGralConf;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.security.Usuario;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
-
+@Slf4j	
 public class RequestIdValidationService {
 	
 	@Autowired @Lazy
@@ -25,17 +26,17 @@ public class RequestIdValidationService {
 	@Value("${usuario.sessioninfo.requestid.expired.seconds}")  
 	private int expiredSeconds;
 
-	public RequestIdDTO getNewRequestIdPrivate(RequestIdDTO halfId) throws ValidationException {
+	public RequestIdDTO getNewRequestIdPrivate(RequestIdDTO halfId) throws PrivacityException {
 		return getNewRequestIdGeneral(halfId,true);
 	}
-	public RequestIdDTO getNewRequestIdPublic(RequestIdDTO halfId) throws ValidationException {
+	public RequestIdDTO getNewRequestIdPublic(RequestIdDTO halfId) throws PrivacityException {
 		return getNewRequestIdGeneral(halfId,false);
 	}
 	
-	private RequestIdDTO getNewRequestIdGeneral(RequestIdDTO halfId, boolean isPrivate) throws ValidationException {
+	private RequestIdDTO getNewRequestIdGeneral(RequestIdDTO halfId, boolean isPrivate) throws PrivacityException {
 		Usuario usuarioLogged=null;
 		if (isPrivate) {
-			usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();	
+			usuarioLogged = comps.requestHelper().getUsuarioLogged();	
 		}
 		
 		
@@ -47,13 +48,17 @@ public class RequestIdValidationService {
 		serverRequestIdDTO.setRequestIdClientSide(halfId.getRequestIdClientSide());
 
 		if (isPrivate) {
-			ConcurrentMap<String, RequestIdDTO> map = comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getRequestIds();
+			// RequestIdDTO> map = comps.service().usuarioSessionInfo().getRequestIds(usuarioLogged.getUsername());
 			//isRequestIdDuplicated(halfId, map);
 						
-			map.put(halfId.getRequestIdClientSide(), serverRequestIdDTO);
+			comps.service().usuarioSessionInfo().putRequestIdPrivate
+			(usuarioLogged.getUsername()
+					,halfId.getRequestIdClientSide(),
+					
+                       serverRequestIdDTO);
 		}else {
 			comps.service().requestIdPublic().isRequestIdDuplicated(halfId);
-			comps.service().requestIdPublic().getRequestIdsPublic().put(halfId.getRequestIdClientSide(), serverRequestIdDTO);
+			comps.service().requestIdPublic().put(halfId.getRequestIdClientSide(), serverRequestIdDTO);
 			
 
 		}
@@ -64,12 +69,18 @@ public class RequestIdValidationService {
 	}
 
 	private void validateRequestIdPeticion(RequestIdDTO halfId) throws ValidationException {
-		
+		log.trace("validateRequestIdPeticion: halfId = " + halfId.toString());
 		MinMaxLenghtDTO ridC = comps.common().serverConf().getSystemGralConf().getRequestId();
-		if( 
-		(halfId == null)
-		|| ( halfId.getRequestIdClientSide().trim().length() < ridC.getMinLenght())
+		if( halfId == null){
+			throw new ValidationException(ExceptionReturnCode.REQUEST_ID_CANT_BE_NULL);
+		}
+		if ( ( halfId.getRequestIdClientSide().trim().length() < ridC.getMinLenght())
 		|| ( halfId.getRequestIdClientSide().trim().length() > ridC.getMaxLenght())) {
+			
+			log.trace("halfId.getRequestIdClientSide().trim().length(): " + halfId.getRequestIdClientSide().trim().length());
+			log.trace(" ridC.getMinLenght(): " +  ridC.getMinLenght());
+			log.trace(" ridC.getMaxLenght(): " +  ridC.getMaxLenght());
+			
 			throw new ValidationException(ExceptionReturnCode.REQUEST_ID_BAD_LENGTH);				
 		}
 		
@@ -77,6 +88,7 @@ public class RequestIdValidationService {
 		date = date.minusSeconds(expiredSeconds);
 		
 		if (halfId.getDate().isBefore(date)) {
+			log.trace("validateRequestIdPeticion: REQUEST_ID_EXPIRED = " + date);
 			throw new ValidationException(ExceptionReturnCode.REQUEST_ID_EXPIRED);
 		}
 	}		

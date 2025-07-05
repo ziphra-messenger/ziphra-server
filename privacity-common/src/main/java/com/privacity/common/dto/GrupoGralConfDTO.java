@@ -1,65 +1,103 @@
 package com.privacity.common.dto;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.annotations.PrivacityId;
+import com.privacity.common.annotations.PrivacityIdExclude;
 import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.enumeration.ConfigurationStateEnum;
+import com.privacity.common.enumeration.RulesConfEnum;
+import com.privacity.common.interfaces.IdGrupoInterface;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 @Data
-public class GrupoGralConfDTO {
+@JsonInclude(JsonInclude.Include.CUSTOM)
+public class GrupoGralConfDTO implements IdGrupoInterface{
 
 	@PrivacityId
 	@PrivacityIdOrder
-	@JsonInclude(Include.NON_NULL)
-	public String idGrupo;
 	
-	@JsonInclude(Include.NON_NULL)
-	public boolean resend;
+	private String idGrupo;
 	
-	@JsonInclude(Include.NON_NULL)
-	public ConfigurationStateEnum anonimo;
+	@PrivacityIdExclude	
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	private boolean blockResend;
 	
-	@JsonInclude(Include.NON_NULL)
-	public boolean timeMessageMandatory;
 	
-	@JsonInclude(Include.NON_NULL)
-	public int timeMessageMaxTimeAllow;
+	@PrivacityIdExclude
+	private RulesConfEnum anonimo;
 	
-	@JsonInclude(Include.NON_NULL)
-	public ConfigurationStateEnum audiochat;
+	@PrivacityIdExclude	
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	private boolean timeMessageMandatory;
 	
-	@JsonInclude(Include.NON_NULL)
-	public int audiochatMaxTime;
+	@PrivacityIdExclude	
+	private int timeMessageMaxTimeAllow;
 	
-	@JsonInclude(Include.NON_NULL)
-	public boolean blackMessageAttachMandatory;
+	@PrivacityIdExclude	
+	private boolean blockAudioMessages;
 	
-	@JsonInclude(Include.NON_NULL)
-	public ConfigurationStateEnum downloadAllowImage;
+	@PrivacityIdExclude	
+	private int audiochatMaxTime;
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	@PrivacityIdExclude	
+	private boolean	 blackMessageAttachMandatory;
 	
-	@JsonInclude(Include.NON_NULL)
-	public ConfigurationStateEnum downloadAllowAudio;
+	@PrivacityIdExclude	
+	private boolean blockMediaDownload;
+
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	@PrivacityIdExclude	
+	private boolean randomNickname;
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	@PrivacityIdExclude	
+	private boolean hideMessageDetails;
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	@PrivacityIdExclude	
+	private boolean hideMessageReadState;
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	@PrivacityIdExclude	
+	private boolean hideMemberList;
 	
-	@JsonInclude(Include.NON_NULL)
-	public ConfigurationStateEnum downloadAllowVideo;
-	
-	@JsonInclude(Include.NON_NULL)
-	public boolean changeNicknameToNumber;
-	
-	@JsonInclude(Include.NON_NULL)
-	public boolean hideMessageDetails;
-	
-	@JsonInclude(Include.NON_NULL)
-	public boolean hideMessageState;
-	
-	@JsonInclude(Include.NON_NULL)
-	public boolean hideMemberList;
-	
-	@JsonInclude(Include.NON_NULL)
-	public ConfigurationStateEnum extraEncrypt;
+	@PrivacityIdExclude	
+	private ConfigurationStateEnum extraEncrypt;
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GrupoGralConfDTO other = (GrupoGralConfDTO) obj;
+		return blockAudioMessages == other.blockAudioMessages && anonimo == other.anonimo
+				&& audiochatMaxTime == other.audiochatMaxTime
+				&& blackMessageAttachMandatory == other.blackMessageAttachMandatory
+
+				&& blockMediaDownload == other.blockMediaDownload && extraEncrypt == other.extraEncrypt
+				&& hideMemberList == other.hideMemberList && hideMessageDetails == other.hideMessageDetails
+				&& hideMessageReadState == other.hideMessageReadState && Objects.equals(idGrupo, other.idGrupo)
+				&& randomNickname == other.randomNickname && blockResend == other.blockResend
+				&& timeMessageMandatory == other.timeMessageMandatory
+				&& timeMessageMaxTimeAllow == other.timeMessageMaxTimeAllow;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(blockAudioMessages, anonimo, audiochatMaxTime, blackMessageAttachMandatory,
+				blockMediaDownload,  extraEncrypt, hideMemberList,
+				hideMessageDetails, hideMessageReadState, idGrupo, randomNickname, blockResend, timeMessageMandatory,
+				timeMessageMaxTimeAllow);
+	}
 
 
 }

@@ -3,77 +3,73 @@ package com.privacity.server.component.grupo;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;import com.privacity.common.enumeration.ProtocoloActionsEnum;
 import com.privacity.common.dto.GrupoDTO;
 import com.privacity.common.dto.GrupoInvitationDTO;
 import com.privacity.common.dto.GrupoUserConfDTO;
-import com.privacity.common.dto.IdDTO;
+import com.privacity.common.dto.IdGrupoDTO;
+import com.privacity.common.dto.MembersQuantityDTO;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.MessageDetailDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.dto.UserForGrupoDTO;
 import com.privacity.common.dto.UsuarioDTO;
+import com.privacity.common.dto.request.GrupoChangeUserRoleDTO;
 import com.privacity.common.dto.response.GrupoRemoveMeResponseDTO;
 import com.privacity.common.dto.response.InitGrupoResponse;
-import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.enumeration.ProtocoloActionsEnum;
+import com.privacity.common.enumeration.ProtocoloComponentsEnum;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.AES;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.GrupoGralConf;
+import com.privacity.core.model.GrupoGralConfLock;
+import com.privacity.core.model.GrupoGralConfPassword;
+import com.privacity.core.model.GrupoInvitation;
+import com.privacity.core.model.GrupoInvitationId;
+import com.privacity.core.model.GrupoUserConf;
+import com.privacity.core.model.GrupoUserConfId;
+import com.privacity.core.model.Message;
+import com.privacity.core.model.MessageDetail;
+import com.privacity.core.model.UserForGrupo;
+import com.privacity.core.model.UserForGrupoId;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.PrivacityException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.AES;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.GrupoGralConf;
-import com.privacity.server.model.GrupoGralConfLock;
-import com.privacity.server.model.GrupoGralConfPassword;
-import com.privacity.server.model.GrupoInvitation;
-import com.privacity.server.model.GrupoInvitationId;
-import com.privacity.server.model.GrupoUserConf;
-import com.privacity.server.model.GrupoUserConfId;
-import com.privacity.server.model.Message;
-import com.privacity.server.model.MessageDetail;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.model.UserForGrupoId;
-import com.privacity.server.security.Usuario;
-import com.privacity.server.websocket.WsMessage;
-import com.privacity.server.websocket.WsQueue;
 
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @NoArgsConstructor
+@Slf4j
 public class GrupoProcessService  {
 
 	@Autowired @Lazy
 	private FacadeComponent comps;
 	
-	   @Autowired 
-	   @Lazy
-	   private WsQueue q;	
+
 	
-	public IdDTO[] getIdsMisGrupos(Usuario u) {
+	public GrupoDTO[] getIdsMisGrupos(Usuario u) {
 		List<Long> l = comps.repo().userForGrupo().findIdGrupoByUserForGrupoIdUser(u.getIdUser());
 		List<Long> gi = comps.repo().grupoInvitation().findIdGrupoByGrupoInvitationUsuarioGrupo(u);
 
 	
 		
 		
-		IdDTO[] r = new IdDTO[l.size() + gi.size()];
+		GrupoDTO[] r = new GrupoDTO[l.size() + gi.size()];
 		
 		int i = 0;
 		for ( ; i < l.size() ; i++) {
-			r[i] = new IdDTO(l.get(i));
+			r[i] = new GrupoDTO(l.get(i));
 		}
 
 		for ( int j = 0 ; j < gi.size() ; j++) {
-			r[j+i] = new IdDTO(gi.get(j));
+			r[j+i] = new GrupoDTO(gi.get(j));
 		}
 
 		return r;
@@ -92,7 +88,7 @@ public class GrupoProcessService  {
 	}
 	
 	
-	public GrupoDTO getGrupoDTO(Usuario u, UserForGrupo v) throws ValidationException {
+	public GrupoDTO getGrupoDTO(Usuario u, UserForGrupo v) throws PrivacityException {
 		Grupo grupo = v.getUserForGrupoId().getGrupo();
 		
 		GrupoDTO g = comps.common().mapper().getGrupoDTOPropio(grupo);
@@ -103,6 +99,7 @@ public class GrupoProcessService  {
 		GrupoUserConfDTO grupoUserConf = comps.util().grupoUserConf().getGrupoUserConf(u, grupo);
 		g.setUserConfDTO(grupoUserConf);
 		
+		//g.setMembersQuantityDTO( comps.webSocket().sender().getMembersOnline(g));
 		return g;
 	} 
 
@@ -118,7 +115,7 @@ public class GrupoProcessService  {
 		g.getPassword().setExtraEncryptDefaultEnabled(false);
 		g.getPassword().setGrupo(g);
 		
-		//comps.repo().grupo().save(g);
+		
 		
 		g.setLock(new GrupoGralConfLock());
 
@@ -126,12 +123,13 @@ public class GrupoProcessService  {
 		g.getLock().setSeconds(900);
 		g.getLock().setGrupo(g);
 		
-
-		comps.repo().grupo().save(g);
+		//g.setIdGrupo(comps.factory().idsGenerator().getNextGrupoId());
+		//comps.repo().grupo().save(g);
 		
 		//g.getGralConf().setGrupo(g);
 		//comps.repo().grupo().save(g);
-		
+		comps.repo().grupo().save(g);
+		comps.repo().aes().save(aesdto);
 		UserForGrupo ug = new UserForGrupo();
 		ug.setUserForGrupoId( new UserForGrupoId(u, g));
 		ug.setRole(GrupoRolesEnum.ADMIN);
@@ -140,11 +138,21 @@ public class GrupoProcessService  {
 		ug.setAes(aesdto);
 		
 		comps.repo().userForGrupo().save(ug);
+
+		//GrupoUserConf grupoUserConf = comps.util().grupoUserConf().getDefaultGrupoUserConf(g,u);
+		
+		
+		comps.service().grupoUserConf().saveDefaultGrupoUserConf(g, u);
+		
+		//comps.repo().grupo().save(g);
+		
 		
 //		g.getGralConf().setPassword(new GrupoGralConfPassword());
 //		g.getGralConf().getPassword().setEnabled(false);
 //		g.getGralConf().getPassword().setGrupoGralConf(g.getGralConf());
-		comps.service().grupoUserConf().saveDefaultGrupoUserConf(g, u);
+		
+		
+		
 		
 		return getGrupoDTO(u,ug);
 	
@@ -193,7 +201,7 @@ public class GrupoProcessService  {
 //
 //	}
 	
-	public void  sentInvitation(Grupo grupo, GrupoRolesEnum role, Usuario logU,Usuario UserInvitationCode, AES aes) throws PrivacityException {
+	public void  sentInvitation(Grupo grupo, GrupoRolesEnum role,String message, Usuario logU,Usuario UserInvitationCode, AES aes) throws PrivacityException {
 		Grupo g = new Grupo();
 		g.setIdGrupo(grupo.getIdGrupo());
 		g.setName(grupo.getName());
@@ -203,14 +211,17 @@ public class GrupoProcessService  {
 		gi.setRole(role);
 		gi.setGrupoInvitationId(new GrupoInvitationId(UserInvitationCode, logU, g));
 		gi.setPrivateKey(UserInvitationCode.getEncryptKeys().getPrivateKey());
-
+		gi.setInvitationMessage(message);
+		
 		comps.repo().grupoInvitation().save(gi);
 		
 		GrupoDTO ginfo = getGrupoDTOInvitation(UserInvitationCode, gi, g);
 		//ginfo.setGrupoInvitation(true);
+		ginfo.setMembersQuantityDTO(new MembersQuantityDTO());
+		ginfo.getMembersQuantityDTO().setTotalQuantity(0);
 		ginfo.setGrupoInvitationDTO(new GrupoInvitationDTO(
-				comps.common().mapper().doit(gi.getGrupoInvitationId().getUsuarioInvitante()), 
-				gi.getRole(),
+				comps.common().mapper().doitForGrupo(gi.getGrupoInvitationId().getUsuarioInvitante()), 
+				gi.getRole(),message,
 				comps.common().mapper().doit(gi.getAes()),
 				gi.getPrivateKey()
 				));
@@ -222,8 +233,21 @@ public class GrupoProcessService  {
 				ProtocoloActionsEnum.GRUPO_INVITATION_RECIVED, 
 				ginfo);
 		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					comps.webSocket().sender().senderToUser(p, UserInvitationCode);
+				} catch (PrivacityException e) {
+					log.error("sentInvitation senderToUser: " + e.getMessage());
+				}
+				
+			}
+		}).start();;
 		
-			q.put(new WsMessage(gi.getGrupoInvitationId().getUsuarioInvitado().getUsername() ,p));
+		
+			//q.put(new WsMessage(gi.getGrupoInvitationId().getUsuarioInvitado().getUsername() ,p));
 
 		
 		
@@ -241,7 +265,7 @@ public class GrupoProcessService  {
 		
 		comps.repo().grupoUserConf().save(gconf);
 		
-		
+		aes.setIdAES(comps.factory().idsGenerator().getNextAESId());
 		ug.setAes(aes);
 		
 		
@@ -264,6 +288,7 @@ public class GrupoProcessService  {
 		{
 
 			MessageDTO mensajeD = comps.webSocket().sender().buildSystemMessage(gi.getGrupoInvitationId().getGrupo(), "SE HA AGREGADO EL USUARIO : " + gi.getGrupoInvitationId().getUsuarioInvitado().getNickname() + " AL GRUPO " + gi.getGrupoInvitationId().getGrupo().getName() + " POR " + gi.getGrupoInvitationId().getUsuarioInvitante().getNickname());
+			
 			Message mensaje = comps.common().mapper().doit(mensajeD, comps.util().usuario().getUsuarioSystem(), gi.getGrupoInvitationId().getGrupo());
 			comps.process().message().sendNormal(comps.util().usuario().getUsuarioSystem().getIdUser(), mensaje, gi.getGrupoInvitationId().getGrupo().getIdGrupo());
 			//esto debe estar activo
@@ -276,7 +301,11 @@ public class GrupoProcessService  {
 			
 			//GrupoDTO dto = getGrupo(comps.util().grupo().getGrupoById(ug.getUserForGrupoId().getGrupo().getIdGrupo()), ug.getUserForGrupoId().getUser());
 			//dto.setUserConfDTO(conf);
-			return getGrupoDTO(gi.getGrupoInvitationId().getUsuarioInvitado(), ug); //dto; 
+			refreshOnline(gi.getGrupoInvitationId().getGrupo().getIdGrupo());
+			
+			GrupoDTO ret = getGrupoDTO(gi.getGrupoInvitationId().getUsuarioInvitado(), ug); 
+			ret.setMembersQuantityDTO(comps.webSocket().sender().getMembersOnline(ret));
+			return ret;
 		}
 	}  	
 
@@ -329,7 +358,7 @@ public class GrupoProcessService  {
 		for (int i = 0 ; i < usuarios.size() ; i++ ) {
 			
 			
-			response.getUsersDTO()[i] = comps.common().mapper().doit(usuarios.get(i));
+			response.getUsersDTO()[i] = comps.common().mapper().doitForGrupo(usuarios.get(i));
 
 		}
 		
@@ -347,11 +376,11 @@ public class GrupoProcessService  {
 			mensaje.setIdGrupo(m.getMessageId().getGrupo().getIdGrupo().toString());
 			mensaje.setIdMessage(m.getMessageId().getIdMessage().toString());
 			mensaje.setText(m.getText());
-			mensaje.setUsuarioCreacion(comps.common().mapper().doit(m.getUserCreation()));
+			mensaje.setUsuarioCreacion(comps.common().mapper().doitForGrupo(m.getUserCreation()));
 	    	
 	    	List<MessageDetail> detalles = comps.repo().messageDetail().findByMessageUser(m.getMessageId().getIdMessage(),u.getIdUser());
 	    	
-			mensaje.setMessagesDetailDTO(new MessageDetailDTO[detalles.size()]);
+			mensaje.setMessagesDetail(new MessageDetailDTO[detalles.size()]);
 
 			int j=0;
 	    	for (MessageDetail d : detalles) {
@@ -360,7 +389,7 @@ public class GrupoProcessService  {
 	    		
 	    		dto.setEstado(d.getState());
 	    		
-				dto.setUsuarioDestino(comps.common().mapper().doit(d.getMessageDetailId().getUserDestino()));
+				dto.setUsuarioDestino(comps.common().mapper().doitForGrupo(d.getMessageDetailId().getUserDestino()));
 				
 	    		//dto.setUserDestino(d.getMessageDetailId().getUserDestino().getUsername());
 	    		
@@ -368,7 +397,7 @@ public class GrupoProcessService  {
 	    		dto.setIdGrupo(m.getMessageId().getGrupo().getIdGrupo().toString());
 	    		dto.setIdMessage(m.getMessageId().getIdMessage().toString());
 	    		
-	    		mensaje.getMessagesDetailDTO()[j] = dto;
+	    		mensaje.getMessagesDetail()[j] = dto;
 				j++;
 	  
 	    	}
@@ -381,15 +410,7 @@ public class GrupoProcessService  {
 
 	}
 
-	public Usuario getUser() {
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-		Usuario u = comps.repo().user().findByUsername(userDetail.getUsername()).get();
-		return u;
-	}
+
 
 //
 //	private void removeMeAnonimo(Usuario usuarioLogged, Grupo grupo) throws PrivacityException {
@@ -400,17 +421,39 @@ public class GrupoProcessService  {
 ////		}
 //	}
 
+	public void refreshOnline(Long idGrupo ) {
+		GrupoDTO r = new GrupoDTO();
+		r.setIdGrupo(idGrupo+"");
+		
+		try {
+			r.setMembersQuantityDTO(
+					
+					comps.webSocket().sender().getMembersOnline(r)
+			);
+			
+			if (r.getMembersQuantityDTO().getQuantityOnline() != 0) {
+				ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
+						ProtocoloComponentsEnum.GRUPO,
+				        ProtocoloActionsEnum.GRUPO_HOW_MANY_MEMBERS_ONLINE,
+				        r);
+				comps.webSocket().sender().senderToGrupo(p, idGrupo);
 
-	public void removeMe(Usuario usuarioLogged, Usuario usuarioSystem, Grupo grupo, UserForGrupo userForGrupo) throws Exception {
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void removeMe(Usuario usuarioToRemove, Usuario usuarioSystem, Grupo grupo, UserForGrupo userForGrupo) throws Exception {
 		//Grupo grupo = userForGrupo.getUserForGrupoId().getGrupo();
 		//removeMeAnonimo(usuarioLogged, grupo);
-		
+	
 		//mediaRepository.deleteAllMyMediaByGrupo(grupo, usuarioLogged);
 		//comps.repo().media().deleteAllMyMediasByGrupo(grupo.getIdGrupo(), usuarioLogged.getIdUser());
-		comps.repo().messageDetail().deleteLogicAllMyMessagesDetailByGrupo(grupo, usuarioLogged);
+		comps.repo().messageDetail().deleteLogicAllMyMessagesDetailByGrupo(grupo, usuarioToRemove);
 		//comps.repo().grupoUserConf().deleteById(new GrupoUserConfId(usuarioLogged,grupo));
 		
-		comps.repo().message().deleteLogicAllMyMessagesByGrupo(grupo, usuarioLogged);
+		comps.repo().message().deleteLogicAllMyMessagesByGrupo(grupo, usuarioToRemove);
 		
 		userForGrupo.setDeleted(true);
 		comps.repo().userForGrupo().save(userForGrupo);
@@ -427,18 +470,32 @@ public class GrupoProcessService  {
 		r.setGrupoDTO(grupoRemove);
 		
 		UsuarioDTO usuarioRemove = new UsuarioDTO();
-		usuarioRemove.setIdUsuario(usuarioLogged.getIdUser()+"");
+		usuarioRemove.setIdUsuario(usuarioToRemove.getIdUser()+"");
 		r.setUsuariosDTO(usuarioRemove);
 		
-		comps.util().grupo().senderToGrupoMinusCreator(ProtocoloComponentsEnum.GRUPO,
-				ProtocoloActionsEnum.GRUPO_REMOVE_USER,  grupo.getIdGrupo(), grupoRemove);
+//		comps.util().grupo().senderToGrupoMinusCreator(ProtocoloComponentsEnum.GRUPO,
+//				ProtocoloActionsEnum.GRUPO_REMOVE_USER,  grupo.getIdGrupo(), grupoRemove);
 	
 
 		//ACA DEBE INFORMAR A TODOS LOS SUSCRIPTORES EL INGRESO DEL NUEVO MIEMBRO
 	
 
-			MessageDTO mensaje = comps.webSocket().sender().buildSystemMessage(grupo, "USUARIO " + usuarioLogged.getNickname() + " HA DEJADO EL GRUPO " + grupo.getName());
+		if (usuarioToRemove.getIdUser() != comps.requestHelper().getUsuarioId()) {
+			MessageDTO mensaje = comps.webSocket().sender().buildSystemMessage(grupo, "USUARIO " + usuarioToRemove.getNickname() + " HA DEJADO EL GRUPO " + grupo.getName());
 			comps.process().message().sendNormal(comps.util().usuario().getUsuarioSystem().getIdUser(), comps.common().mapper().doit(mensaje, usuarioSystem,grupo), grupo.getIdGrupo());
+			
+			ProtocoloDTO p = comps.webSocket().sender().buildProtocoloDTO(
+					ProtocoloComponentsEnum.GRUPO,
+			        ProtocoloActionsEnum.GRUPO_REMOVE_ME,
+			        new IdGrupoDTO(grupo.getIdGrupo()+""));
+			comps.webSocket().sender().senderToUser(p, usuarioToRemove);
+			
+		}else {
+			MessageDTO mensaje = comps.webSocket().sender().buildSystemMessage(grupo, "USUARIO " + usuarioToRemove.getNickname() + " HA SIDO REMOVIDO DEL GRUPO " + grupo.getName());
+			comps.process().message().sendNormal(comps.util().usuario().getUsuarioSystem().getIdUser(), comps.common().mapper().doit(mensaje, usuarioSystem,grupo), grupo.getIdGrupo());
+			
+		}
+			refreshOnline(grupoRemove.convertIdGrupoToLong());
 
 	}
 
@@ -453,7 +510,7 @@ public class GrupoProcessService  {
 		Optional<GrupoUserConf> o = comps.repo().grupoUserConf().findById(new GrupoUserConfId(usuarioLogged, grupo));
 		
 		if ( o.isPresent() ) {
-			return comps.common().mapper().doit(o.get());
+			return comps.common().mapper().doitGrupoUserConf(o.get());
 		}
 		
 		GrupoUserConfDTO r = new GrupoUserConfDTO();
@@ -462,12 +519,11 @@ public class GrupoProcessService  {
 	}
 
 
-	public Object getGrupoUserConf(GrupoGralConf c) {
-		// TODO Auto-generated method stub
-		return null;
+
+	public void changeUserRole(GrupoChangeUserRoleDTO request) {
+		System.out.println(request.toString());
+		//comps.repo().grupo().save(grupo);
 	}
-
-
 	public void saveGrupoGeneralConfiguration(Grupo grupo) {
 		comps.repo().grupo().save(grupo);
 	}

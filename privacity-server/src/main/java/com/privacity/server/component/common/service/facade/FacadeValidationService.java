@@ -9,9 +9,13 @@ import com.privacity.server.component.grupo.GrupoValidationService;
 import com.privacity.server.component.message.MessageValidationService;
 import com.privacity.server.component.requestid.RequestIdValidationService;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 @Component
 @NoArgsConstructor
+@Accessors(fluent = true, chain = false)
+@Getter
 public class FacadeValidationService {
 	@Autowired @Lazy
 	private AuthValidationService auth;
@@ -25,20 +29,6 @@ public class FacadeValidationService {
 	@Autowired @Lazy
 	private MessageValidationService message;
 	
-	public MessageValidationService message() {
-		return message;
-	}
-	
-	public GrupoValidationService grupo() {
-		return grupo;
-	}
-	
-	public RequestIdValidationService requestId() {
-		return requestId;
-	}
-	
-	public AuthValidationService auth() {
-		return auth;
-	}
+
 
 }

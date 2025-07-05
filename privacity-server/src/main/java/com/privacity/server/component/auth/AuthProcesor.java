@@ -1,12 +1,18 @@
 package com.privacity.server.component.auth;
 
 import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.spec.X509EncodedKeySpec;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -17,26 +23,31 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.privacity.common.adapters.LocalDateAdapter;
+import com.privacity.common.dto.AESAllDTO;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.LoginDataDTO;
 import com.privacity.common.dto.response.LoginDTOResponse;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.commonback.common.enumeration.RolesSecurityAccessToServerEnum;
+import com.privacity.core.model.EncryptKeys;
+import com.privacity.core.model.MyAccountConf;
+import com.privacity.core.model.Role;
+import com.privacity.core.model.Usuario;
+import com.privacity.security.util.UserDetailsImpl;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.encrypt.PrivacityIdServices;
-import com.privacity.server.encrypt.RSA;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.MyAccountConf;
-import com.privacity.server.security.ERole;
+import com.privacity.server.component.encryptkeys.RSAComponent;
 import com.privacity.server.security.JwtUtils;
-import com.privacity.server.security.Role;
-import com.privacity.server.security.UserDetailsImpl;
-import com.privacity.server.security.Usuario;
-import com.privacity.server.security.UsuarioSessionInfo;
-import com.privacity.server.util.PrivacityLogguer;
+
+import lombok.extern.slf4j.Slf4j;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Service
 //@RequestMapping("/api/auth")
+@Slf4j
 public class AuthProcesor {
 
 	@Value("${serverconf.privacityIdAESOn}")
@@ -45,9 +56,7 @@ public class AuthProcesor {
 	@Autowired @Lazy
 	private AuthenticationManager authenticationManager;
 
-	
-	@Autowired @Lazy
-	private PrivacityLogguer privacityLogguer;
+
 	
 
 	@Autowired @Lazy
@@ -62,30 +71,48 @@ public class AuthProcesor {
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getUsuarioPassword().getPassword()));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwt = jwtUtils.generateJwtToken(authentication);
+		String jwt = jwtUtils.generateJwtToken(loginRequest.getUsername());
 		
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
-		List<String> roles = userDetails.getAuthorities().stream()
-				.map(item -> item.getAuthority())
-				.collect(Collectors.toList());
+		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+//		userDetails.setJwt(jwt);
+//		List<String> roles = userDetails.getAuthorities().stream()
+//				.map(item -> item.getAuthority())
+//				.collect(Collectors.toList());
 
 		//List<UsuarioSessionIdInfo> info = SocketSessionRegistry.getSessionIds(userDetails.getUsername());
 		
-		UsuarioSessionInfo info = comps.service().usuarioSessionInfo().get(loginRequest.getUsername(),true);
-		
-		Usuario usuarioDB = info.getUsuarioDB();
+	
+		Usuario usuarioDB = comps.util().usuario().getUsuarioForUsername(loginRequest.getUsername());
 		
 		 //
 		// Encriptar publica
 		
-		RSA t = comps.common().RSA();
+		RSAComponent t = comps.common().RSA();
+		
+//		{
+		EncryptKeys ek = usuarioDB.getEncryptKeys();
+		Security.addProvider(new BouncyCastleProvider());
+        KeyFactory kf = KeyFactory.getInstance("RSA","BC");
+
+        X509EncodedKeySpec spec2 = new X509EncodedKeySpec(
+                new Gson().fromJson(
+                		ek.getPublicKeyNoEncrypt()
+
+                        , byte[].class));
+          PublicKey publicKey = kf.generatePublic(spec2);
+//        ////System.out.println(publicKey.toString());
+//        
+//
+//	}
 		////System.out.println("Session AES Key = " + info.getSessionAES().getSecretKeyAES());
 		////System.out.println("Session AES Salt = " + info.getSessionAES().getSaltAES());
 		////System.out.println("Session AES iterator = " + info.getSessionAES().getIteration());
 		
-		byte[] aesEncriptadoKey = t.encryptFilePublic(info.getSessionAES().getSecretKeyAES().getBytes(StandardCharsets.UTF_8), info.getPublicKey());
-		byte[] aesEncriptadoSalt = t.encryptFilePublic(info.getSessionAES().getSaltAES().getBytes(StandardCharsets.UTF_8), info.getPublicKey());		
-		byte[] aesEncriptadoIterator = t.encryptFilePublic((info.getSessionAES().getIteration()+"").getBytes(StandardCharsets.UTF_8), info.getPublicKey());
+		AESAllDTO aesAll = comps.service().usuarioSessionInfo().getAesDtoAll(loginRequest.getUsername());
+		
+		byte[] aesEncriptadoKey = t.encryptFilePublic(aesAll.getSessionAESDTOServerIn().getSecretKeyAES().getBytes(StandardCharsets.UTF_8), publicKey);
+		byte[] aesEncriptadoSalt = t.encryptFilePublic(aesAll.getSessionAESDTOServerIn().getSaltAES().getBytes(StandardCharsets.UTF_8), publicKey);
+		byte[] aesEncriptadoIterator = t.encryptFilePublic((aesAll.getSessionAESDTOServerIn().getIteration()+"").getBytes(StandardCharsets.UTF_8), publicKey);
 		
 		AESDTO aesEncrypt = new AESDTO(); 
 		aesEncrypt.setSecretKeyAES(Base64.getEncoder().withoutPadding().encodeToString(aesEncriptadoKey));
@@ -99,27 +126,36 @@ public class AuthProcesor {
 
 		//String userIdEnc = privacityIdServices.getAES(usuarioDB.getIdUser().toString());
 		
+		Gson gson = new GsonBuilder()
+				.setPrettyPrinting()
+				.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
+				.create();
 		
 		LoginDataDTO data = new LoginDataDTO();
-		data.setToken(jwt);
+		
 		data.setId(usuarioDB.getIdUser().toString());
+		data= gson.fromJson( comps.service().usuarioSessionInfo().privacityIdServiceEncrypt(usuarioDB.getUsername()
+				, data
+				,data.getClass().getName()),LoginDataDTO.class);
+		
+		data.setToken(jwt);
 		data.setNickname(usuarioDB.getNickname());
 		data.setInvitationCode(usuarioDB.getUserInvitationCode().getInvitationCode());
-		data.setPublicKey(usuarioDB.getEncryptKeys().getPublicKey());
+
 		data.setMyAccountGralConfDTO(comps.common().mapper().doit(comps.repo().user().findById(usuarioDB.getIdUser()).get().getMyAccountConf()));
-		data.setSessionAESDTOWS(info.getSessionAESToUseWS().getAESDTO());
-		data.setSessionAESDTOServerEncrypt(info.getSessionAESToUseServerEncrypt().getAESDTO());
-		privacityLogguer.write(data);
+		data.setSessionAESDTOWS(aesAll.getSessionAESDTOWS());
+		data.setSessionAESDTOServerEncrypt(aesAll.getSessionAESDTOServerOut());
 
-		info.getPrivacityIdServices().encryptIds(data);
 
-			privacityLogguer.write(data);
+		data.setPublicKey(usuarioDB.getEncryptKeys().getPublicKey());
+
 	
 //		
 		
 		
 		response.setLoginDataDTO(data);
 		
+		log.trace("LoginDTOResponse salida-> " + comps.util().string().gsonToSend(response));
 		return response;
 	}
 
@@ -130,7 +166,7 @@ public class AuthProcesor {
 		return false;
 	}
 	
-	public void registerUser(Usuario usuario) throws ValidationException {
+	public void registerUser(Usuario usuario, RolesSecurityAccessToServerEnum erole) throws PrivacityException {
 		
 
 		// Create new user's account
@@ -140,17 +176,21 @@ public class AuthProcesor {
 		user.setNickname(usuario.getNickname());
 		Set<Role> roles = new HashSet<>();
 
-		Role userRole = comps.repo().role().findByName(ERole.ROLE_USER).get();
+		Role userRole = comps.repo().role().findByName(erole).get();
 		roles.add(userRole);
 		user.setRoles(roles);
 		usuario.getUserInvitationCode().setUsuario(user);
 		user.setEncryptKeys(usuario.getEncryptKeys());
-		user.setUserInvitationCode(usuario.getUserInvitationCode());
+		user.getEncryptKeys().setIdEncryptKeys(comps.factory().idsGenerator().getNextEncryptKeysId());
 		
+		comps.repo().encryptKeys().save(user.getEncryptKeys());
+		
+		user.setUserInvitationCode(usuario.getUserInvitationCode());
+		user.getUserInvitationCode().getEncryptKeys().setIdEncryptKeys(comps.factory().idsGenerator().getNextEncryptKeysId());
 		user.setMyAccountConf(new MyAccountConf(user));
 		comps.util().myAccountConf().getDefaultConf(user);
-
 		
+		user.setIdUser(comps.factory().idsGenerator().getNextUsuarioId());
 		comps.repo().user().save(user);
 
 	

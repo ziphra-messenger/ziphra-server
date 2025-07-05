@@ -1,6 +1,7 @@
 package com.privacity.server.component.requestid;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +11,10 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
+import com.privacity.common.exceptions.PrivacityException;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.security.Usuario;
-
-import lombok.AllArgsConstructor;
 
 @Service
 public class RequestIdUtilService {
@@ -26,10 +26,10 @@ public class RequestIdUtilService {
 	private int expiredSeconds;
 	
 	
-	public boolean existsRequestId(RequestIdDTO requestId, boolean isPrivate) throws ValidationException {
+	public boolean existsRequestId(RequestIdDTO requestId, boolean isPrivate) throws PrivacityException {
 		Usuario usuarioLogged = null;
 		if (isPrivate) {
-			usuarioLogged = comps.util().usuario().getUsuarioLoggedValidate();
+			usuarioLogged = comps.requestHelper().getUsuarioLogged();
 		}
 		
 		
@@ -40,7 +40,7 @@ public class RequestIdUtilService {
 		// AUNQUE NO ES NECESARIO
 		RequestIdDTO r =null;
 		if (!isPrivate) {
-			r = comps.service().requestIdPublic().getRequestIdsPublic().get(requestId.getRequestIdClientSide());
+			r = comps.service().requestIdPublic().get(requestId.getRequestIdClientSide());
 		}
 		
 			
@@ -51,7 +51,8 @@ public class RequestIdUtilService {
 			
 			if (isPrivate) {
 				requestId.setDate(LocalDateTime.now());
-				ConcurrentMap<String, RequestIdDTO> map = comps.service().usuarioSessionInfo().get(usuarioLogged.getUsername()).getRequestIds();
+				Map map = comps.service().usuarioSessionInfo().getRequestIds(usuarioLogged.getUsername());
+
 				
 				if ( map.containsKey(requestId.getRequestIdClientSide())){
 					throw new ValidationException(ExceptionReturnCode.REQUEST_ID_CANT_BE_USED_MULTI_TIMES);	
@@ -64,14 +65,13 @@ public class RequestIdUtilService {
 					throw new ValidationException(ExceptionReturnCode.REQUEST_ID_EXPIRED);
 				}
 				
-				if ( r != null ) {
-				}else {
+				if ( r == null ) {
 					throw new ValidationException(ExceptionReturnCode.REQUEST_ID_NOT_EXISTS);
 				}
 			
 				if (requestId.getRequestIdServerSide().equals(r.getRequestIdServerSide())) {
 			
-						comps.service().requestIdPublic().getRequestIdsPublic().remove(requestId.getRequestIdClientSide());
+						comps.service().requestIdPublic().remove(requestId.getRequestIdClientSide());
 			
 				}else {
 					throw new ValidationException(ExceptionReturnCode.REQUEST_ID_NOT_EXISTS);

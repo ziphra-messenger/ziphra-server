@@ -5,28 +5,36 @@ import org.springframework.stereotype.Service;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.EncryptKeysDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
-import com.privacity.server.exceptions.ValidationException;
+import com.privacity.common.exceptions.ValidationException;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class EncryptKeysValidation {
 
 	public void encryptKeysDTO(EncryptKeysDTO e) throws ValidationException {
 		if (e == null) {
-			throw new ValidationException(ExceptionReturnCode.ENCRYPT_IS_NULL);			
+			log.error(ExceptionReturnCode.ENCRYPT_IS_NULL.getToShow());
+			throw new ValidationException(ExceptionReturnCode.ENCRYPT_IS_NULL);
+			
 		}
 		
 		if (e.getPrivateKey() ==null || e.getPrivateKey().trim().length() == 0) {
+			log.error(ExceptionReturnCode.ENCRYPT_PRIVATE_KEY_IS_NULL.getToShow());
 			throw new ValidationException(ExceptionReturnCode.ENCRYPT_PRIVATE_KEY_IS_NULL);
+			
 		}
 		
 		if (e.getPublicKey() ==null|| e.getPublicKey().trim().length() == 0) {
+			log.error(ExceptionReturnCode.ENCRYPT_PUBLIC_KEY_IS_NULL.getToShow());
 			throw new ValidationException(ExceptionReturnCode.ENCRYPT_PUBLIC_KEY_IS_NULL);
 		}
 		
 		if (e.getPublicKeyNoEncrypt() ==null || e.getPublicKeyNoEncrypt().trim().length() == 0) {
+			log.error(ExceptionReturnCode.ENCRYPT_PUBLIC_KEY_NO_ENCRIPT_IS_NULL.getToShow());
 			throw new ValidationException(ExceptionReturnCode.ENCRYPT_PUBLIC_KEY_NO_ENCRIPT_IS_NULL);
 		}
 	}
@@ -37,14 +45,17 @@ public class EncryptKeysValidation {
 		}
 		
 		if (e.getPrivateKey() ==null || e.getPrivateKey().trim().length() == 0) {
+			log.error(ExceptionReturnCode.ENCRYPT_PRIVATE_KEY_IS_NULL.toShow());
 			throw new ValidationException(ExceptionReturnCode.ENCRYPT_PRIVATE_KEY_IS_NULL);
 		}
 		
 		if (e.getPublicKey() !=null) {
-			throw new ValidationException(ExceptionReturnCode.ENCRYPT_PUBLIC_KEY_MUST_BE_NULL);
+			log.error(ExceptionReturnCode.ENCRYPT_PUBLIC_KEY_INVITATION_MUST_BE_NULL.toShow());
+			throw new ValidationException(ExceptionReturnCode.ENCRYPT_PUBLIC_KEY_INVITATION_MUST_BE_NULL);
 		}
 		
 		if (e.getPublicKeyNoEncrypt() ==null || e.getPublicKeyNoEncrypt().trim().length() == 0) {
+			log.error(ExceptionReturnCode.ENCRYPT_PUBLIC_KEY_NO_ENCRIPT_IS_NULL.toShow());
 			throw new ValidationException(ExceptionReturnCode.ENCRYPT_PUBLIC_KEY_NO_ENCRIPT_IS_NULL);
 		}
 	}

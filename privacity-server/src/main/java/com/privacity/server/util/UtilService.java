@@ -7,17 +7,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.privacity.common.adapters.LocalDateAdapter;
 import com.privacity.common.enumeration.RandomGeneratorType;
 import com.privacity.common.util.RandomGenerator;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.security.Usuario;
 
 @Service
 public class UtilService {
@@ -36,25 +33,9 @@ public class UtilService {
 	                .create();
 	}
 	
-	public Object clon(Class clazz, Object o ) {
-		
-	       
-        String j = gson.toJson(o);
-        
-        Object fromJson = gson.fromJson(j, clazz);
-		return fromJson;
-		
-	}
 
-	public Usuario getUser() {
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-		Usuario u = comps.repo().user().findByUsername(userDetail.getUsername()).get();
-		return u;
-	}    
+
+
  
 	public String mix(String s,boolean mixIterationRandom, int mixIteration, int minIRamdomterationm , int maxIRamdomteration ) {
 		

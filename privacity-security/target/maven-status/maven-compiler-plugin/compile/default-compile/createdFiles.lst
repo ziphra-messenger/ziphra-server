@@ -1,0 +1,10 @@
+com\privacity\security\util\AuthEntryPointJwt.class
+com\privacity\security\util\SignupRequest.class
+com\privacity\security\util\CustomAccessDeniedHandler.class
+com\privacity\security\util\CustomAuthenticationFailureHandler.class
+com\privacity\security\util\SocketSessionRegistry.class
+com\privacity\security\util\AuthTokenFilter.class
+com\privacity\security\util\UserDetailsImpl.class
+com\privacity\security\util\UserDetailsServiceImpl.class
+com\privacity\security\util\ServerConfigurationValues.class
+com\privacity\security\util\WebSecurityConfigAbstract.class

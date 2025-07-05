@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.encrypt.RSA;
 
 import lombok.extern.java.Log;
 
@@ -29,7 +27,7 @@ import lombok.extern.java.Log;
 @Log
 public class PrivacityRSAValidation {
 	
-	private final RSA rsa;
+	private final RSAComponent rsa;
 	private PublicKey publicKey;
 	private PrivateKey privateKey;
 

@@ -1,24 +1,15 @@
 package com.privacity.server.main;
 
-import java.time.LocalDateTime;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.GsonBuilder;
-import com.privacity.common.dto.GrupoDTO;
-import com.privacity.server.component.grupo.Grupo2Repository;
-import com.privacity.server.component.grupo.GrupobaseRepository;
-import com.privacity.server.model.Grupo2;
-import com.privacity.server.model.Grupobase;
-import com.privacity.server.security.ERole;
-import com.privacity.server.security.Role;
-import com.privacity.server.security.RoleRepository;
-import com.privacity.server.security.Usuario;
-import com.privacity.server.security.UsuarioRepository;
-import com.privacity.server.util.LocalDateAdapter;
+import com.privacity.commonback.common.enumeration.RolesSecurityAccessToServerEnum;
+import com.privacity.core.model.Role;
+import com.privacity.core.model.Usuario;
+import com.privacity.core.repository.RoleRepository;
+import com.privacity.core.repository.UsuarioRepository;
 import com.privacity.server.util.MapperService;
 
 
@@ -44,12 +35,12 @@ public class LoadDataController {
 		try {
 			Role role = new Role();
 			role.setId(1);
-			role.setName(ERole.ROLE_ADMIN);
+			role.setName(RolesSecurityAccessToServerEnum.ROLE_ADMIN);
 			roleRepository.save(role);
 
 			Role role2 = new Role();
 			role2.setId(2);
-			role2.setName(ERole.ROLE_USER);
+			role2.setName(RolesSecurityAccessToServerEnum.ROLE_USER);
 
 			roleRepository.save(role2);
 			
@@ -57,7 +48,14 @@ public class LoadDataController {
 			u.setIdUser(1L);
 			u.setNickname("INFO");
 			u.setUsername("SYSTEM");
-			usuarioRepository.save(u);
+	usuarioRepository.save(u);
+	
+	Usuario u2 = new Usuario();
+	u2.setIdUser(2L);
+	u2.setNickname("Anonimo");
+	u2.setUsername("Anonimo");
+usuarioRepository.save(u2);
+
 		} catch (Exception e) {
 
 		}
@@ -106,13 +104,5 @@ public class LoadDataController {
 ////		
 
 	}
-	static public GrupoDTO doit(Grupo2 grupo) {
-		
-		GrupoDTO g = new GrupoDTO();
-		g.setIdGrupo(grupo.getIdGrupo().toString());
-		g.setName(grupo.getName() + "");
-		g.setAlias(grupo.isDeleted() + "");
-		return g;
-	
-}
+
 }

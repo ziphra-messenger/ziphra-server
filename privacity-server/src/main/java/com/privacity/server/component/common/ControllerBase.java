@@ -1,76 +1,35 @@
 package com.privacity.server.component.common;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.privacity.common.RolesAllowed;
 import com.privacity.common.dto.MessageDTO;
 import com.privacity.common.dto.ProtocoloDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.ProtocoloActionsEnum;
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;
-import com.privacity.common.interfaces.GrupoRoleInterface;
-import com.privacity.common.interfaces.UserForGrupoRoleInterface;
-import com.privacity.common.interfaces.UsuarioRoleInterface;
-import com.privacity.server.common.enumeration.Urls;
-import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.component.model.request.GrupoIdLocalDTO;
-import com.privacity.server.component.requestid.RequestIdUtilService;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.security.Usuario;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.common.interfaces.IdGrupoInterface;
+import com.privacity.commonback.common.enumeration.ServerUrls;
 import com.privacity.server.services.protocolomap.ProtocoloValue;
-import com.privacity.server.util.LocalDateAdapter;
 
-public abstract class ControllerBase {
+import lombok.extern.slf4j.Slf4j;
 
-	private Map<ProtocoloActionsEnum,Method> mapaMetodos = new HashMap<ProtocoloActionsEnum,Method>();
-	private Map<ProtocoloComponentsEnum,Object> mapaController = new HashMap<ProtocoloComponentsEnum,Object>();
-
-	@Autowired
-	@Lazy
-	private RequestIdUtilService requestIdUtil;
-
-	@Autowired
-	@Lazy
-	private FacadeComponent comps;
-
-
-
-	protected Map<ProtocoloComponentsEnum, Object> getMapaController() {
-		return mapaController;
-	}
+@Slf4j
+public abstract class ControllerBase extends ControllerBaseUtil {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected Object getDTOObject(ProtocoloDTO request, String objectDTO, Class clazz) {
-
-		Gson gson = new GsonBuilder()
-				.setPrettyPrinting()
-				.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
-				.create();
-
-		if (showLog(request)) System.out.println("getDTOObject Base :" + objectDTO + "clazz:" + clazz.getName());
-
-		return gson.fromJson(objectDTO, clazz);
+	protected Object getDTOObject(ProtocoloDTO request, String objectDTO, Class clazz) throws IOException {
+		log.debug("getDTOObject Base :" +comps.util().string().cutString ( objectDTO) + "clazz:" + clazz.getName());
+		return comps.util().gson().fromJson(objectDTO, clazz);
 	}
 
 
-	public ProtocoloDTO in(@RequestBody ProtocoloDTO request) throws Exception {
+	public ProtocoloDTO in(@RequestBody ProtocoloDTO request)  {
 
-		if (showLog(request)) System.out.println("<<" + request.toString());
+		log.debug(">> " + request.toString());
+
 		
-		ProtocoloValue value = comps.service().protocoloMap().get(getUrl(),  request.getComponent(),  request.getAction());
 		ProtocoloDTO p = new ProtocoloDTO();
 
 		// tomo el dto a ejecutar
@@ -79,85 +38,38 @@ public abstract class ControllerBase {
 
 
 		try {
+			ProtocoloValue value = comps.service().protocoloMap().get(getUrl(),  request.getComponent(),  request.getAction());
+			
 			if (value == null) {
 				throw new ValidationException(ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL);
 			}
 			if ( this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.REQUEST_ID_PRIVATE_GET)) {
-				requestIdUtil.existsRequestId(request.getRequestIdDTO(), true) ;
+				comps.util().requestId().existsRequestId(request.getRequestIdDTO(), true) ;
 			}else if ( !this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.REQUEST_ID_PUBLIC_GET)) {
-				requestIdUtil.existsRequestId(request.getRequestIdDTO(),false) ;
+				comps.util().requestId().existsRequestId(request.getRequestIdDTO(),false) ;
 			}
 
-			if (showLog(request)) System.out.println("Action Base = " + request.getAction());
-			if (showLog(request)) System.out.println("Component Base = " + request.getComponent());
-			//			if (showLog()) System.out.println("MapaMetodos = " + getMapaMetodos());
-			//			if (showLog()) System.out.println("MapaController = " + getMapaController());
+			log.debug("URL Base = " + request.getComponent());
+			log.debug("COMPONENT Base = " + request.getComponent());
+			log.debug("ACTION Base = " + request.getAction());
 
 			if (   value.getParametersType() == null) {
 
+				log.debug("Invoke 1 sin parametros = " + value.getMethod().getName() + " " + value.getClazz().toString());
 				objetoRetorno = value.getMethod().invoke(value.getClazz());
 			}else {
 				dtoObject =  getDTOObject(request, request.getObjectDTO(), value.getParametersType());
 
-				if ( this.isSecure() ) {
-					comps.service().usuarioSessionInfo().get().getPrivacityIdServices().decryptIds(dtoObject);
 
-				}
-				if (dtoObject instanceof UsuarioRoleInterface) {
-					((UsuarioRoleInterface) dtoObject).setUsuarioLoggued(comps.util().usuario().getUsuarioLoggedValidate());
-				}
+				log.debug("Invoke 1 parametro = " + value.getMethod().getName() + " " + value.getClazz().toString());
 
-				if (dtoObject instanceof GrupoRoleInterface) {
+				log.debug("Invoke 2 parameter = " + ((dtoObject==null) ? "null" : comps.util().string().cutString(dtoObject.toString())));
 
-					Optional<Grupo> grupoO = comps.repo().grupo().findById(
-
-							comps.util().grupo().convertIdGrupoStringToLong(((GrupoRoleInterface) dtoObject).getIdGrupo()));
-
-					if (grupoO.isPresent()) {
-
-
-						((GrupoRoleInterface) dtoObject).setGrupo(grupoO.get()
-
-								);	}
-				}
-
-				if (dtoObject instanceof UserForGrupoRoleInterface) {
-					((UserForGrupoRoleInterface) dtoObject).setUserForGrupo(
-							comps.repo().userForGrupo().findByIdPrimitive(
-									comps.util().grupo().convertIdGrupoStringToLong(((GrupoRoleInterface) dtoObject).getIdGrupo())
-									,
-									((UsuarioRoleInterface) dtoObject).getUsuarioLoggued().getIdUser()));
-
-
-				}
-				Annotation[] ann =value.getAnnotations();
-				for (int i=0; i < ann.length ; i++) {
-					if (ann[i] instanceof RolesAllowed) {
-						invokeUnderTrace(dtoObject, ann[i]);
-						break;
-					}
-				}
-
-				System.out.println("dtoObject deserializado = " + dtoObject.toString());
-				if (showLog(request)) {
-					if ( dtoObject instanceof GrupoIdLocalDTO[]) {
-						for (int i = 0 ; i < ((GrupoIdLocalDTO[]) dtoObject).length ; i ++) {
-							System.out.println("dtoObject array deserializado = " +  ((GrupoIdLocalDTO[]) dtoObject)[i].toString());
-						}
-					}
-
+				if (dtoObject!= null && dtoObject instanceof IdGrupoInterface) {
+					comps.requestHelper().setGrupoInUse((IdGrupoInterface)dtoObject);
 				}
 				objetoRetorno =value.getMethod().invoke(value.getClazz(),  dtoObject);
 			}
-
-
-
-			//				if(getEncryptIds()) {
-			//					if ( mapaMetodos.get(request.getAction()).getParameterTypes().length != 0) {
-			//						 getPrivacityIdServices().transformarDesencriptarOut(dtoObject);
-			//					}
-			//				}
-
 
 
 
@@ -181,146 +93,46 @@ public abstract class ControllerBase {
 		} 
 
 
-		if ( this.isSecure()){
-
-			comps.service().usuarioSessionInfo().get().getPrivacityIdServices().encryptIds(objetoRetorno);
-		}
-		//	if(getEncryptIds()) {
-		//		objetoRetorno = getPrivacityIdServices().transformarDesencriptarOut(getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject));
-		//	}else {
-		//		objetoRetorno = getMapaMetodos().get(request.getAction()).invoke(getMapaController().get(request.getComponent()), dtoObject);
-		//	}	
-		// armo la devolucion
-
-
-
+		//		if ( this.isSecure()){
+		//
+		//			objetoRetorno= comps.service().usuarioSessionInfo().privacityIdServiceEncrypt2(
+		//					comps.requestHelper().getUsuarioUsername()
+		//					, objetoRetorno
+		//					,value.getReturnType().getName());
+		//		}
 
 		p.setComponent(request.getComponent());
 		p.setAction(request.getAction());
 
 		if (objetoRetorno instanceof MessageDTO ) {
-			p.setMessageDTO((MessageDTO)objetoRetorno);
+			p.setMessage((MessageDTO)objetoRetorno);
 		}else {
-
-			Gson gson = new GsonBuilder()
-					.setPrettyPrinting()
-					.registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
-					.create();
 
 			String retornoJson=null;
 			if (objetoRetorno != null) {
-				retornoJson = gson.toJson(objetoRetorno);	
+				//				if ( !this.isSecure()){
+				//				retornoJson = UtilsString.gsonToSend(objetoRetorno);
+				//				}else {
+				retornoJson=comps.util().gson().toJson(objetoRetorno);
+				//}
+
 			}
 
-			//if (showLog()) System.out.println("OBJETO RETORNO Base >>" + retornoJson);
-
-
-			if (showLog(request)) System.out.println("ProtocoloDTO Retorno Base prettyJsonString >> " + retornoJson);
+			log.debug("ProtocoloDTO Retorno >> " + comps.util().string().cutString(retornoJson));
 
 			p.setObjectDTO(retornoJson);	
 		}
 
 		p.setAsyncId(request.getAsyncId());
-		//if (showLog()) System.out.println(">>" + p.toString());
 		return p;
 
 	}	
 
-	public abstract boolean getEncryptIds();
 	public abstract boolean isSecure();
-
-
-
-
-	public static void main(String...strings ) {
-
-		//String a = new Gson().toJson("wCddwFHXqIgLzTB/6ntQLlfIKO3t92onltnujNtNads=");
-
-		Gson gson = new GsonBuilder()
-				.setLenient()
-				.create();
-		String b =gson.fromJson("wCddwFHXqIgLzTB/6ntQLlfIKO3t92onltnujNtNads=", String.class);
-		////System.out.println(b);
-	}
 
 	public abstract boolean isRequestId();
 
+	public abstract ServerUrls getUrl();
+	
 
-	protected boolean showLog(ProtocoloDTO request) {
-		return true;
-	}	
-
-	protected void invokeUnderTrace(Object o, Annotation ann2) 
-			throws ValidationException {
-		System.out.println("----->AppConfigurationMethodRolValidationInterceptor");
-
-		System.out.println("-----> " + o.toString());
-
-		//        Gson gson = new GsonBuilder()
-		//                .setPrettyPrinting()
-		//                .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
-		//                .create();
-		//        String retornoJson = gson.toJson(o);
-		//        System.out.println("-----> " +retornoJson);
-
-
-
-		RolesAllowed ann = (( RolesAllowed)ann2);
-
-
-
-		Grupo g=null;
-		Usuario u = null;
-		UserForGrupo ufg = null;
-
-
-		if (o instanceof GrupoRoleInterface) {
-			g = ((GrupoRoleInterface)o).getGrupo();
-
-			if ( g == null ) {
-				throw new ValidationException(ExceptionReturnCode.GRUPO_NOT_EXISTS);	
-			}
-
-
-		}
-		if (o instanceof UsuarioRoleInterface) {
-			u = ((UsuarioRoleInterface)o).getUsuarioLoggued();
-
-
-		}
-
-		if (o instanceof UserForGrupoRoleInterface) {
-			ufg = ((UserForGrupoRoleInterface)o).getUserForGrupo();
-
-			if ( ufg == null ) {
-				throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO);	
-			}
-
-		}
-
-
-
-
-
-		boolean isOk= false;
-
-		for (int i=0; i < ann.value().length ; i++) {
-			if (ann.value()[i].equals(ufg.getRole())){
-				isOk=true;
-				break;
-			}
-		}
-		if (!isOk) {
-			throw new ValidationException(ExceptionReturnCode.GRUPO_ROLE_NOT_ALLOW_THIS_ACTION );
-		}
-
-
-
-
-
-
-
-
-	}
-	public abstract Urls getUrl();
 }

@@ -1,7 +1,6 @@
 package com.privacity.server.component.userforgrupo;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -9,17 +8,18 @@ import org.springframework.stereotype.Service;
 
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.UserForGrupo;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.model.UserForGrupoId;
-import com.privacity.server.security.Usuario;
 
 import lombok.NoArgsConstructor;
+import lombok.extern.java.Log;
 
 @Service
 @NoArgsConstructor
+@Log
 public class UserForGrupoUtil {
 
 	
@@ -31,6 +31,7 @@ public class UserForGrupoUtil {
 		UserForGrupo ufgO = comps.repo().userForGrupo().findByIdPrimitive(idGrupo, u.getIdUser());
 		
 		if ( ufgO == null ) {
+			log.severe(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO.name() + " usuario: " + u.getIdUser() + " grupo: " + idGrupo);
 			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO);	
 		}
 		
@@ -42,6 +43,7 @@ public class UserForGrupoUtil {
 		UserForGrupo ufgO = comps.repo().userForGrupo().findByIdPrimitive(idGrupo, u.getIdUser());
 		
 		if ( ufgO == null ) {
+			log.severe(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO.name() + " usuario: " + u.getIdUser() + " grupo: " + idGrupo);
 			throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO);	
 		}
 		
@@ -53,12 +55,15 @@ public class UserForGrupoUtil {
 		for (UserForGrupo ufg : usersForGrupo) {
 			if (ufg.getUserForGrupoId().getUser().getUsername().equals(u)) {
 				
-				if (ufg.getRole().equals(GrupoRolesEnum.READONLY)) return null;
+				if (ufg.getRole().equals(GrupoRolesEnum.READONLY)) {
+					log.severe(GrupoRolesEnum.READONLY.name() + " usuario: " + ufg.getUserForGrupoId().getUser().getIdUser() + " grupo: " + g.getIdGrupo());
+					return null;
+				}
 				
 				return ufg.getUserForGrupoId().getUser();
 			}
 		}
-
+		log.severe(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO.name() + " usuario: " + u + " grupo: " + g.getIdGrupo());
 		throw new ValidationException(ExceptionReturnCode.GRUPO_USER_IS_NOT_IN_THE_GRUPO);
 		
 

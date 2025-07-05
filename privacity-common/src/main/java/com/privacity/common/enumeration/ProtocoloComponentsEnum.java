@@ -6,7 +6,7 @@ public enum ProtocoloComponentsEnum {
 
 	PRIVACITY_RSA("PRIVACITY_RSA"),
 
-	
+	SERVER_INFO("SERVER_INFO"),
 	
 	SERVER_CONF_UNSECURE("SERVER_CONF_UNSECURE"),
 

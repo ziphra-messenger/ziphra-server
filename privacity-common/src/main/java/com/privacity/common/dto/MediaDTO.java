@@ -1,15 +1,23 @@
 package com.privacity.common.dto;
 
-import java.util.Arrays;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.privacity.common.annotations.PrivacityId;
+import com.privacity.common.annotations.PrivacityIdExclude;
 import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.enumeration.MediaTypeEnum;
+import com.privacity.common.interfaces.IdGrupoInterface;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 @Data
-public class MediaDTO {
+@JsonInclude(JsonInclude.Include.CUSTOM)
+public class MediaDTO implements IdGrupoInterface{
 
 //	@Id
 //	@OneToOne
@@ -18,30 +26,23 @@ public class MediaDTO {
 //	
 	@PrivacityId
 	@PrivacityIdOrder
-	public String idGrupo;
+	private String idGrupo;
 
 	@PrivacityIdOrder
-	public String idMessage;
-	private boolean downloadable;
-    public byte data[];
-    
-    public byte miniatura[];
-    
-	public MediaTypeEnum mediaType;
 
+	private String idMessage;
+	@PrivacityIdExclude	
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	private boolean downloadable;
+	@PrivacityIdExclude	
+	private MediaTypeEnum mediaType;
+	@PrivacityIdExclude	
+	private byte miniatura[];
+	@PrivacityIdExclude	
+	private byte data[];
 	@Override
 	public String toString() {
 		return "MediaDTO [idGrupo=" + idGrupo + ", idMessage=" + idMessage + ", downloadable=" + downloadable
-				+ ", data=" + 
-				
-				 
-				
-				", miniatura=" + Arrays.toString(miniatura) + ", mediaType="
-				+ mediaType + "]";
+				+ ", mediaType=" + mediaType + "]";
 	}
-	
-
-
-
-    
 }

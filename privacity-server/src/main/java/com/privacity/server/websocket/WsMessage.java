@@ -1,7 +1,5 @@
 package com.privacity.server.websocket;
 
-import com.privacity.common.dto.ProtocoloDTO;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class WsMessage {
 
 	private String username;
-	private ProtocoloDTO protocolo;
+	private String protocolo;
 
 }

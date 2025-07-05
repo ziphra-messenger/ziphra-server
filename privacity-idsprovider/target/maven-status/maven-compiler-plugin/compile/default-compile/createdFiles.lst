@@ -1,0 +1,3 @@
+com\privacity\idsprovider\controller\GeneratorController.class
+com\privacity\idsprovider\components\HealthCheckerPingAction.class
+com\privacity\PrivacityIdsProviderApplication.class

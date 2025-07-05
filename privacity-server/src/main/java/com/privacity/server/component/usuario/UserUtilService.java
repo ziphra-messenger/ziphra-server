@@ -4,20 +4,18 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.privacity.common.dto.UsuarioDTO;
 import com.privacity.common.enumeration.ExceptionReturnCode;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.exceptions.ProcessException;
+import com.privacity.common.exceptions.ValidationException;
+import com.privacity.core.model.Grupo;
+import com.privacity.core.model.UserForGrupo;
+import com.privacity.core.model.UserForGrupoId;
+import com.privacity.core.model.Usuario;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.exceptions.ProcessException;
-import com.privacity.server.exceptions.ValidationException;
-import com.privacity.server.model.Grupo;
-import com.privacity.server.model.UserForGrupo;
-import com.privacity.server.model.UserForGrupoId;
-import com.privacity.server.security.Usuario;
 
 @Service
 public class UserUtilService {
@@ -25,46 +23,31 @@ public class UserUtilService {
 	@Autowired @Lazy
 	private FacadeComponent comps;
 
+	
 
+	private Usuario usuarioSystem;
 
-
-	public UserUtilService() {
+	private Usuario usuarioAnonimo;
+	
+	public UserUtilService() throws Exception {
 		super();
 
 	}
 
-	private Usuario getUsuarioLogged() {
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-		Usuario u = comps.repo().user().findByUsername(userDetail.getUsername()).get();
-		return u;
-	}    
+ 
 	
-	public String getUsernameLogged() {
-		Authentication auth = SecurityContextHolder
-	            .getContext()
-	            .getAuthentication();
-	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
-	    
-	    return userDetail.getUsername();
-	    
-	}
-	public Usuario getUsuarioLoggedValidate() throws ValidationException {
-	    
-		Usuario u = getUsuarioLogged();
-		
-		if ( u.getIdUser() == null) {
-			ValidationException e = new ValidationException(ExceptionReturnCode.USER_USER_NOT_LOGGER);
-			
-			throw e; 
-		}
-		return u;
-	} 
+//	public String getUsernameLogged() {
+//		Authentication auth = SecurityContextHolder
+//	            .getContext()
+//	            .getAuthentication();
+//	    UserDetails userDetail = (UserDetails) auth.getPrincipal();
+//	    
+//	    return userDetail.getUsername();
+//	    
+//	}
+
 	
-	public Usuario getUsuarioSystem() throws ProcessException {
+	private Usuario getUsuarioSystemPrivate () throws ProcessException {
 		Optional<Usuario> uSystemO = comps.repo().user().findByUsername("SYSTEM");
 		
 		if ( uSystemO == null || uSystemO.get() == null) {
@@ -72,6 +55,41 @@ public class UserUtilService {
 		}
 		return uSystemO.get();
 	}
+	
+	private Usuario getUsuarioAnonimoPrivate () throws ProcessException {
+		Optional<Usuario> uAnonimoO = comps.repo().user().findByUsername("Anonimo");
+		
+		if ( uAnonimoO == null || uAnonimoO.get() == null) {
+			throw new ProcessException(ExceptionReturnCode.USER_USER_SYSTEM_NOT_EXISTS); 
+		}
+		return uAnonimoO.get();
+	}
+	public Usuario getUsuarioSystem() throws ProcessException {
+		
+		if (usuarioSystem == null) {
+			usuarioSystem=getUsuarioSystemPrivate();
+		}
+		return usuarioSystem;
+	}
+
+	public Usuario getUsuarioAnonimo() throws ProcessException {
+		
+		if (usuarioAnonimo == null) {
+			usuarioAnonimo=getUsuarioAnonimoPrivate();
+		}
+		return usuarioAnonimo;
+	}
+	
+	public UsuarioDTO getUsuarioSystemDTO() throws ProcessException {
+		
+
+		return comps.common().mapper().doitForGrupo(getUsuarioSystemPrivate ());
+	
+	
+	}
+
+
+	
 	public Usuario getUsuarioById(String idUsuario) throws ValidationException {
 		return getUsuarioById(Long.parseLong(idUsuario));
 	}

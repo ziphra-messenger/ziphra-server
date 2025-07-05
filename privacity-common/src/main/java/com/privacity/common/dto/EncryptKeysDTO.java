@@ -1,18 +1,25 @@
 package com.privacity.common.dto;
 
-import lombok.Data;
+import com.privacity.common.annotations.PrivacityIdExclude;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@PrivacityIdExclude	
+@AllArgsConstructor
+@NoArgsConstructor
 public class EncryptKeysDTO {
-	
-	public String publicKey; 
-	public String privateKey;
-
-	public String publicKeyNoEncrypt;
-	
+	@PrivacityIdExclude	
+	private String publicKey;
+	@PrivacityIdExclude	
+	private String privateKey;
+	@PrivacityIdExclude	
+	private String publicKeyNoEncrypt;
+	@PrivacityIdExclude	
 	public String borrar;
 
 

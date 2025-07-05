@@ -3,30 +3,40 @@ package com.privacity;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
-import com.privacity.server.security.CustomAccessDeniedHandler;
-import com.privacity.server.security.CustomAuthenticationFailureHandler;
+import com.privacity.commonback.annotations.SpringIgnoreThisComponent;
+import com.privacity.security.util.CustomAccessDeniedHandler;
+import com.privacity.security.util.CustomAuthenticationFailureHandler;
 
 
 @SpringBootApplication
-//@ComponentScan(basePackages = "com.privacity.server.component.grupo")
-//@ComponentScan(basePackages = "com.privacity.server.security")
-//@ComponentScan(basePackages = "com.privacity.server")
+@ComponentScan(basePackages = "com.privacity.server.component")
+@ComponentScan(basePackages = "com.privacity.server.security")
+@ComponentScan(basePackages = "com.privacity.core.idsprovider")
+//@EnableConfigurationProperties(value = MessageIdSequenceFactoryPropertiesEnumConfiguration.class)
+@EnableJpaRepositories(excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = {
+        		SpringIgnoreThisComponent.class})
+})  
 public class PrivacityServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PrivacityServerApplication.class, args);
 	}
 
+	
 	@Bean
-	public AccessDeniedHandler accessDeniedHandler() {
+	AccessDeniedHandler accessDeniedHandler() {
 	   return new CustomAccessDeniedHandler();
 	}
 	
 	@Bean
-	public AuthenticationFailureHandler authenticationFailureHandler() {
+	AuthenticationFailureHandler authenticationFailureHandler() {
 	    return new CustomAuthenticationFailureHandler();
 	} 
 	

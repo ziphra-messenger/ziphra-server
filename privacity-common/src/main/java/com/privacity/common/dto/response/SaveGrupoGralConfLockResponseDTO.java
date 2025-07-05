@@ -7,18 +7,25 @@ import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.dto.GrupoGralConfPasswordDTO;
 import com.privacity.common.dto.LockDTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 @Data
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SaveGrupoGralConfLockResponseDTO {
 
 	@PrivacityId
 	@PrivacityIdOrder
 	@JsonInclude(Include.NON_NULL)
-	public String idGrupo;
+	private String idGrupo;
 	
-	public GrupoGralConfPasswordDTO password;
-	public LockDTO lock;
+	private GrupoGralConfPasswordDTO password;
+	private LockDTO lock;
 
 
 }

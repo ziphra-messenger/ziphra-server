@@ -1,15 +1,25 @@
 package com.privacity.common.dto.response;
 
+import java.io.Serializable;
+
+import com.privacity.common.annotations.PrivacityIdExclude;
 import com.privacity.common.dto.AESDTO;
 import com.privacity.common.dto.LoginDataDTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 @Data
-public class LoginDTOResponse {
+@AllArgsConstructor
+@NoArgsConstructor
+public class LoginDTOResponse implements Serializable {
+
+	private static final long serialVersionUID = -2374084006427173088L;
 	
-	public AESDTO sessionAESDTO;
-	public String privateKey;
+	private AESDTO sessionAESDTO;
+	@PrivacityIdExclude	
+	private String privateKey;
 	
-	public LoginDataDTO loginDataDTO;
+	private LoginDataDTO loginDataDTO;
 
 }

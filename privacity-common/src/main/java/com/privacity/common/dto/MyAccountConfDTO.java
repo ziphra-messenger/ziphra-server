@@ -1,26 +1,31 @@
 package com.privacity.common.dto;
 
-import com.privacity.common.annotations.PrivacityId;
-import com.privacity.common.enumeration.ConfigurationStateEnum;
+import com.privacity.common.annotations.PrivacityIdExclude;
+import com.privacity.common.enumeration.RulesConfEnum;
 
 import lombok.Data;
 
 @Data
 public class MyAccountConfDTO {
 
-	public boolean resend;
-	public boolean timeMessageAlways;
-	public long timeMessageDefaultTime;
-
-	public boolean blackMessageAttachMandatory;
-
-	public boolean downloadAttachAllowImage;
+	@PrivacityIdExclude	
+	private boolean blockResend;
 	
-	public boolean hideMyMessageState;
+	@PrivacityIdExclude	
+	private boolean timeMessageAlways;
+	@PrivacityIdExclude	
+	private long timeMessageDefaultTime;
+
+	@PrivacityIdExclude	
+	private boolean blackMessageAttachMandatory;
+	private boolean blackMessageAttachMandatoryReceived;
+	@PrivacityIdExclude	
+	private boolean blockMediaDownload;
+	@PrivacityIdExclude	
+	private boolean hideMyMessageState;
 	
-	public LockDTO lock;
-	public boolean loginSkip;
-
-
+	private LockDTO lock;
+	@PrivacityIdExclude	
+	private boolean loginSkip;
 
 }

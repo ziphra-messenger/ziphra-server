@@ -1,36 +1,36 @@
 package com.privacity.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.privacity.common.annotations.PrivacityId;
+import com.privacity.common.annotations.PrivacityIdExclude;
 import com.privacity.common.annotations.PrivacityIdOrder;
 import com.privacity.common.enumeration.GrupoRolesEnum;
+import com.privacity.common.interfaces.IdGrupoInterface;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.Accessors;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserForGrupoDTO {
+@Accessors(chain = true)
+@Data
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class UserForGrupoDTO implements IdGrupoInterface{
 	@PrivacityId
 	@PrivacityIdOrder
-	@JsonInclude(Include.NON_NULL)
-	public String idGrupo; 
+	private String idGrupo; 
 	
-	public UsuarioDTO usuario;
-	public GrupoRolesEnum role;
+	private UsuarioDTO usuario;
+	@PrivacityIdExclude	
+	private GrupoRolesEnum role;
 	
-	public AESDTO aesDTO;
-	
-	@JsonInclude(Include.NON_NULL)
+	private AESDTO aesDTO;
+
+	@PrivacityIdExclude	
     private String nickname;
-	
-    @JsonInclude(Include.NON_NULL)
+	@PrivacityIdExclude	
     private String alias;
     
 	@Override

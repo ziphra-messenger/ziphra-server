@@ -6,15 +6,18 @@ import org.springframework.stereotype.Component;
 
 import com.privacity.server.component.common.service.RandomGeneratorService;
 import com.privacity.server.component.common.service.ServerConfService;
-import com.privacity.server.component.common.service.ZipUtilService;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
-import com.privacity.server.encrypt.RSA;
+import com.privacity.server.component.encryptkeys.RSAComponent;
 import com.privacity.server.util.MapperService;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Accessors(fluent = true, chain = false)
 @Component
 @NoArgsConstructor
+@Getter
 public class FacadeCommonComponent {
 
 	@Autowired @Lazy
@@ -25,43 +28,12 @@ public class FacadeCommonComponent {
 	
 	@Autowired @Lazy
 	private MapperService mapper;
-	
-	@Autowired @Lazy
-	private ZipUtilService zip;
-	
-	
+
 
 	@Autowired @Lazy
 	private PrivacityRSAValidation privacityRSA;
 
 	@Autowired @Lazy
-	private RSA RSA;
-
-
-	public ServerConfService serverConf() {
-		return serverConf;
-	}
-
-	
-	public RSA RSA() {
-		return RSA;
-	}
-	
-	public PrivacityRSAValidation privacityRSA() {
-		return privacityRSA;
-	}
-	
-	public RandomGeneratorService randomGenerator() {
-		return randomGenerator;
-	}
-
-	public MapperService mapper() {
-		return mapper;
-	}
-
-	public ZipUtilService zip() {
-		return zip;
-	}
-
+	private RSAComponent RSA;
 
 }

@@ -1,19 +1,15 @@
 package com.privacity.server.tasks;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.privacity.common.dto.RequestIdDTO;
 import com.privacity.server.component.common.service.facade.FacadeComponent;
-import com.privacity.server.security.UsuarioSessionInfo;
 
 import lombok.extern.java.Log;
 
@@ -59,33 +55,33 @@ public class RequestIdCleanerTask extends Thread {
 
 
   private void publicClean(LocalDateTime date) {
-		ConcurrentMap<String, RequestIdDTO> userMap = comps.service().requestIdPublic().getRequestIdsPublic();
-		  
-		  for (String userKey : userMap.keySet()) {
-			  
-			  if ( userMap.get(userKey).getDate().isBefore(date)) {
-				  log.fine("eliminando public " + userKey);
-				  userMap.remove(userKey);
-			  }
-		}
+//		ConcurrentMap<String, RequestIdDTO> userMap = comps.service().requestIdPublic().getRequestIdsPublic();
+//		  
+//		  for (String userKey : userMap.keySet()) {
+//			  
+//			  if ( userMap.get(userKey).getDate().isBefore(date)) {
+//				  log.fine("eliminando public " + userKey);
+//				  userMap.remove(userKey);
+//			  }
+//		}
 	}
   
 	private void privateClean(LocalDateTime date) {
-		ConcurrentMap<String, UsuarioSessionInfo> map = comps.service().usuarioSessionInfo().getAll();
-		  
-		  for (String key : map.keySet()) {
-			    
-			  
-			  ConcurrentMap<String, RequestIdDTO> userMap = map.get(key).getRequestIds();
-			  
-			  for (String userKey : userMap.keySet()) {
-				  
-				  if ( userMap.get(userKey).getDate().isBefore(date)) {
-					  log.fine("eliminando " + userKey);
-					  userMap.remove(userKey);
-				  }
-			  }
-			  
-			}
+//		ConcurrentMap<String, UsuarioSessionInfo> map = comps.service().usuarioSessionInfo().getAll();
+//		  
+//		  for (String key : map.keySet()) {
+//			    
+//			  
+//			  ConcurrentMap<String, RequestIdDTO> userMap = map.get(key).getRequestIds();
+//			  
+//			  for (String userKey : userMap.keySet()) {
+//				  
+//				  if ( userMap.get(userKey).getDate().isBefore(date)) {
+//					  log.fine("eliminando " + userKey);
+//					  userMap.remove(userKey);
+//				  }
+//			  }
+//			  
+//			}
 	}
 }

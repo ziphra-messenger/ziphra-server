@@ -1,14 +1,13 @@
 package com.privacity.server.main;
 
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.privacity.common.dto.ProtocoloDTO;
-import com.privacity.common.enumeration.ProtocoloActionsEnum;
-import com.privacity.common.enumeration.ProtocoloComponentsEnum;
-import com.privacity.server.common.enumeration.Urls;
+import com.privacity.commonback.common.enumeration.ServerUrls;
 import com.privacity.server.component.common.ControllerBase;
 import com.privacity.server.component.encryptkeys.PrivacityRSAValidation;
 import com.privacity.server.component.serverconf.ServerConfValidationService;
@@ -37,7 +36,7 @@ public class FreeAccessController extends ControllerBase{
 	}
 
 	@PostMapping("/entry")
-	public ProtocoloDTO in(@RequestBody ProtocoloDTO request) throws Exception {
+	public ProtocoloDTO in(@RequestBody ProtocoloDTO request)  {
 //    	new Thread(new Runnable() {
 //			
 //			@Override
@@ -65,13 +64,6 @@ public class FreeAccessController extends ControllerBase{
 	}
 
 
-
-	
-	@Override
-	public boolean getEncryptIds() {
-		return false;
-	}
-
 	@Override
 	public boolean isSecure() {
 		return false;
@@ -81,13 +73,9 @@ public class FreeAccessController extends ControllerBase{
 	public boolean isRequestId() {
 		return false;
 	}
+
 	@Override
-	public boolean showLog(ProtocoloDTO request) {
-		return false;
-	}	
-	
-	@Override
-	public Urls getUrl() {
-		return Urls.CONSTANT_URL_PATH_FREE;
+	public ServerUrls getUrl() {
+		return ServerUrls.CONSTANT_URL_PATH_FREE;
 	}	
 }
