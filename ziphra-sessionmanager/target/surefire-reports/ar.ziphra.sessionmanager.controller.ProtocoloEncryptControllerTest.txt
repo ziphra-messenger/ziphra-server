@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: ar.ziphra.sessionmanager.controller.ProtocoloEncryptControllerTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.576 s - in ar.ziphra.sessionmanager.controller.ProtocoloEncryptControllerTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.853 s - in ar.ziphra.sessionmanager.controller.ProtocoloEncryptControllerTest

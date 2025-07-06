@@ -18,9 +18,9 @@
 		<ziphra.root.name>ziphra</ziphra.root.name>
 		<ziphra.concatenate>-</ziphra.concatenate>
 		<ziphra.groupId>ar.ziphra</ziphra.groupId>
-		<ziphra.module.server>${ziphra.root.name}${ziphra.concatenate}server</ziphra.module.server>
+		<ziphra.module.appserver>${ziphra.root.name}${ziphra.concatenate}appserver</ziphra.module.appserver>
 		<ziphra.module.messaging>${ziphra.root.name}${ziphra.concatenate}messaging</ziphra.module.messaging>
-		<ziphra.module.common>${ziphra.root.name}${ziphra.concatenate}common</ziphra.module.common>
+<!--		<ziphra.module.common>${ziphra.root.name}${ziphra.concatenate}common</ziphra.module.common>-->
 		<ziphra.module.idsprovider>${ziphra.root.name}${ziphra.concatenate}idsprovider</ziphra.module.idsprovider>
 		<ziphra.module.sessionmanager>${ziphra.root.name}${ziphra.concatenate}sessionmanager</ziphra.module.sessionmanager>
 		<ziphra.module.commonback>${ziphra.root.name}${ziphra.concatenate}commonback</ziphra.module.commonback>
@@ -46,9 +46,9 @@
 		</dependency>
 	</dependencies>
 	<modules>
-		<module>${ziphra.module.server}</module>
+		<module>${ziphra.module.appserver}</module>
 		<module>${ziphra.module.messaging}</module>
-		<module>${ziphra.module.common}</module>
+<!--		<module>${ziphra.module.common}</module>-->
 		<module>${ziphra.module.idsprovider}</module>
 		<module>${ziphra.module.sessionmanager}</module>
 		<module>${ziphra.module.commonback}</module>

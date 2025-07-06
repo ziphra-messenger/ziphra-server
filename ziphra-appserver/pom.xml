@@ -6,8 +6,8 @@
 		<artifactId>ziphra</artifactId>
 		<version>2.3.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>ziphra-server</artifactId>
-	<name>${ziphra.module.server}}</name>
+	<artifactId>ziphra-appserver</artifactId>
+	<name>${ziphra.module.appserver}</name>
 	<packaging>jar</packaging>
 	<dependencies>
 
@@ -27,10 +27,10 @@
 			<artifactId>${ziphra.module.commonback}</artifactId>
 			<version>${ziphra.version}</version>
 		</dependency>
-						<dependency>
-			<groupId>${ziphra.groupId}</groupId>
-			<artifactId>${ziphra.module.common}</artifactId>
-			<version>${ziphra.version}</version>
+		<dependency>
+		  <groupId>ar.ziphra</groupId>
+		  <artifactId>ziphra-common</artifactId>
+		  <version>2.3.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

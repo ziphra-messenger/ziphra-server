@@ -7,7 +7,7 @@
 		<version>2.3.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>ziphra-messaging</artifactId>
-	<name>${ziphra.module.messaging}}</name>
+	<name>${ziphra.module.messaging}</name>
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
@@ -15,10 +15,10 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>${ziphra.groupId}</groupId>
-			<artifactId>${ziphra.module.common}</artifactId>
-			<version>${ziphra.version}</version>
-		</dependency>
+		  <groupId>ar.ziphra</groupId>
+		  <artifactId>ziphra-common</artifactId>
+		  <version>2.3.2-SNAPSHOT</version>
+		</dependency>	
 		<dependency>
 			<groupId>${ziphra.groupId}</groupId>
 			<artifactId>${ziphra.module.commonback}</artifactId>
