@@ -10,6 +10,7 @@ import ar.ziphra.commonback.common.interfaces.KeyLockerCallback;
 import ar.ziphra.core.repository.MessageRepository;
 
 //@Service  esto es solo para cuando se usa el id dentro del server
+//hay q volver a ponerlo
 @Qualifier("MessageIdGeneratorRepositoryService")
 public class MessageIdGeneratorRepositoryService extends MessageIdGeneratorAbstractService{
 	@Autowired @Lazy
