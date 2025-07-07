@@ -46,7 +46,7 @@ public class UsuarioSessionInfoService{
 	}
 
 	public void remove(String username){
-		if (databaseSave) uf.sessionRepository().deleteById(username);
+		//if (databaseSave) uf.sessionRepository().deleteById(username);
 		this.userSessionIds.remove(username);
 	}
 
@@ -96,9 +96,9 @@ public class UsuarioSessionInfoService{
 
 			Optional<Session> sessionDBO=null;
 
-			if ( databaseSave) sessionDBO = uf.sessionRepository().findById(username);
+			//if ( databaseSave) sessionDBO = uf.sessionRepository().findById(username);
 
-			if (databaseSave && sessionDBO.isPresent()) {
+			if (databaseSave && sessionDBO != null && sessionDBO.isPresent()) {
 
 				log.debug("lo recupera de la base: " + username);
 				Session sDB= sessionDBO.get();
@@ -138,7 +138,7 @@ public class UsuarioSessionInfoService{
 						uf.gson().toJson( t.getZiphraIdEncoder().getMutateDigitUtil().getPorLetra()),
 						uf.gson().toJson( t.getZiphraIdEncoder().getMutateDigitUtil().getPorNro())
 						);
-				uf.sessionRepository().save(s);
+				//uf.sessionRepository().save(s);
 				t.setUsername(username);
 
 			}

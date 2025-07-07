@@ -1,14 +1,14 @@
 package ar.ziphra.sessionmanager.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import javax.persistence.Id;
+
+//import org.springframework.data.mongodb.core.mapping.Document;
 
 import ar.ziphra.common.dto.AESDTO;
-
 import lombok.NoArgsConstructor;
 
 
-@Document
+//@Document
 @NoArgsConstructor
 public class Session {
 
