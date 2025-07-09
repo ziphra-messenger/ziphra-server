@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ar.ziphra.common.dto.MessageDTO;
 import ar.ziphra.common.dto.ProtocoloDTO;
 import ar.ziphra.common.enumeration.ExceptionReturnCode;
@@ -24,7 +25,6 @@ import ar.ziphra.commonback.constants.SessionManagerRestConstants;
 import ar.ziphra.sessionmanager.enumeration.Urls;
 import ar.ziphra.sessionmanager.services.UtilFacade;
 import ar.ziphra.sessionmanager.util.protocolomap.ProtocoloValue;
-
 import lombok.extern.slf4j.Slf4j;
 
 @RestController

@@ -12,11 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ar.ziphra.common.exceptions.ZiphraException;
 import ar.ziphra.commonback.common.utils.IdsProviderRestConstants;
-import ar.ziphra.commonback.constants.SessionManagerRestConstants;
 import ar.ziphra.core.util.UtilsStringComponent;
 import ar.ziphra.idsprovider.components.RandomNicknameComponent;
-
-import antlr.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController

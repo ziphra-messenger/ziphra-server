@@ -9,7 +9,6 @@ import ar.ziphra.common.exceptions.ZiphraException;
 import ar.ziphra.commonback.common.interfaces.HealthCheckerPingActionInterface;
 import ar.ziphra.commonback.common.utils.HealthCheckerUtil;
 import ar.ziphra.commonback.constants.HealthCheckerConstants;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

@@ -24,7 +24,6 @@ import ar.ziphra.core.util.UtilsStringComponent;
 import ar.ziphra.messaging.model.WsMessage;
 import ar.ziphra.messaging.pool.WsQueue;
 import ar.ziphra.messaging.util.UtilFacade;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service

@@ -8,7 +8,6 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandler;
 
 import ar.ziphra.core.model.Message;
-
 import lombok.extern.java.Log;
 @Log
 public class MyStompSessionHandler implements StompSessionHandler {

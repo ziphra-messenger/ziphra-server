@@ -16,7 +16,6 @@ import ar.ziphra.commonback.common.utils.ZiphraIdEncoder;
 import ar.ziphra.sessionmanager.model.Session;
 import ar.ziphra.sessionmanager.model.UsuarioSessionInfo;
 import ar.ziphra.sessionmanager.util.pool.ProducersGenerator;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -25,10 +24,10 @@ public class UsuarioSessionInfoService{
 	//this map save every session
 	//This collection stores session
 	private final ConcurrentMap<String, UsuarioSessionInfo> userSessionIds = new ConcurrentHashMap<String, UsuarioSessionInfo>();
-	@Value("${ar.ziphra.server.sessionmanager.services.UsuarioSessionInfoService.encryptIds}")
+	@Value("${ar.ziphra.appserver.sessionmanager.services.UsuarioSessionInfoService.encryptIds}")
 	private boolean encryptIds;
 
-	@Value("${ar.ziphra.server.sessionmanager.services.UsuarioSessionInfoService.saveSession.database}")
+	@Value("${ar.ziphra.appserver.sessionmanager.services.UsuarioSessionInfoService.saveSession.database}")
 	private boolean databaseSave;
 
 

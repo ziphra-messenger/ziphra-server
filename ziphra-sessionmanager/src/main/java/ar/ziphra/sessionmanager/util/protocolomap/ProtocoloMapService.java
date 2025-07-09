@@ -37,7 +37,6 @@ import ar.ziphra.common.enumeration.ProtocoloActionsEnum;
 import ar.ziphra.common.enumeration.ProtocoloComponentsEnum;
 import ar.ziphra.common.exceptions.ZiphraException;
 import ar.ziphra.sessionmanager.enumeration.Urls;
-
 import lombok.extern.slf4j.Slf4j;
 
 

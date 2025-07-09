@@ -10,7 +10,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import ar.ziphra.common.annotations.ExcludeInterceptorLog;
-
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;

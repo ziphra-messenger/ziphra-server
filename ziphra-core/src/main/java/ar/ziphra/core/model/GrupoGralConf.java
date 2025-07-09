@@ -12,7 +12,6 @@ import javax.persistence.OneToOne;
 
 import ar.ziphra.common.enumeration.ConfigurationStateEnum;
 import ar.ziphra.common.enumeration.RulesConfEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

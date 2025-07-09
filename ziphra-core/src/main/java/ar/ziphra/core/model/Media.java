@@ -10,7 +10,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.Lob;
 
 import ar.ziphra.common.enumeration.MediaTypeEnum;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
 

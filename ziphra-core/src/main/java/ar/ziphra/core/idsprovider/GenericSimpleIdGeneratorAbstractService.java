@@ -2,7 +2,6 @@ package ar.ziphra.core.idsprovider;
 
 import ar.ziphra.core.interfaces.GetMaxIdInterface;
 import ar.ziphra.core.interfaces.SimpleIdIdsGeneratorInterface;
-
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ar.ziphra.common.dto.JWTDTO;
 import ar.ziphra.commonback.constants.SessionManagerRestConstants;
 import ar.ziphra.sessionmanager.services.UtilFacade;
-
 import lombok.extern.slf4j.Slf4j;
 
 @RestController

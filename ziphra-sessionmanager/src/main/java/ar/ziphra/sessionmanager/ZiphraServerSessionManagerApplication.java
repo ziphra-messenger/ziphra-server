@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan(basePackages = "ar.ziphra.commonback.controller")
 @ComponentScan(basePackages = "ar.ziphra.sessionmanager")
-//@ComponentScan(basePackages = "ar.ziphra.server.security")
-//@ComponentScan(basePackages = "ar.ziphra.server")
+//@ComponentScan(basePackages = "ar.ziphra.appserver.security")
+//@ComponentScan(basePackages = "ar.ziphra.appserver")
 public class ZiphraServerSessionManagerApplication {
 
 	public static void main(String[] args) {

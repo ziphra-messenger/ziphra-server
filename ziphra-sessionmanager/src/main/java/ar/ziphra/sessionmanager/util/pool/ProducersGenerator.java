@@ -20,21 +20,21 @@ public class ProducersGenerator {
     public static DataQueue dataQueue = new DataQueue(MAX_QUEUE_CAPACITY);
     private static final Logger log = Logger.getLogger(ProducersGenerator.class.getCanonicalName());
     
-    @Value("${ar.ziphra.server.sessionmanager.util.pool.ProducersGenerator.keyMinLenght}")
+    @Value("${ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.keyMinLenght}")
     private Integer keyMinLenght;
-    @Value("${ar.ziphra.server.sessionmanager.util.pool.ProducersGenerator.keyMaxLenght}")
+    @Value("${ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.keyMaxLenght}")
     private Integer keyMaxLenght;
-    @Value("${ar.ziphra.server.sessionmanager.util.pool.ProducersGenerator.saltMinLenght}")
+    @Value("${ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.saltMinLenght}")
     private Integer saltMinLenght;
-    @Value("${ar.ziphra.server.sessionmanager.util.pool.ProducersGenerator.saltMaxLenght}")
+    @Value("${ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.saltMaxLenght}")
     private Integer saltMaxLenght;
-    @Value("${ar.ziphra.server.sessionmanager.util.pool.ProducersGenerator.iterationMinValue}")
+    @Value("${ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.iterationMinValue}")
     private Integer iterationMinValue;
-    @Value("${ar.ziphra.server.sessionmanager.util.pool.ProducersGenerator.iterationMaxValue}")
+    @Value("${ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.iterationMaxValue}")
     private Integer iterationMaxValue;
-    @Value("${ar.ziphra.server.sessionmanager.util.pool.ProducersGenerator.bits}")
+    @Value("${ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.bits}")
     private Integer bits;
-    @Value("${ar.ziphra.server.sessionmanager.util.pool.ProducersGenerator.randomGeneratorType}")
+    @Value("${ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.randomGeneratorType}")
     private String randomGeneratorType;
     
     @PostConstruct    

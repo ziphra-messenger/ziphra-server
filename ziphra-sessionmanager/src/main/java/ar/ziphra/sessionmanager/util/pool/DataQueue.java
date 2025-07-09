@@ -5,7 +5,6 @@ import java.util.Queue;
 import java.util.logging.Logger;
 
 import ar.ziphra.commonback.common.utils.AESToUse;
-
 import lombok.Getter;
 
 public class DataQueue {

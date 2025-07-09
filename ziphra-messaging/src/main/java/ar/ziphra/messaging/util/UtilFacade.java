@@ -5,12 +5,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+
 import ar.ziphra.core.repository.UserForGrupoRepository;
 import ar.ziphra.core.util.UtilsStringComponent;
 import ar.ziphra.messaging.configuration.SocketSessionRegistry;
 import ar.ziphra.messaging.configuration.UsuarioSessionInfoService;
 import ar.ziphra.messaging.services.WebSocketSenderService;
-
 import lombok.Getter;
 import lombok.experimental.Accessors;
 

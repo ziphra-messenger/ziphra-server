@@ -5,7 +5,6 @@ import java.util.Objects;
 import ar.ziphra.common.enumeration.ProtocoloActionsEnum;
 import ar.ziphra.common.enumeration.ProtocoloComponentsEnum;
 import ar.ziphra.sessionmanager.enumeration.Urls;
-
 import lombok.Getter;
 import lombok.Setter;
 

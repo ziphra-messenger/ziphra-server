@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+
 import ar.ziphra.common.adapters.LocalDateAdapter;
 import ar.ziphra.common.dto.JWTDTO;
 import ar.ziphra.common.enumeration.ExceptionReturnCode;
@@ -17,7 +18,6 @@ import ar.ziphra.common.exceptions.ZiphraException;
 import ar.ziphra.commonback.common.enumeration.HealthCheckerServerType;
 import ar.ziphra.commonback.common.interfaces.HealthCheckerInterface;
 import ar.ziphra.commonback.constants.SessionManagerRestConstants;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;

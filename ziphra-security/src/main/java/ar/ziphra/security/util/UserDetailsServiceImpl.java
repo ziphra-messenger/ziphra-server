@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ar.ziphra.core.model.Usuario;
 import ar.ziphra.core.repository.UsuarioRepository;
-
 import lombok.extern.slf4j.Slf4j;
 
 

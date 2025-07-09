@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+
 import ar.ziphra.sessionmanager.repositories.SessionRepository;
 import ar.ziphra.sessionmanager.util.protocolomap.ProtocoloMapService;
-
 import lombok.Getter;
 import lombok.experimental.Accessors;
 

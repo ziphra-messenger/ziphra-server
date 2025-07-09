@@ -6,7 +6,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
 import ar.ziphra.common.enumeration.MessageState;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

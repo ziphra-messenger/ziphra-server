@@ -15,8 +15,8 @@ import ar.ziphra.security.util.CustomAuthenticationFailureHandler;
 
 
 @SpringBootApplication
-@ComponentScan(basePackages = "ar.ziphra.server.component")
-@ComponentScan(basePackages = "ar.ziphra.server.security")
+@ComponentScan(basePackages = "ar.ziphra.appserver.component")
+@ComponentScan(basePackages = "ar.ziphra.appserver.security")
 @ComponentScan(basePackages = "ar.ziphra.core.idsprovider")
 //@EnableConfigurationProperties(value = MessageIdSequenceFactoryPropertiesEnumConfiguration.class)
 @EnableJpaRepositories(excludeFilters = {

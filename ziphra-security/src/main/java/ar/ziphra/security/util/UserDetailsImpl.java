@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ar.ziphra.core.model.Usuario;
 
 public class UserDetailsImpl implements UserDetails {

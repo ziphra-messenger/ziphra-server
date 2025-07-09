@@ -10,7 +10,6 @@ import javax.persistence.OneToOne;
 
 import ar.ziphra.common.enumeration.GrupoRolesEnum;
 import ar.ziphra.common.enumeration.PasswordGrupoTypeEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

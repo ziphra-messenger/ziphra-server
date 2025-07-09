@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Random;
 
 import ar.ziphra.common.util.RandomGenerator;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

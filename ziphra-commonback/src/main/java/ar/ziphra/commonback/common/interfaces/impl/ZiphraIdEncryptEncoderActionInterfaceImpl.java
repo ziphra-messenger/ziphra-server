@@ -10,7 +10,6 @@ import ar.ziphra.common.enumeration.ExceptionReturnCode;
 import ar.ziphra.common.exceptions.ZiphraException;
 import ar.ziphra.commonback.common.interfaces.ZiphraIdEncoderActionInterface;
 import ar.ziphra.commonback.common.utils.ZiphraIdEncoder;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

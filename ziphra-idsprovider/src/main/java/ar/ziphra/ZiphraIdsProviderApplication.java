@@ -26,8 +26,8 @@ import ar.ziphra.commonback.annotations.SpringIgnoreThisComponent;
 })
 //@ComponentScan(excludeFilters = @Filter(SpringIgnoreThisComponent.class))
 //@EnableJpaRepositories(basePackages = "ar.ziphra.core.repository")
-//@ComponentScan(basePackages = "ar.ziphra.server.security")
-//@ComponentScan(basePackages = "ar.ziphra.server")
+//@ComponentScan(basePackages = "ar.ziphra.appserver.security")
+//@ComponentScan(basePackages = "ar.ziphra.appserver")
 @SpringIgnoreThisComponent
 public class ZiphraIdsProviderApplication {
 

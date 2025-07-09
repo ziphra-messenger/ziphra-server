@@ -10,7 +10,7 @@ import ar.ziphra.commonback.annotations.SpringIgnoreThisComponent;
 
 
 @SpringBootApplication
-//@ComponentScan(basePackages = "ar.ziphra.server.component.grupo")
+//@ComponentScan(basePackages = "ar.ziphra.appserver.component.grupo")
 @ComponentScan(basePackages = "ar.ziphra.commonback.controller")
 @ComponentScan(basePackages = "ar.ziphra")
 @EnableJpaRepositories(excludeFilters = {

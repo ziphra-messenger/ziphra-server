@@ -16,7 +16,6 @@ import ar.ziphra.commonback.common.enumeration.HealthCheckerState;
 import ar.ziphra.commonback.common.interfaces.HealthCheckerInterface;
 import ar.ziphra.commonback.constants.HealthCheckerConstants;
 import ar.ziphra.commonback.pojo.HealthCheckerPojo;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

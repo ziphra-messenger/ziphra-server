@@ -4,7 +4,6 @@ import java.security.PublicKey;
 import ar.ziphra.common.dto.AESAllDTO;
 import ar.ziphra.commonback.common.utils.AESToUse;
 import ar.ziphra.commonback.common.utils.ZiphraIdEncoder;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

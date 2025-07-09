@@ -13,7 +13,6 @@ import ar.ziphra.commonback.constants.SessionManagerRestConstants;
 import ar.ziphra.sessionmanager.enumeration.Urls;
 import ar.ziphra.sessionmanager.services.UtilFacade;
 import ar.ziphra.sessionmanager.util.protocolomap.ProtocoloValue;
-
 import lombok.extern.slf4j.Slf4j;
 
 @RestController

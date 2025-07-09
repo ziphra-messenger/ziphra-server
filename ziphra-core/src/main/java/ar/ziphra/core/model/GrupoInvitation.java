@@ -11,7 +11,6 @@ import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 
 import ar.ziphra.common.enumeration.GrupoRolesEnum;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
 
