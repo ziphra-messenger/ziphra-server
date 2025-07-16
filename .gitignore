@@ -37,3 +37,4 @@ tmp/
 .localhistory/
 .recommenders/
 .factorypath
+JWT.key

@@ -1,6 +1,7 @@
 package ar.ziphra.appserver.component.common;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -9,129 +10,187 @@ import ar.ziphra.common.dto.ProtocoloDTO;
 import ar.ziphra.common.enumeration.ExceptionReturnCode;
 import ar.ziphra.common.enumeration.ProtocoloActionsEnum;
 import ar.ziphra.common.exceptions.ValidationException;
+import ar.ziphra.common.exceptions.ZiphraException;
 import ar.ziphra.common.interfaces.IdGrupoInterface;
 import ar.ziphra.commonback.common.enumeration.ServerUrls;
 import ar.ziphra.appserver.services.protocolomap.ProtocoloValue;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Base controller class for handling protocol-based requests.
+ * 
+ * <p>This abstract class provides the core logic for decoding incoming protocol requests,
+ * mapping them to corresponding service methods, invoking those methods, handling exceptions,
+ * and preparing protocol responses.</p>
+ * 
+ * <p>Subclasses must specify security behavior and URL mapping.</p>
+ * 
+ * @author Jorge
+ * @version 1.0
+ * @since 2025-07-10
+ */
 @Slf4j
 public abstract class ControllerBase extends ControllerBaseUtil {
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected Object getDTOObject(ProtocoloDTO request, String objectDTO, Class clazz) throws IOException {
-		log.debug("getDTOObject Base :" +comps.util().string().cutString ( objectDTO) + "clazz:" + clazz.getName());
-		return comps.util().gson().fromJson(objectDTO, clazz);
-	}
+    /**
+     * Handles an incoming protocol request.
+     * 
+     * <p>It retrieves the mapped method based on the request, validates the request ID if required,
+     * parses DTO parameters, invokes the target method, catches and handles exceptions, and
+     * prepares the response DTO accordingly.</p>
+     * 
+     * @param request the incoming protocol DTO containing the request details
+     * @return the protocol response DTO with result or error information
+     */
+    public ProtocoloDTO in(@RequestBody ProtocoloDTO request) {
+        log.debug(">> ProtocoloDTO IN: {}", request);
 
+        ProtocoloDTO response = new ProtocoloDTO();
+        Object returnObject = null;
 
-	public ProtocoloDTO in(@RequestBody ProtocoloDTO request)  {
+        try {
+            ProtocoloValue value = comps.service().protocoloMap().get(getUrl(), request.getComponent(), request.getAction());
+            if (value == null) {
+                throw new ValidationException(ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL);
+            }
 
-		log.debug(">> " + request.toString());
+            validateRequestId(request);
 
-		
-		ProtocoloDTO p = new ProtocoloDTO();
+            if (value.getParametersType() == null) {
+                returnObject = value.getMethod().invoke(value.getClazz());
+            } else {
+                Object dto = parseDTO(request.getObjectDTO(), value.getParametersType());
 
-		// tomo el dto a ejecutar
-		Object objetoRetorno=null;
-		Object dtoObject=null;
+                if (dto instanceof IdGrupoInterface) {
+                    comps.requestHelper().setGrupoInUse((IdGrupoInterface) dto);
+                }
 
+                returnObject = value.getMethod().invoke(value.getClazz(), dto);
+            }
 
-		try {
-			ProtocoloValue value = comps.service().protocoloMap().get(getUrl(),  request.getComponent(),  request.getAction());
-			
-			if (value == null) {
-				throw new ValidationException(ExceptionReturnCode.GENERAL_INVALID_ACCESS_PROTOCOL);
-			}
-			if ( this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.REQUEST_ID_PRIVATE_GET)) {
-				comps.util().requestId().existsRequestId(request.getRequestIdDTO(), true) ;
-			}else if ( !this.isSecure() && (this.isRequestId()) && !request.getAction().equals(ProtocoloActionsEnum.REQUEST_ID_PUBLIC_GET)) {
-				comps.util().requestId().existsRequestId(request.getRequestIdDTO(),false) ;
-			}
+        } catch (Exception e) {
+            handleException(response, e);
+            return finalizeResponse(request, response);
+        }
 
-			log.debug("URL Base = " + request.getComponent());
-			log.debug("COMPONENT Base = " + request.getComponent());
-			log.debug("ACTION Base = " + request.getAction());
+        prepareResponseData(response, request, returnObject);
 
-			if (   value.getParametersType() == null) {
+        return finalizeResponse(request, response);
+    }
 
-				log.debug("Invoke 1 sin parametros = " + value.getMethod().getName() + " " + value.getClazz().toString());
-				objetoRetorno = value.getMethod().invoke(value.getClazz());
-			}else {
-				dtoObject =  getDTOObject(request, request.getObjectDTO(), value.getParametersType());
+    /**
+     * Validates the request ID if the controller requires it.
+     * 
+     * <p>Checks the security mode and request action type to decide whether
+     * to validate the request ID and ensures it exists and is valid.</p>
+     * 
+     * @param request the incoming protocol DTO to validate
+     * @throws ZiphraException if the request ID is invalid or missing
+     */
+    private void validateRequestId(ProtocoloDTO request) throws ZiphraException {
+        boolean secure = isSecure();
+        boolean requiresRequestId = isRequestId();
+        ProtocoloActionsEnum action = request.getAction();
 
+        if (!requiresRequestId) return;
 
-				log.debug("Invoke 1 parametro = " + value.getMethod().getName() + " " + value.getClazz().toString());
+        boolean isRequestValid = secure
+            ? !ProtocoloActionsEnum.REQUEST_ID_PRIVATE_GET.equals(action)
+            : !ProtocoloActionsEnum.REQUEST_ID_PUBLIC_GET.equals(action);
 
-				log.debug("Invoke 2 parameter = " + ((dtoObject==null) ? "null" : comps.util().string().cutString(dtoObject.toString())));
+        if (isRequestValid) {
+            comps.util().requestId().existsRequestId(request.getRequestIdDTO(), secure);
+        }
+    }
 
-				if (dtoObject!= null && dtoObject instanceof IdGrupoInterface) {
-					comps.requestHelper().setGrupoInUse((IdGrupoInterface)dtoObject);
-				}
-				objetoRetorno =value.getMethod().invoke(value.getClazz(),  dtoObject);
-			}
+    /**
+     * Parses a JSON string into an object of the specified class.
+     * 
+     * @param json  JSON string representing the DTO
+     * @param clazz target class to parse the JSON into
+     * @return the parsed DTO object
+     * @throws IOException if parsing the JSON fails
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private Object parseDTO(String json, Class clazz) throws IOException {
+        log.debug("Parsing DTO: {} to class {}", comps.util().string().cutString(json), clazz.getName());
+        return comps.util().gson().fromJson(json, clazz);
+    }
 
+    /**
+     * Handles exceptions occurring during method invocation.
+     * 
+     * <p>Logs the error and sets the response with appropriate error messages and codes.</p>
+     * 
+     * @param response the protocol response DTO to update with error information
+     * @param e        the caught exception
+     */
+    private void handleException(ProtocoloDTO response, Exception e) {
+        log.error("Error in protocol execution: {}", e.getMessage(), e);
+        response.setObjectDTO(null);
 
+        Throwable cause = e instanceof InvocationTargetException ? e.getCause() : e;
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			p.setObjectDTO(null);
-			if ( e.getCause() != null) {
-				p.setCodigoRespuesta(e.getCause().getMessage());
-			}else if( e.getMessage() != null && !e.getMessage().equals("")) {
-				if (e instanceof ValidationException) {
-					p.setMensajeRespuesta(((ValidationException)e).getDescription());
+        if (cause instanceof ValidationException) {
+            response.setMensajeRespuesta(((ValidationException) cause).getDescription());
+        }
 
-				}
-				p.setCodigoRespuesta(e.getMessage());
-				//p.setMensajeRespuesta(e.getCause());
-			}else {
-				p.setMensajeRespuesta("UNCLASSIFIED_ERROR");
-				p.setCodigoRespuesta("G_000");
-			}
+        response.setCodigoRespuesta(cause != null ? cause.getMessage() : "G_000");
+        if (response.getMensajeRespuesta() == null) {
+            response.setMensajeRespuesta("UNCLASSIFIED_ERROR");
+        }
+    }
 
-		} 
+    /**
+     * Prepares the response data by converting the returned object to JSON or setting
+     * the message DTO as needed.
+     * 
+     * @param response the protocol response DTO to populate
+     * @param request  the original protocol request DTO
+     * @param result   the object returned by the invoked method
+     */
+    private void prepareResponseData(ProtocoloDTO response, ProtocoloDTO request, Object result) {
+        if (result instanceof MessageDTO) {
+            response.setMessage((MessageDTO) result);
+        } else {
+            String jsonResult = result != null ? comps.util().gson().toJson(result) : null;
+            log.debug("ProtocoloDTO OUT JSON: {}", comps.util().string().cutString(jsonResult));
+            response.setObjectDTO(jsonResult);
+        }
+    }
 
+    /**
+     * Finalizes the response by copying metadata fields from the request.
+     * 
+     * @param request  the original protocol request DTO
+     * @param response the response DTO to finalize
+     * @return the finalized response DTO
+     */
+    private ProtocoloDTO finalizeResponse(ProtocoloDTO request, ProtocoloDTO response) {
+        response.setComponent(request.getComponent());
+        response.setAction(request.getAction());
+        response.setAsyncId(request.getAsyncId());
+        return response;
+    }
 
-		//		if ( this.isSecure()){
-		//
-		//			objetoRetorno= comps.service().usuarioSessionInfo().ziphraIdServiceEncrypt2(
-		//					comps.requestHelper().getUsuarioUsername()
-		//					, objetoRetorno
-		//					,value.getReturnType().getName());
-		//		}
+    /**
+     * Indicates whether the controller requires secure handling.
+     * 
+     * @return true if security is enabled, false otherwise
+     */
+    public abstract boolean isSecure();
 
-		p.setComponent(request.getComponent());
-		p.setAction(request.getAction());
+    /**
+     * Indicates whether the controller requires request ID validation.
+     * 
+     * @return true if request ID validation is required, false otherwise
+     */
+    public abstract boolean isRequestId();
 
-		if (objetoRetorno instanceof MessageDTO ) {
-			p.setMessage((MessageDTO)objetoRetorno);
-		}else {
-
-			String retornoJson=null;
-			if (objetoRetorno != null) {
-				//				if ( !this.isSecure()){
-				//				retornoJson = UtilsString.gsonToSend(objetoRetorno);
-				//				}else {
-				retornoJson=comps.util().gson().toJson(objetoRetorno);
-				//}
-
-			}
-
-			log.debug("ProtocoloDTO Retorno >> " + comps.util().string().cutString(retornoJson));
-
-			p.setObjectDTO(retornoJson);	
-		}
-
-		p.setAsyncId(request.getAsyncId());
-		return p;
-
-	}	
-
-	public abstract boolean isSecure();
-
-	public abstract boolean isRequestId();
-
-	public abstract ServerUrls getUrl();
-	
-
+    /**
+     * Returns the ServerUrls enum value that identifies this controller's URL mapping.
+     * 
+     * @return the ServerUrls value for this controller
+     */
+    public abstract ServerUrls getUrl();
 }

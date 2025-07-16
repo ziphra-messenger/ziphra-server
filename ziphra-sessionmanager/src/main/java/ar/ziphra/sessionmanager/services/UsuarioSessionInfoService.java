@@ -16,6 +16,7 @@ import ar.ziphra.commonback.common.utils.ZiphraIdEncoder;
 import ar.ziphra.sessionmanager.model.Session;
 import ar.ziphra.sessionmanager.model.UsuarioSessionInfo;
 import ar.ziphra.sessionmanager.util.pool.ProducersGenerator;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -24,10 +25,10 @@ public class UsuarioSessionInfoService{
 	//this map save every session
 	//This collection stores session
 	private final ConcurrentMap<String, UsuarioSessionInfo> userSessionIds = new ConcurrentHashMap<String, UsuarioSessionInfo>();
-	@Value("${ar.ziphra.appserver.sessionmanager.services.UsuarioSessionInfoService.encryptIds}")
+	@Value("${ar.ziphra.sessionmanager.services.UsuarioSessionInfoService.encryptIds}")
 	private boolean encryptIds;
 
-	@Value("${ar.ziphra.appserver.sessionmanager.services.UsuarioSessionInfoService.saveSession.database}")
+	@Value("${ar.ziphra.sessionmanager.services.UsuarioSessionInfoService.saveSession.database}")
 	private boolean databaseSave;
 
 
@@ -45,7 +46,7 @@ public class UsuarioSessionInfoService{
 	}
 
 	public void remove(String username){
-		//if (databaseSave) uf.sessionRepository().deleteById(username);
+		if (databaseSave) uf.sessionRepository().deleteById(username);
 		this.userSessionIds.remove(username);
 	}
 
@@ -95,9 +96,9 @@ public class UsuarioSessionInfoService{
 
 			Optional<Session> sessionDBO=null;
 
-			//if ( databaseSave) sessionDBO = uf.sessionRepository().findById(username);
+			if ( databaseSave) sessionDBO = uf.sessionRepository().findById(username);
 
-			if (databaseSave && sessionDBO != null && sessionDBO.isPresent()) {
+			if (databaseSave && sessionDBO.isPresent()) {
 
 				log.debug("lo recupera de la base: " + username);
 				Session sDB= sessionDBO.get();
@@ -137,7 +138,7 @@ public class UsuarioSessionInfoService{
 						uf.gson().toJson( t.getZiphraIdEncoder().getMutateDigitUtil().getPorLetra()),
 						uf.gson().toJson( t.getZiphraIdEncoder().getMutateDigitUtil().getPorNro())
 						);
-				//uf.sessionRepository().save(s);
+				uf.sessionRepository().save(s);
 				t.setUsername(username);
 
 			}

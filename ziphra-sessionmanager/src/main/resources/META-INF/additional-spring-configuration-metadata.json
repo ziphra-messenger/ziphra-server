@@ -1,47 +1,47 @@
 {"properties": [
   {
-    "name": "ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.keyMinLenght",
+    "name": "ar.ziphra.sessionmanager.util.pool.ProducersGenerator.keyMinLenght",
     "type": "java.lang.String",
-    "description": "A description for 'ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.keyMinLenght'"
+    "description": "A description for 'ar.ziphra.sessionmanager.util.pool.ProducersGenerator.keyMinLenght'"
   },
   {
-    "name": "ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.keyMaxLenght",
+    "name": "ar.ziphra.sessionmanager.util.pool.ProducersGenerator.keyMaxLenght",
     "type": "java.lang.String",
-    "description": "A description for 'ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.keyMaxLenght'"
+    "description": "A description for 'ar.ziphra.sessionmanager.util.pool.ProducersGenerator.keyMaxLenght'"
   },
   {
-    "name": "ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.saltMaxLenght",
+    "name": "ar.ziphra.sessionmanager.util.pool.ProducersGenerator.saltMaxLenght",
     "type": "java.lang.String",
-    "description": "A description for 'ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.saltMaxLenght'"
+    "description": "A description for 'ar.ziphra.sessionmanager.util.pool.ProducersGenerator.saltMaxLenght'"
   },
   {
-    "name": "ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.iterationMinValue",
+    "name": "ar.ziphra.sessionmanager.util.pool.ProducersGenerator.iterationMinValue",
     "type": "java.lang.String",
-    "description": "A description for 'ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.iterationMinValue'"
+    "description": "A description for 'ar.ziphra.sessionmanager.util.pool.ProducersGenerator.iterationMinValue'"
   },
   {
-    "name": "ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.iterationMaxValue",
+    "name": "ar.ziphra.sessionmanager.util.pool.ProducersGenerator.iterationMaxValue",
     "type": "java.lang.String",
-    "description": "A description for 'ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.iterationMaxValue'"
+    "description": "A description for 'ar.ziphra.sessionmanager.util.pool.ProducersGenerator.iterationMaxValue'"
   },
   {
-    "name": "ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.bits",
+    "name": "ar.ziphra.sessionmanager.util.pool.ProducersGenerator.bits",
     "type": "java.lang.String",
-    "description": "A description for 'ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.bits'"
+    "description": "A description for 'ar.ziphra.sessionmanager.util.pool.ProducersGenerator.bits'"
   },
   {
-    "name": "ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.randomGeneratorType",
+    "name": "ar.ziphra.sessionmanager.util.pool.ProducersGenerator.randomGeneratorType",
     "type": "java.lang.String",
-    "description": "A description for 'ar.ziphra.appserver.sessionmanager.util.pool.ProducersGenerator.randomGeneratorType'"
+    "description": "A description for 'ar.ziphra.sessionmanager.util.pool.ProducersGenerator.randomGeneratorType'"
   },
   {
-    "name": "ar.ziphra.appserver.sessionmanager.services.ZiphraIdServices.encryptId",
+    "name": "ar.ziphra.sessionmanager.services.ZiphraIdServices.encryptId",
     "type": "java.lang.String",
-    "description": "A description for 'ar.ziphra.appserver.sessionmanager.services.ZiphraIdServices.encryptId'"
+    "description": "A description for 'ar.ziphra.sessionmanager.services.ZiphraIdServices.encryptId'"
   },
   {
-    "name": "ar.ziphra.appserver.sessionmanager.services.UsuarioSessionInfoService.encryptIds",
+    "name": "ar.ziphra.sessionmanager.services.UsuarioSessionInfoService.encryptIds",
     "type": "java.lang.String",
-    "description": "A description for 'ar.ziphra.appserver.sessionmanager.services.UsuarioSessionInfoService.encryptIds'"
+    "description": "A description for 'ar.ziphra.sessionmanager.services.UsuarioSessionInfoService.encryptIds'"
   }
 ]}

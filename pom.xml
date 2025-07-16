@@ -13,7 +13,7 @@
 	<packaging>pom</packaging>
 	<name>ziphra</name>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<ziphra.version>2.3.2-SNAPSHOT</ziphra.version>
 		<ziphra.root.name>ziphra</ziphra.root.name>
 		<ziphra.concatenate>-</ziphra.concatenate>
@@ -55,4 +55,23 @@
 		<module>${ziphra.module.core}</module>
 		<module>${ziphra.module.security}</module>
 	</modules>
+	
+	<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-javadoc-plugin</artifactId>
+
+      <configuration>
+        <source>17</source> <!-- versión de Java, ajustar a la que uses -->
+        <encoding>UTF-8</encoding>
+        <show>protected</show> <!-- puede ser public, protected, etc. -->
+        <additionalJOptions>
+          <additionalJOption>-Xdoclint:none</additionalJOption> <!-- evitar warnings -->
+        </additionalJOptions>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+
 </project>

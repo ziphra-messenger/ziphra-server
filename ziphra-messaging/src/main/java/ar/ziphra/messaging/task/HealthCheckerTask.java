@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class HealthCheckerTask extends HealthCheckerTaskAbstract{
 
-	@Value("${ar.ziphra.appserver.tasks.healthChecker.serverSessionnanager}")
+	@Value("${ar.ziphra.appserver.tasks.healthChecker.serverSessionmanager}")
 	private String serverSessionmanager;
 
 	@Override

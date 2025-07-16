@@ -1,0 +1,132 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ziphra-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sec
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - ziphra-net
+
+  mongodb:
+    image: mongo:6.0
+    container_name: ziphra-mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      
+
+
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ziphra-net
+
+  appserver:
+    build: ./ziphra-appserver
+    depends_on:
+      - mysql
+      - mongodb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sec?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      MODULE_IDSPROVIDER__PORT: ${MODULE_IDSPROVIDER__PORT}
+      MODULE_SESSIONMANAGER__PORT: ${MODULE_SESSIONMANAGER__PORT}
+      MODULE_REQUESTID__PORT: ${MODULE_REQUESTID__PORT}
+      MODULE_MESSAGING__PORT: ${MODULE_MESSAGING__PORT}
+      MODULE_APPSERVER__PORT: ${MODULE_APPSERVER__PORT}
+      MODULE_IDSPROVIDER: ${MODULE_IDSPROVIDER}
+      MODULE_SESSIONMANAGER: ${MODULE_SESSIONMANAGER}
+      MODULE_REQUESTID: ${MODULE_REQUESTID}
+      MODULE_MESSAGING: ${MODULE_MESSAGING}
+      MODULE_SESSIONMANAGER__JWT: ${MODULE_SESSIONMANAGER__JWT}
+      
+    ports:
+      - "8080:8080"
+    networks:
+      - ziphra-net
+
+  messaging:
+    build: ./ziphra-messaging
+    depends_on:
+      - mysql
+      - mongodb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sec?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      MODULE_IDSPROVIDER__PORT: ${MODULE_IDSPROVIDER__PORT}
+      MODULE_SESSIONMANAGER__PORT: ${MODULE_SESSIONMANAGER__PORT}
+      MODULE_REQUESTID__PORT: ${MODULE_REQUESTID__PORT}
+      MODULE_MESSAGING__PORT: ${MODULE_MESSAGING__PORT}
+      MODULE_APPSERVER__PORT: ${MODULE_APPSERVER__PORT}
+      MODULE_IDSPROVIDER: ${MODULE_IDSPROVIDER}
+      MODULE_SESSIONMANAGER: ${MODULE_SESSIONMANAGER}
+      MODULE_REQUESTID: ${MODULE_REQUESTID}
+      MODULE_MESSAGING: ${MODULE_MESSAGING}
+      MODULE_SESSIONMANAGER__JWT: ${MODULE_SESSIONMANAGER__JWT}
+    ports:
+      - "8090:8090"
+    networks:
+      - ziphra-net
+
+  sessionmanager:
+    build: ./ziphra-sessionmanager
+    depends_on:
+      - mysql
+      - mongodb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sec?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongodb:27017
+      
+      MODULE_IDSPROVIDER__PORT: ${MODULE_IDSPROVIDER__PORT}
+      MODULE_SESSIONMANAGER__PORT: ${MODULE_SESSIONMANAGER__PORT}
+      MODULE_REQUESTID__PORT: ${MODULE_REQUESTID__PORT}
+      MODULE_MESSAGING__PORT: ${MODULE_MESSAGING__PORT}
+      MODULE_APPSERVER__PORT: ${MODULE_APPSERVER__PORT}
+      MODULE_IDSPROVIDER: ${MODULE_IDSPROVIDER}
+      MODULE_SESSIONMANAGER: ${MODULE_SESSIONMANAGER}
+      MODULE_REQUESTID: ${MODULE_REQUESTID}
+      MODULE_MESSAGING: ${MODULE_MESSAGING}
+      MODULE_SESSIONMANAGER__JWT: ${MODULE_SESSIONMANAGER__JWT}
+            
+    networks:
+      - ziphra-net
+
+  idsprovider:
+    build: ./ziphra-idsprovider
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sec?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      
+      MODULE_IDSPROVIDER__PORT: ${MODULE_IDSPROVIDER__PORT}
+      MODULE_SESSIONMANAGER__PORT: ${MODULE_SESSIONMANAGER__PORT}
+      MODULE_REQUESTID__PORT: ${MODULE_REQUESTID__PORT}
+      MODULE_MESSAGING__PORT: ${MODULE_MESSAGING__PORT}
+      MODULE_APPSERVER__PORT: ${MODULE_APPSERVER__PORT}
+      MODULE_IDSPROVIDER: ${MODULE_IDSPROVIDER}
+      MODULE_SESSIONMANAGER: ${MODULE_SESSIONMANAGER}
+      MODULE_REQUESTID: ${MODULE_REQUESTID}
+      MODULE_MESSAGING: ${MODULE_MESSAGING}
+      MODULE_SESSIONMANAGER__JWT: ${MODULE_SESSIONMANAGER__JWT}      
+    networks:
+      - ziphra-net
+
+volumes:
+  mysql_data:
+  mongo_data:
+
+networks:
+  ziphra-net:

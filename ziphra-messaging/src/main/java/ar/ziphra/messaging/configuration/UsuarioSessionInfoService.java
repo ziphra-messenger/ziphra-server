@@ -27,7 +27,7 @@ import ar.ziphra.core.util.UtilsStringComponent;
 @Service
 public class UsuarioSessionInfoService {
 
-	@Value("${ar.ziphra.appserver.tasks.healthChecker.serverSessionnanager}")
+	@Value("${ar.ziphra.appserver.tasks.healthChecker.serverSessionmanager}")
 	private String urlService;
 
 	@Autowired

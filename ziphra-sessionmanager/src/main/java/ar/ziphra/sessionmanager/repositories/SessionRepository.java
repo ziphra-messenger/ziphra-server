@@ -1,4 +1,8 @@
 package ar.ziphra.sessionmanager.repositories;
 
-public interface SessionRepository /*extends MongoRepository<Session, String>*/ {
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import ar.ziphra.sessionmanager.model.Session;
+
+public interface SessionRepository extends MongoRepository<Session, String> {
 }
